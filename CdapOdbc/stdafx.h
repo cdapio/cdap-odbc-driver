@@ -26,3 +26,12 @@
 
 #include <sql.h>
 #include <sqlext.h>
+
+#include <cassert>
+
+#include <memory>
+#include <unordered_map>
+#include <atomic>
+#include <mutex>
+#include <exception>
+#include <stdexcept>

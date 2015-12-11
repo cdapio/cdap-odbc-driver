@@ -16,14 +16,84 @@
 
 #include "stdafx.h"
 #include "core.h"
+#include "Driver.h"
 
+using namespace Cask::CdapOdbc;
 
 SQLRETURN SQLAllocHandle(
 	SQLSMALLINT   HandleType,
 	SQLHANDLE     InputHandle,
 	SQLHANDLE *   OutputHandlePtr)
 {
-	return SQL_ERROR;
+	try
+	{
+		// OutputHandlePtr must be a valid pointer
+		if (!OutputHandlePtr)
+		{
+			return SQL_ERROR;
+		}
+
+		*OutputHandlePtr = SQL_NULL_HANDLE;
+
+		switch (HandleType)
+		{
+			case SQL_HANDLE_ENV:
+			{
+				// InputHandle must be NULL
+				if (InputHandle != SQL_NULL_HANDLE)
+				{
+					return SQL_ERROR;
+				}
+
+				// Allocate new environment
+				*OutputHandlePtr = Driver::getInstance().allocEnvironment();
+				return SQL_SUCCESS;
+			}
+
+			case SQL_HANDLE_DBC:
+			{
+				// InputHandle must not be NULL
+				if (InputHandle == SQL_NULL_HANDLE)
+				{
+					return SQL_ERROR;
+				}
+
+				break;
+			}
+
+			case SQL_HANDLE_STMT:
+			{
+				// InputHandle must not be NULL
+				if (InputHandle == SQL_NULL_HANDLE)
+				{
+					return SQL_ERROR;
+				}
+
+				break;
+			}
+
+			case SQL_HANDLE_DESC:
+			{
+				// InputHandle must not be NULL
+				if (InputHandle == SQL_NULL_HANDLE)
+				{
+					return SQL_ERROR;
+				}
+
+				break;
+			}
+		}
+
+		return SQL_ERROR;
+	}
+	catch (std::invalid_argument&)
+	{
+		return SQL_INVALID_HANDLE;
+	}
+	catch (std::exception&)
+	{
+		return SQL_ERROR;
+	}
 }
 
 SQLRETURN SQLConnectW(
@@ -368,5 +438,30 @@ SQLRETURN SQLFreeHandle(
 	SQLSMALLINT   HandleType,
 	SQLHANDLE     Handle)
 {
-	return SQL_ERROR;
+	if (!Handle)
+	{
+		return SQL_INVALID_HANDLE;
+	}
+
+	try
+	{
+		switch (HandleType)
+		{
+			case SQL_HANDLE_ENV:
+			{
+				Driver::getInstance().freeEnvironment(Handle);
+				return SQL_SUCCESS;
+			}
+		}
+
+		return SQL_ERROR;
+	}
+	catch (std::invalid_argument&)
+	{
+		return SQL_INVALID_HANDLE;
+	}
+	catch (std::exception&)
+	{
+		return SQL_ERROR;
+	}
 }
