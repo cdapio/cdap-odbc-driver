@@ -174,7 +174,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CdapOdbc.def" />
+    <None Include="CdapOdbc.def">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

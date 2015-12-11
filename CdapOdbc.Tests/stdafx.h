@@ -19,3 +19,7 @@
 #include "targetver.h"
 
 #include "CppUnitTest.h"
+
+#include <Windows.h>
+#include <sql.h>
+#include <sqlext.h>

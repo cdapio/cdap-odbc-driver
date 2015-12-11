@@ -1,27 +1,37 @@
 LIBRARY CdapOdbc
 EXPORTS
     SQLAllocHandle
-    SQLConnect
-    SQLGetTypeInfo
-    SQLDataSources
-    SQLPrepare
+    SQLConnectA
+    SQLConnectW
+    SQLGetTypeInfoA
+    SQLGetTypeInfoW
+    SQLDataSourcesA
+    SQLDataSourcesW
+    SQLPrepareA
+    SQLPrepareW
     SQLBindParameter
     SQLExecute
-    SQLExecDirect
+    SQLExecDirectA
+    SQLExecDirectW
     SQLNumParams
     SQLParamData
     SQLPutData
     SQLNumResultCols
-    SQLDescribeCol
-    SQLColAttribute
+    SQLDescribeColA
+    SQLDescribeColW
+    SQLColAttributeA
+    SQLColAttributeW
     SQLBindCol
     SQLFetch
     SQLGetData
     SQLSetPos
     SQLMoreResults
-    SQLColumns
-    SQLPrimaryKeys
-    SQLTables
+    SQLColumnsA
+    SQLColumnsW
+    SQLPrimaryKeysA
+    SQLPrimaryKeysW
+    SQLTablesA
+    SQLTablesW
     SQLFreeStmt
     SQLCloseCursor
     SQLCancel

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdapOdbc", "CdapOdbc\CdapOdbc.vcxproj", "{8F9A79B2-A66C-42E6-B9CE-E2F1B75C82B6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdapOdbc.Tests", "CdapOdbc.Tests\CdapOdbc.Tests.vcxproj", "{35F99D77-FA1E-40DA-98BC-9506868ED18E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8F9A79B2-A66C-42E6-B9CE-E2F1B75C82B6} = {8F9A79B2-A66C-42E6-B9CE-E2F1B75C82B6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

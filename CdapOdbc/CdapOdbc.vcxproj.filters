@@ -4,6 +4,9 @@
     <Filter Include="Driver">
       <UniqueIdentifier>{6e3a7bb5-0c2a-47f6-8bf0-0291c776e0ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{49e0be68-730b-49dc-94c6-96ea0e0e4d58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
