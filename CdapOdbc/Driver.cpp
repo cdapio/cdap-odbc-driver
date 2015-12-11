@@ -37,32 +37,48 @@ Driver& Cask::CdapOdbc::Driver::getInstance()
 bool Cask::CdapOdbc::Driver::hasEnvironment(SQLHENV env)
 {
 	assert(env);
-	std::lock_guard<std::mutex> lock(this->envMutex);
+	std::lock_guard<std::mutex> lock(this->mutex);
 	return this->environments.find(env) != this->environments.end();
 }
 
 Environment& Cask::CdapOdbc::Driver::getEnvironment(SQLHENV env)
 {
-	std::lock_guard<std::mutex> lock(this->envMutex);
-	assert(this->environments.find(env) != this->environments.end());
-	return *this->environments.at(env);
+	std::lock_guard<std::mutex> lock(this->mutex);
+	auto it = this->environments.find(env);
+	if (it == this->environments.end())
+	{
+		throw std::invalid_argument("env");
+	}
+
+	return *(it->second);
 }
 
 SQLHENV Cask::CdapOdbc::Driver::allocEnvironment()
 {
-	SQLHENV env = this->generateNewHandle();
+	SQLHENV env = generateNewHandle();
 	assert(env);
-	std::lock_guard<std::mutex> lock(this->envMutex);
+	std::lock_guard<std::mutex> lock(this->mutex);
 	this->environments.emplace(env, std::make_unique<Environment>());
 	return env;
 }
 
-void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env)
+bool Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env)
 {
 	assert(env);
-	std::lock_guard<std::mutex> lock(this->envMutex);
-	if (this->environments.erase(env) == 0)
+	std::lock_guard<std::mutex> lock(this->mutex);
+	return (this->environments.erase(env) != 0);
+}
+
+bool Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc)
+{
+	std::lock_guard<std::mutex> lock(this->mutex);
+	for (auto& item : this->environments)
 	{
-		throw std::invalid_argument("env");
+		if (item.second->freeConnection(dbc))
+		{
+			return true;
+		}
 	}
+
+	return false;
 }

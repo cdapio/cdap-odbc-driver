@@ -18,7 +18,3 @@
 #include "Connection.h"
 
 using namespace Cask::CdapOdbc;
-
-Cask::CdapOdbc::Connection::~Connection()
-{
-}

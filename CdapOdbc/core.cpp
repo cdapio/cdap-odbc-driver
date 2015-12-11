@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "core.h"
 #include "Driver.h"
+#include "Environment.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -58,7 +59,8 @@ SQLRETURN SQLAllocHandle(
 					return SQL_ERROR;
 				}
 
-				break;
+				*OutputHandlePtr = Driver::getInstance().getEnvironment(InputHandle).allocConnection();
+				return SQL_SUCCESS;
 			}
 
 			case SQL_HANDLE_STMT:
@@ -449,8 +451,22 @@ SQLRETURN SQLFreeHandle(
 		{
 			case SQL_HANDLE_ENV:
 			{
-				Driver::getInstance().freeEnvironment(Handle);
-				return SQL_SUCCESS;
+				if (Driver::getInstance().freeEnvironment(Handle))
+				{
+					return SQL_SUCCESS;
+				}
+
+				return SQL_INVALID_HANDLE;
+			}
+
+			case SQL_HANDLE_DBC:
+			{
+				if (Driver::getInstance().freeConnection(Handle))
+				{
+					return SQL_SUCCESS;
+				}
+
+				return SQL_INVALID_HANDLE;
 			}
 		}
 

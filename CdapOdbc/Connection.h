@@ -26,7 +26,7 @@ namespace Cask
 
 		public:
 			Connection() = default;
-			~Connection();
+			~Connection() = default;
 
 			SQLHDBC getHandle() const
 			{

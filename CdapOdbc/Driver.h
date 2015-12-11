@@ -33,9 +33,7 @@ namespace Cask
 			static std::atomic_int lastHandleIndex;
 
 			std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
-			std::mutex envMutex;
-
-			SQLHANDLE generateNewHandle();
+			std::mutex mutex;
 
 			Driver(const Driver&) = delete;
 			void operator=(const Driver&) = delete;
@@ -46,12 +44,13 @@ namespace Cask
 			~Driver() = default;
 
 			static Driver& getInstance();
-
+			static SQLHANDLE generateNewHandle();
 
 			bool hasEnvironment(SQLHENV);
 			Environment& getEnvironment(SQLHENV);
 			SQLHENV allocEnvironment();
-			void freeEnvironment(SQLHENV);
+			bool freeEnvironment(SQLHENV);
+			bool freeConnection(SQLHDBC);
 		};
 	}
 }
