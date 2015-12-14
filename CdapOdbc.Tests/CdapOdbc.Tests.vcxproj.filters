@@ -7,5 +7,6 @@
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="LibraryTests.cpp" />
+    <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
   </ItemGroup>
 </Project>

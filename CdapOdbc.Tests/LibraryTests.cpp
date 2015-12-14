@@ -64,7 +64,6 @@ namespace Cask {
         "SQLFreeHandle",
       };
 
-
       TEST_CLASS(LibraryTests) {
       public:
 
