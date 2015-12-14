@@ -18,29 +18,25 @@
 
 #include "Connection.h"
 
-namespace Cask
-{
-	namespace CdapOdbc
-	{
-		class Environment
-		{
-			SQLHENV handle;
-			std::unordered_map<SQLHDBC, std::unique_ptr<Connection>> connections;
-			std::mutex mutex;
+namespace Cask {
+  namespace CdapOdbc {
+    class Environment {
+      SQLHENV handle;
+      std::unordered_map<SQLHDBC, std::unique_ptr<Connection>> connections;
+      std::mutex mutex;
 
-		public:
-			Environment() = default;
-			~Environment() = default;
+    public:
+      Environment() = default;
+      ~Environment() = default;
 
-			SQLHENV getHandle() const
-			{
-				return this->handle;
-			}
+      SQLHENV getHandle() const {
+        return this->handle;
+      }
 
-			bool hasConnection(SQLHDBC);
-			Connection& getConnection(SQLHDBC);
-			SQLHDBC allocConnection();
-			bool freeConnection(SQLHDBC);
-		};
-	}
+      bool hasConnection(SQLHDBC);
+      Connection& getConnection(SQLHDBC);
+      SQLHDBC allocConnection();
+      bool freeConnection(SQLHDBC);
+    };
+  }
 }

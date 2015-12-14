@@ -23,62 +23,52 @@ using namespace Cask::CdapOdbc;
 std::unique_ptr<Driver> Cask::CdapOdbc::Driver::instance(std::make_unique<Driver>());
 std::atomic_int Cask::CdapOdbc::Driver::lastHandleIndex = 100;
 
-SQLHANDLE Cask::CdapOdbc::Driver::generateNewHandle()
-{
-	char* ptr = nullptr;
-	return static_cast<SQLHANDLE>(ptr + lastHandleIndex.fetch_add(1));
+SQLHANDLE Cask::CdapOdbc::Driver::generateNewHandle() {
+  char* ptr = nullptr;
+  return static_cast<SQLHANDLE>(ptr + lastHandleIndex.fetch_add(1));
 }
 
-Driver& Cask::CdapOdbc::Driver::getInstance()
-{
-	return *instance;
+Driver& Cask::CdapOdbc::Driver::getInstance() {
+  return *instance;
 }
 
-bool Cask::CdapOdbc::Driver::hasEnvironment(SQLHENV env)
-{
-	assert(env);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	return this->environments.find(env) != this->environments.end();
+bool Cask::CdapOdbc::Driver::hasEnvironment(SQLHENV env) {
+  assert(env);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->environments.find(env) != this->environments.end();
 }
 
-Environment& Cask::CdapOdbc::Driver::getEnvironment(SQLHENV env)
-{
-	std::lock_guard<std::mutex> lock(this->mutex);
-	auto it = this->environments.find(env);
-	if (it == this->environments.end())
-	{
-		throw std::invalid_argument("env");
-	}
+Environment& Cask::CdapOdbc::Driver::getEnvironment(SQLHENV env) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  auto it = this->environments.find(env);
+  if (it == this->environments.end()) {
+    throw std::invalid_argument("env");
+  }
 
-	return *(it->second);
+  return *(it->second);
 }
 
-SQLHENV Cask::CdapOdbc::Driver::allocEnvironment()
-{
-	SQLHENV env = generateNewHandle();
-	assert(env);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	this->environments.emplace(env, std::make_unique<Environment>());
-	return env;
+SQLHENV Cask::CdapOdbc::Driver::allocEnvironment() {
+  SQLHENV env = generateNewHandle();
+  assert(env);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->environments.emplace(env, std::make_unique<Environment>());
+  return env;
 }
 
-bool Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env)
-{
-	assert(env);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	return (this->environments.erase(env) != 0);
+bool Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
+  assert(env);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return (this->environments.erase(env) != 0);
 }
 
-bool Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc)
-{
-	std::lock_guard<std::mutex> lock(this->mutex);
-	for (auto& item : this->environments)
-	{
-		if (item.second->freeConnection(dbc))
-		{
-			return true;
-		}
-	}
+bool Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  for (auto& item : this->environments) {
+    if (item.second->freeConnection(dbc)) {
+      return true;
+    }
+  }
 
-	return false;
+  return false;
 }

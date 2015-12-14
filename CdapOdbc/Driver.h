@@ -16,41 +16,38 @@
 
 #pragma once
 
-namespace Cask
-{
-	namespace CdapOdbc
-	{
-		class Environment;
+namespace Cask {
+  namespace CdapOdbc {
+    class Environment;
 
-		/**
-			Represents root object of ODBC driver.
+    /**
+      Represents root object of ODBC driver.
 
-			Implemented as a singleton.
-		*/
-		class Driver
-		{
-			static std::unique_ptr<Driver> instance;
-			static std::atomic_int lastHandleIndex;
+      Implemented as a singleton.
+    */
+    class Driver {
+      static std::unique_ptr<Driver> instance;
+      static std::atomic_int lastHandleIndex;
 
-			std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
-			std::mutex mutex;
+      std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
+      std::mutex mutex;
 
-			Driver(const Driver&) = delete;
-			void operator=(const Driver&) = delete;
+      Driver(const Driver&) = delete;
+      void operator=(const Driver&) = delete;
 
-		public:
+    public:
 
-			Driver() = default;
-			~Driver() = default;
+      Driver() = default;
+      ~Driver() = default;
 
-			static Driver& getInstance();
-			static SQLHANDLE generateNewHandle();
+      static Driver& getInstance();
+      static SQLHANDLE generateNewHandle();
 
-			bool hasEnvironment(SQLHENV);
-			Environment& getEnvironment(SQLHENV);
-			SQLHENV allocEnvironment();
-			bool freeEnvironment(SQLHENV);
-			bool freeConnection(SQLHDBC);
-		};
-	}
+      bool hasEnvironment(SQLHENV);
+      Environment& getEnvironment(SQLHENV);
+      SQLHENV allocEnvironment();
+      bool freeEnvironment(SQLHENV);
+      bool freeConnection(SQLHDBC);
+    };
+  }
 }

@@ -16,22 +16,18 @@
 
 #pragma once
 
-namespace Cask
-{
-	namespace CdapOdbc
-	{
-		class Connection
-		{
-			SQLHDBC handle;
+namespace Cask {
+  namespace CdapOdbc {
+    class Connection {
+      SQLHDBC handle;
 
-		public:
-			Connection() = default;
-			~Connection() = default;
+    public:
+      Connection() = default;
+      ~Connection() = default;
 
-			SQLHDBC getHandle() const
-			{
-				return this->handle;
-			}
-		};
-	}
+      SQLHDBC getHandle() const {
+        return this->handle;
+      }
+    };
+  }
 }

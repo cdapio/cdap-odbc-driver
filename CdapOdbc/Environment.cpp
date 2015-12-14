@@ -20,37 +20,32 @@
 
 using namespace Cask::CdapOdbc;
 
-bool Cask::CdapOdbc::Environment::hasConnection(SQLHDBC dbc)
-{
-	assert(dbc);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	return this->connections.find(dbc) != this->connections.end();
+bool Cask::CdapOdbc::Environment::hasConnection(SQLHDBC dbc) {
+  assert(dbc);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->connections.find(dbc) != this->connections.end();
 }
 
-Connection& Cask::CdapOdbc::Environment::getConnection(SQLHDBC dbc)
-{
-	std::lock_guard<std::mutex> lock(this->mutex);
-	auto it = this->connections.find(dbc);
-	if (it == this->connections.end())
-	{
-		throw std::invalid_argument("dbc");
-	}
+Connection& Cask::CdapOdbc::Environment::getConnection(SQLHDBC dbc) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  auto it = this->connections.find(dbc);
+  if (it == this->connections.end()) {
+    throw std::invalid_argument("dbc");
+  }
 
-	return *(it->second);
+  return *(it->second);
 }
 
-SQLHDBC Cask::CdapOdbc::Environment::allocConnection()
-{
-	SQLHDBC dbc = Driver::generateNewHandle();
-	assert(dbc);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	this->connections.emplace(dbc, std::make_unique<Connection>());
-	return dbc;
+SQLHDBC Cask::CdapOdbc::Environment::allocConnection() {
+  SQLHDBC dbc = Driver::generateNewHandle();
+  assert(dbc);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->connections.emplace(dbc, std::make_unique<Connection>());
+  return dbc;
 }
 
-bool Cask::CdapOdbc::Environment::freeConnection(SQLHDBC dbc)
-{
-	assert(dbc);
-	std::lock_guard<std::mutex> lock(this->mutex);
-	return (this->connections.erase(dbc) != 0);
+bool Cask::CdapOdbc::Environment::freeConnection(SQLHDBC dbc) {
+  assert(dbc);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return (this->connections.erase(dbc) != 0);
 }

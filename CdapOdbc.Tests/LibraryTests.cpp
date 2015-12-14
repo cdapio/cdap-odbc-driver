@@ -20,81 +20,74 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Cask
-{
-	namespace CdapOdbc
-	{
-		namespace Tests
-		{
-			std::array<LPCSTR, 37> functions =
-			{
-				"SQLAllocHandle",
-				"SQLConnectA",
-				"SQLConnectW",
-				"SQLGetTypeInfoA",
-				"SQLGetTypeInfoW",
-				"SQLDataSourcesA",
-				"SQLDataSourcesW",
-				"SQLPrepareA",
-				"SQLPrepareW",
-				"SQLBindParameter",
-				"SQLExecute",
-				"SQLExecDirectA",
-				"SQLExecDirectW",
-				"SQLNumParams",
-				"SQLParamData",
-				"SQLPutData",
-				"SQLNumResultCols",
-				"SQLDescribeColA",
-				"SQLDescribeColW",
-				"SQLColAttributeA",
-				"SQLColAttributeW",
-				"SQLBindCol",
-				"SQLFetch",
-				"SQLGetData",
-				"SQLSetPos",
-				"SQLMoreResults",
-				"SQLColumnsA",
-				"SQLColumnsW",
-				"SQLPrimaryKeysA",
-				"SQLPrimaryKeysW",
-				"SQLTablesA",
-				"SQLTablesW",
-				"SQLFreeStmt",
-				"SQLCloseCursor",
-				"SQLCancel",
-				"SQLDisconnect",
-				"SQLFreeHandle",
-			};
+namespace Cask {
+  namespace CdapOdbc {
+    namespace Tests {
+      std::array<LPCSTR, 37> functions =
+      {
+        "SQLAllocHandle",
+        "SQLConnectA",
+        "SQLConnectW",
+        "SQLGetTypeInfoA",
+        "SQLGetTypeInfoW",
+        "SQLDataSourcesA",
+        "SQLDataSourcesW",
+        "SQLPrepareA",
+        "SQLPrepareW",
+        "SQLBindParameter",
+        "SQLExecute",
+        "SQLExecDirectA",
+        "SQLExecDirectW",
+        "SQLNumParams",
+        "SQLParamData",
+        "SQLPutData",
+        "SQLNumResultCols",
+        "SQLDescribeColA",
+        "SQLDescribeColW",
+        "SQLColAttributeA",
+        "SQLColAttributeW",
+        "SQLBindCol",
+        "SQLFetch",
+        "SQLGetData",
+        "SQLSetPos",
+        "SQLMoreResults",
+        "SQLColumnsA",
+        "SQLColumnsW",
+        "SQLPrimaryKeysA",
+        "SQLPrimaryKeysW",
+        "SQLTablesA",
+        "SQLTablesW",
+        "SQLFreeStmt",
+        "SQLCloseCursor",
+        "SQLCancel",
+        "SQLDisconnect",
+        "SQLFreeHandle",
+      };
 
 
-			TEST_CLASS(LibraryTests)
-			{
-			public:
+      TEST_CLASS(LibraryTests) {
+      public:
 
-				TEST_METHOD(LoadLibrarySucceeds)
-				{
-					HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
-					Assert::IsNotNull(libraryHandle);
-					FreeLibrary(libraryHandle);
-				}
+        TEST_METHOD(LoadLibrarySucceeds) {
+          HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
+          Assert::IsNotNull(libraryHandle);
+          FreeLibrary(libraryHandle);
+        }
 
-				TEST_METHOD(GetFunctionsSucceeds)
-				{
-					HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
-					Assert::IsNotNull(libraryHandle);
+        TEST_METHOD(GetFunctionsSucceeds) {
+          HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
+          Assert::IsNotNull(libraryHandle);
 
-					FARPROC proc = nullptr;
+          FARPROC proc = nullptr;
 
-					for (auto& item : functions)
-					{
-						proc = GetProcAddress(libraryHandle, item);
-						Assert::IsNotNull(proc);
-					}
+          for (auto& item : functions) {
+            proc = GetProcAddress(libraryHandle, item);
+            Assert::IsNotNull(proc);
+          }
 
-					FreeLibrary(libraryHandle);
-				}
-			};
-		}
-	}
+          FreeLibrary(libraryHandle);
+        }
+      };
+    }
+  }
 }
