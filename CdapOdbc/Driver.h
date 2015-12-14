@@ -19,6 +19,9 @@
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
+    class Connection;
+    class Statement;
+    class Descriptor;
 
     /**
       Represents root object of ODBC driver.
@@ -30,7 +33,14 @@ namespace Cask {
       static std::atomic_int lastHandleIndex;
 
       std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
+      std::unordered_map<SQLHDBC, std::unique_ptr<Connection>> connections;
+      std::unordered_map<SQLHSTMT, std::unique_ptr<Statement>> statements;
+      std::unordered_map<SQLHDESC, std::unique_ptr<Descriptor>> descriptors;
+
       std::mutex mutex;
+
+      Environment* findEnvironment(SQLHENV env);
+      Connection* findConnection(SQLHDBC dbc);
 
       Driver(const Driver&) = delete;
       void operator=(const Driver&) = delete;
@@ -43,11 +53,20 @@ namespace Cask {
       static Driver& getInstance();
       static SQLHANDLE generateNewHandle();
 
-      bool hasEnvironment(SQLHENV);
-      Environment& getEnvironment(SQLHENV);
+      Environment& getEnvironment(SQLHENV env);
+      Connection& getConnection(SQLHDBC dbc);
+      Statement& getStatement(SQLHSTMT stmt);
+      Descriptor& getDescriptor(SQLHDESC desc);
+
       SQLHENV allocEnvironment();
-      bool freeEnvironment(SQLHENV);
-      bool freeConnection(SQLHDBC);
+      SQLHDBC allocConnection(SQLHENV env);
+      SQLHSTMT allocStatement(SQLHDBC dbc);
+      SQLHDESC allocDescriptor(SQLHDBC dbc);
+      
+      void freeEnvironment(SQLHENV env);
+      void freeConnection(SQLHDBC dbc);
+      void freeStatement(SQLHSTMT stmt);
+      void freeDescriptor(SQLHDESC desc);
     };
   }
 }

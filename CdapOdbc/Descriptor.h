@@ -18,20 +18,17 @@
 
 namespace Cask {
   namespace CdapOdbc {
-    class Driver;
+    class Connection;
 
-    class Environment {
-      Driver* driver;
-      SQLHENV handle;
-
-      Environment(const Environment&) = delete;
-      void operator=(const Environment&) = delete;
+    class Descriptor {
+      Connection* connection;
+      SQLHDESC handle;
 
     public:
-      Environment(Driver* driver, SQLHENV handle);
-      ~Environment() = default;
+      Descriptor(Connection* connection, SQLHDESC handle);
+      ~Descriptor() = default;
 
-      SQLHENV getHandle() const {
+      SQLHDESC getHandle() const {
         return this->handle;
       }
     };

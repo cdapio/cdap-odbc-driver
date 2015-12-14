@@ -35,7 +35,6 @@ SQLRETURN SQLAllocHandle(
 
     switch (HandleType) {
       case SQL_HANDLE_ENV:
-      {
         // InputHandle must be NULL
         if (InputHandle != SQL_NULL_HANDLE) {
           return SQL_ERROR;
@@ -44,41 +43,37 @@ SQLRETURN SQLAllocHandle(
         // Allocate new environment
         *OutputHandlePtr = Driver::getInstance().allocEnvironment();
         return SQL_SUCCESS;
-      }
 
       case SQL_HANDLE_DBC:
-      {
         // InputHandle must not be NULL
         if (InputHandle == SQL_NULL_HANDLE) {
           return SQL_ERROR;
         }
 
-        *OutputHandlePtr = Driver::getInstance().getEnvironment(InputHandle).allocConnection();
+        *OutputHandlePtr = Driver::getInstance().allocConnection(InputHandle);
         return SQL_SUCCESS;
-      }
 
       case SQL_HANDLE_STMT:
-      {
         // InputHandle must not be NULL
         if (InputHandle == SQL_NULL_HANDLE) {
           return SQL_ERROR;
         }
 
-        break;
-      }
+        *OutputHandlePtr = Driver::getInstance().allocStatement(InputHandle);
+        return SQL_SUCCESS;
 
       case SQL_HANDLE_DESC:
-      {
         // InputHandle must not be NULL
         if (InputHandle == SQL_NULL_HANDLE) {
           return SQL_ERROR;
         }
 
-        break;
-      }
-    }
+        *OutputHandlePtr = Driver::getInstance().allocDescriptor(InputHandle);
+        return SQL_SUCCESS;
 
-    return SQL_ERROR;
+      default:
+        return SQL_ERROR;
+    }
   } catch (std::invalid_argument&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
@@ -400,25 +395,24 @@ SQLRETURN SQLFreeHandle(
   try {
     switch (HandleType) {
       case SQL_HANDLE_ENV:
-      {
-        if (Driver::getInstance().freeEnvironment(Handle)) {
-          return SQL_SUCCESS;
-        }
-
-        return SQL_INVALID_HANDLE;
-      }
+        Driver::getInstance().freeEnvironment(Handle);
+        return SQL_SUCCESS;
 
       case SQL_HANDLE_DBC:
-      {
-        if (Driver::getInstance().freeConnection(Handle)) {
-          return SQL_SUCCESS;
-        }
+        Driver::getInstance().freeConnection(Handle);
+        return SQL_SUCCESS;
 
-        return SQL_INVALID_HANDLE;
-      }
+      case SQL_HANDLE_STMT:
+        Driver::getInstance().freeStatement(Handle);
+        return SQL_SUCCESS;
+
+      case SQL_HANDLE_DESC:
+        Driver::getInstance().freeDescriptor(Handle);
+        return SQL_SUCCESS;
+
+      default:
+        return SQL_ERROR;
     }
-
-    return SQL_ERROR;
   } catch (std::invalid_argument&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {

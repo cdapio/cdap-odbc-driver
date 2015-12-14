@@ -27,6 +27,12 @@
     <ClInclude Include="Connection.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="Statement.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Descriptor.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -45,6 +51,12 @@
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="Connection.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Statement.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Descriptor.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>

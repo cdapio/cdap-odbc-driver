@@ -14,26 +14,15 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "Descriptor.h"
+#include "Connection.h"
 
-namespace Cask {
-  namespace CdapOdbc {
-    class Driver;
+using namespace Cask::CdapOdbc;
 
-    class Environment {
-      Driver* driver;
-      SQLHENV handle;
-
-      Environment(const Environment&) = delete;
-      void operator=(const Environment&) = delete;
-
-    public:
-      Environment(Driver* driver, SQLHENV handle);
-      ~Environment() = default;
-
-      SQLHENV getHandle() const {
-        return this->handle;
-      }
-    };
-  }
+Cask::CdapOdbc::Descriptor::Descriptor(Connection* connection, SQLHDESC handle)
+  : connection(connection)
+  , handle(handle) {
+  assert(connection);
+  assert(handle);
 }

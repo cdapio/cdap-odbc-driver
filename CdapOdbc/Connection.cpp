@@ -16,5 +16,13 @@
 
 #include "stdafx.h"
 #include "Connection.h"
+#include "Environment.h"
 
 using namespace Cask::CdapOdbc;
+
+Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
+  : environment(environment)
+  , handle(handle) {
+  assert(environment);
+  assert(handle);
+}
