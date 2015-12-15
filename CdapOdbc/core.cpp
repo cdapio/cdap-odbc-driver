@@ -21,7 +21,7 @@
 
 using namespace Cask::CdapOdbc;
 
-SQLRETURN SQLAllocHandle(
+SQLRETURN SQL_API SQLAllocHandle(
   SQLSMALLINT   HandleType,
   SQLHANDLE     InputHandle,
   SQLHANDLE *   OutputHandlePtr) {
@@ -81,7 +81,7 @@ SQLRETURN SQLAllocHandle(
   }
 }
 
-SQLRETURN SQLConnectW(
+SQLRETURN SQL_API SQLConnectW(
   SQLHDBC        ConnectionHandle,
   SQLWCHAR *     ServerName,
   SQLSMALLINT    NameLength1,
@@ -92,7 +92,7 @@ SQLRETURN SQLConnectW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLConnectA(
+SQLRETURN SQL_API SQLConnectA(
   SQLHDBC        ConnectionHandle,
   SQLCHAR *      ServerName,
   SQLSMALLINT    NameLength1,
@@ -103,19 +103,19 @@ SQLRETURN SQLConnectA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLGetTypeInfoW(
+SQLRETURN SQL_API SQLGetTypeInfoW(
   SQLHSTMT      StatementHandle,
   SQLSMALLINT   DataType) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLGetTypeInfoA(
+SQLRETURN SQL_API SQLGetTypeInfoA(
   SQLHSTMT      StatementHandle,
   SQLSMALLINT   DataType) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLDataSourcesW(
+SQLRETURN SQL_API SQLDataSourcesW(
   SQLHENV          EnvironmentHandle,
   SQLUSMALLINT     Direction,
   SQLWCHAR *       ServerName,
@@ -127,7 +127,7 @@ SQLRETURN SQLDataSourcesW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLDataSourcesA(
+SQLRETURN SQL_API SQLDataSourcesA(
   SQLHENV          EnvironmentHandle,
   SQLUSMALLINT     Direction,
   SQLCHAR *        ServerName,
@@ -139,21 +139,41 @@ SQLRETURN SQLDataSourcesA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLPrepareW(
+SQLRETURN SQL_API SQLSetConnectAttrW(
+  SQLHDBC       ConnectionHandle,
+  SQLINTEGER    Attribute,
+  SQLPOINTER    ValuePtr,
+  SQLINTEGER    StringLength) {
+  // Attrs not supported 
+  // Always report success 
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLSetConnectAttrA(
+  SQLHDBC       ConnectionHandle,
+  SQLINTEGER    Attribute,
+  SQLPOINTER    ValuePtr,
+  SQLINTEGER    StringLength) {
+  // Attrs not supported 
+  // Always report success 
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLPrepareW(
   SQLHSTMT      StatementHandle,
   SQLWCHAR *     StatementText,
   SQLINTEGER    TextLength) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLPrepareA(
+SQLRETURN SQL_API SQLPrepareA(
   SQLHSTMT      StatementHandle,
   SQLCHAR *     StatementText,
   SQLINTEGER    TextLength) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLBindParameter(
+SQLRETURN SQL_API SQLBindParameter(
   SQLHSTMT        StatementHandle,
   SQLUSMALLINT    ParameterNumber,
   SQLSMALLINT     InputOutputType,
@@ -167,44 +187,44 @@ SQLRETURN SQLBindParameter(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLExecute(
+SQLRETURN SQL_API SQLExecute(
   SQLHSTMT     StatementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLExecDirectW(
+SQLRETURN SQL_API SQLExecDirectW(
   SQLHSTMT     StatementHandle,
   SQLWCHAR *   StatementText,
   SQLINTEGER   TextLength) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLExecDirectA(
+SQLRETURN SQL_API SQLExecDirectA(
   SQLHSTMT     StatementHandle,
   SQLCHAR *    StatementText,
   SQLINTEGER   TextLength) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLNumParams(
+SQLRETURN SQL_API SQLNumParams(
   SQLHSTMT        StatementHandle,
   SQLSMALLINT *   ParameterCountPtr) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLParamData(
+SQLRETURN SQL_API SQLParamData(
   SQLHSTMT       StatementHandle,
   SQLPOINTER *   ValuePtrPtr) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLNumResultCols(
+SQLRETURN SQL_API SQLNumResultCols(
   SQLHSTMT        StatementHandle,
   SQLSMALLINT *   ColumnCountPtr) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLDescribeColW(
+SQLRETURN SQL_API SQLDescribeColW(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   ColumnNumber,
   SQLWCHAR *     ColumnName,
@@ -217,7 +237,7 @@ SQLRETURN SQLDescribeColW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLDescribeColA(
+SQLRETURN SQL_API SQLDescribeColA(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   ColumnNumber,
   SQLCHAR *      ColumnName,
@@ -230,7 +250,7 @@ SQLRETURN SQLDescribeColA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLColAttributeW(
+SQLRETURN SQL_API SQLColAttributeW(
   SQLHSTMT        StatementHandle,
   SQLUSMALLINT    ColumnNumber,
   SQLUSMALLINT    FieldIdentifier,
@@ -241,7 +261,7 @@ SQLRETURN SQLColAttributeW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLColAttributeA(
+SQLRETURN SQL_API SQLColAttributeA(
   SQLHSTMT        StatementHandle,
   SQLUSMALLINT    ColumnNumber,
   SQLUSMALLINT    FieldIdentifier,
@@ -252,7 +272,7 @@ SQLRETURN SQLColAttributeA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLBindCol(
+SQLRETURN SQL_API SQLBindCol(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   ColumnNumber,
   SQLSMALLINT    TargetType,
@@ -262,12 +282,12 @@ SQLRETURN SQLBindCol(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLFetch(
+SQLRETURN SQL_API SQLFetch(
   SQLHSTMT     StatementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLGetData(
+SQLRETURN SQL_API SQLGetData(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   Col_or_Param_Num,
   SQLSMALLINT    TargetType,
@@ -277,7 +297,7 @@ SQLRETURN SQLGetData(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLSetPos(
+SQLRETURN SQL_API SQLSetPos(
   SQLHSTMT        StatementHandle,
   SQLSETPOSIROW   RowNumber,
   SQLUSMALLINT    Operation,
@@ -285,12 +305,12 @@ SQLRETURN SQLSetPos(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLMoreResults(
+SQLRETURN SQL_API SQLMoreResults(
   SQLHSTMT     StatementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLColumnsW(
+SQLRETURN SQL_API SQLColumnsW(
   SQLHSTMT       StatementHandle,
   SQLWCHAR *      CatalogName,
   SQLSMALLINT    NameLength1,
@@ -303,7 +323,7 @@ SQLRETURN SQLColumnsW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLColumnsA(
+SQLRETURN SQL_API SQLColumnsA(
   SQLHSTMT       StatementHandle,
   SQLCHAR *      CatalogName,
   SQLSMALLINT    NameLength1,
@@ -316,7 +336,7 @@ SQLRETURN SQLColumnsA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLPrimaryKeysW(
+SQLRETURN SQL_API SQLPrimaryKeysW(
   SQLHSTMT       StatementHandle,
   SQLWCHAR *     CatalogName,
   SQLSMALLINT    NameLength1,
@@ -327,7 +347,7 @@ SQLRETURN SQLPrimaryKeysW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLPrimaryKeysA(
+SQLRETURN SQL_API SQLPrimaryKeysA(
   SQLHSTMT       StatementHandle,
   SQLCHAR *     CatalogName,
   SQLSMALLINT    NameLength1,
@@ -338,7 +358,7 @@ SQLRETURN SQLPrimaryKeysA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLTablesW(
+SQLRETURN SQL_API SQLTablesW(
   SQLHSTMT       StatementHandle,
   SQLWCHAR *     CatalogName,
   SQLSMALLINT    NameLength1,
@@ -351,7 +371,7 @@ SQLRETURN SQLTablesW(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLTablesA(
+SQLRETURN SQL_API SQLTablesA(
   SQLHSTMT       StatementHandle,
   SQLCHAR *      CatalogName,
   SQLSMALLINT    NameLength1,
@@ -364,28 +384,28 @@ SQLRETURN SQLTablesA(
   return SQL_ERROR;
 }
 
-SQLRETURN SQLFreeStmt(
+SQLRETURN SQL_API SQLFreeStmt(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   Option) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLCloseCursor(
+SQLRETURN SQL_API SQLCloseCursor(
   SQLHSTMT     StatementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLCancel(
+SQLRETURN SQL_API SQLCancel(
   SQLHSTMT     StatementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLDisconnect(
+SQLRETURN SQL_API SQLDisconnect(
   SQLHDBC     ConnectionHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLFreeHandle(
+SQLRETURN SQL_API SQLFreeHandle(
   SQLSMALLINT   HandleType,
   SQLHANDLE     Handle) {
   if (!Handle) {

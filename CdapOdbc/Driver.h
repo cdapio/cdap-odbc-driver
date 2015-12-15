@@ -25,7 +25,6 @@ namespace Cask {
 
     /**
       Represents root object of ODBC driver.
-
       Implemented as a singleton.
     */
     class Driver {
