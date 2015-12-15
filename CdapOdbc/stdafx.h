@@ -35,3 +35,6 @@
 #include <mutex>
 #include <exception>
 #include <stdexcept>
+#include <codecvt>
+#include <locale>
+#include <string>
