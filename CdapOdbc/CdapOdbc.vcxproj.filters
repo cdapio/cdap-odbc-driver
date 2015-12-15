@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Driver">
+      <UniqueIdentifier>{6e3a7bb5-0c2a-47f6-8bf0-0291c776e0ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{49e0be68-730b-49dc-94c6-96ea0e0e4d58}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Driver.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Statement.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Descriptor.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoding.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="core.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Driver.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Connection.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Statement.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Descriptor.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoding.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CdapOdbc.def">
+      <Filter>Driver</Filter>
+    </None>
+  </ItemGroup>
+</Project>
