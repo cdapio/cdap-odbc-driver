@@ -26,3 +26,15 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio specific files
+*.suo
+*.sdf
+*.opendb
+*.user
+.vs/
+x64/
+ipch/
+Debug/
+Release/
+
