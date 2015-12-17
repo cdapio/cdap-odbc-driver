@@ -76,5 +76,6 @@
     <None Include="CdapOdbc.def">
       <Filter>Driver</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
