@@ -22,14 +22,24 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace Cask {
   namespace CdapOdbc {
     namespace Tests {
+
+      /**
+       * Tests for SQLAllocHandle and SQLFreeHandle functions.
+       */
       TEST_CLASS(SQLAllocFreeHandleTests) {
       public:
 
+        /**
+         * Ensures that passing NULL as output handle argument fails with error.
+         */
         TEST_METHOD(NullOutputHandlePtrFails) {
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, nullptr);
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
         }
 
+        /**
+         * Ensures that SQLAllocHandle fails if handle type is invalid.
+         */
         TEST_METHOD(InvalidHandleTypeFails) {
           SQLHANDLE outHandle = nullptr;
           SQLSMALLINT badType = 300;
@@ -37,6 +47,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
         }
 
+        /**
+         * Ensures that an environment can be successfully allocated and freed.
+         */
         TEST_METHOD(AllocAndFreeEnvironmentSucceeds) {
           SQLHENV env = nullptr;
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
@@ -48,6 +61,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
         }
 
+        /**
+         * Ensures that a connection can be successfully allocated and freed.
+         */
         TEST_METHOD(AllocAndFreeConnectionSucceeds) {
           SQLHENV env = nullptr;
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
@@ -66,6 +82,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
         }
 
+        /**
+         * Ensures that a statememnt can be successfully allocated and freed.
+         */
         TEST_METHOD(AllocAndFreeStatementSucceeds) {
           SQLHENV env = nullptr;
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
@@ -92,6 +111,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
         }
 
+        /**
+         * Ensures that a descriptor can be successfully allocated and freed.
+         */
         TEST_METHOD(AllocAndFreeDescriptorSucceeds) {
           SQLHENV env = nullptr;
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
@@ -118,6 +140,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
         }
 
+        /**
+         * Ensures that passing an invalid handle fails with error.
+         */
         TEST_METHOD(AllocPassInvalidHandleFails) {
           SQLHANDLE handle = nullptr;
           SQLHANDLE badHandle = reinterpret_cast<void*>(1);
@@ -134,6 +159,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
         }
 
+        /**
+        * Ensures that passing NULL handle to SQLFreeHandle fails with error.
+        */
         TEST_METHOD(FreeNullHandleFails) {
           SQLRETURN result = SQLFreeHandle(SQL_HANDLE_ENV, nullptr);
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_INVALID_HANDLE));
@@ -148,6 +176,9 @@ namespace Cask {
           Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_INVALID_HANDLE));
         }
 
+        /**
+        * Ensures that passing an invalid handle to SQLFreeHandle fails with error.
+        */
         TEST_METHOD(FreeInvalidHandleFails) {
           SQLHANDLE badHandle = reinterpret_cast<void*>(1);
           SQLRETURN result = SQLFreeHandle(SQL_HANDLE_ENV, badHandle);
