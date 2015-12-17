@@ -20,14 +20,29 @@ namespace Cask {
   namespace CdapOdbc {
     class Connection;
 
+    /**
+     * Represents an ODBC descriptor which holds information 
+     * about either columns or dynamic parameters.
+     */
     class Descriptor {
       Connection* connection;
       SQLHDESC handle;
 
     public:
+
+      /**
+       * Creates a descriptor instance.
+       */
       Descriptor(Connection* connection, SQLHDESC handle);
+      
+      /**
+       * Desctructor.
+       */ 
       ~Descriptor() = default;
 
+      /**
+       * Gets a descriptor handle.
+       */
       SQLHDESC getHandle() const {
         return this->handle;
       }

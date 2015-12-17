@@ -20,8 +20,8 @@ namespace Cask {
   namespace CdapOdbc {
     
     /** 
-      Utility class for converting strings to UTF-8 and UTF-16 encodings.
-    */
+     * Utility class for converting strings to UTF-8 and UTF-16 encodings.
+     */
     class Encoding {
       static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
 
@@ -30,13 +30,13 @@ namespace Cask {
     public:
       
       /**
-        Converts UTF-8 string to UTF-16 string.
-      */
+       * Converts UTF-8 string to UTF-16 string.
+       */
       static std::wstring toUtf16(const std::string& utf8);
 
       /**
-        Converts UTF-16 string to UTF-8 string.
-      */
+       * Converts UTF-16 string to UTF-8 string.
+       */
       static std::string toUtf8(const std::wstring& utf16);
     };
   }
