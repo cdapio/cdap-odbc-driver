@@ -24,6 +24,7 @@ namespace Cask {
       Environment* environment;
       SQLHDBC handle;
       std::mutex mutex;
+      bool isOpen;
 
     public:
       Connection(Environment* environment, SQLHDBC handle);
@@ -32,6 +33,9 @@ namespace Cask {
       SQLHDBC getHandle() const {
         return this->handle;
       }
+
+      void open(const std::string& connectionString);
+      void close();
     };
   }
 }

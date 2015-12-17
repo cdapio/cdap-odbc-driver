@@ -38,3 +38,4 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iterator>

@@ -18,6 +18,8 @@
 #include "core.h"
 #include "Driver.h"
 #include "Environment.h"
+#include "Connection.h"
+#include "Argument.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -101,6 +103,47 @@ SQLRETURN SQL_API SQLConnectA(
   SQLCHAR *      Authentication,
   SQLSMALLINT    NameLength3) {
   return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLDriverConnectW(
+  SQLHDBC         ConnectionHandle,
+  SQLHWND         WindowHandle,
+  SQLWCHAR *      InConnectionString,
+  SQLSMALLINT     StringLength1,
+  SQLWCHAR *      OutConnectionString,
+  SQLSMALLINT     BufferLength,
+  SQLSMALLINT *   StringLength2Ptr,
+  SQLUSMALLINT    DriverCompletion) {
+  try {
+    std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
+    Driver::getInstance().getConnection(ConnectionHandle).open(connectionString);
+    return SQL_SUCCESS;
+  } catch (std::invalid_argument&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
+ }
+
+SQLRETURN SQL_API SQLDriverConnectA(
+  SQLHDBC         ConnectionHandle,
+  SQLHWND         WindowHandle,
+  SQLCHAR *       InConnectionString,
+  SQLSMALLINT     StringLength1,
+  SQLCHAR *       OutConnectionString,
+  SQLSMALLINT     BufferLength,
+  SQLSMALLINT *   StringLength2Ptr,
+  SQLUSMALLINT    DriverCompletion) {
+
+  try {
+    std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
+    Driver::getInstance().getConnection(ConnectionHandle).open(connectionString);
+    return SQL_SUCCESS;
+  } catch (std::invalid_argument&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLGetTypeInfoW(
@@ -402,7 +445,15 @@ SQLRETURN SQL_API SQLCancel(
 
 SQLRETURN SQL_API SQLDisconnect(
   SQLHDBC     ConnectionHandle) {
-  return SQL_ERROR;
+
+  try {
+    Driver::getInstance().getConnection(ConnectionHandle).close();
+    return SQL_SUCCESS;
+  } catch (std::invalid_argument&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLFreeHandle(

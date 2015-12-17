@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Argument.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Descriptor.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Argument.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Descriptor.cpp" />

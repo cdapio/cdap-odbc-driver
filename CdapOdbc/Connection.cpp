@@ -22,7 +22,17 @@ using namespace Cask::CdapOdbc;
 
 Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   : environment(environment)
-  , handle(handle) {
+  , handle(handle)
+  , isOpen(false) {
   assert(environment);
   assert(handle);
+}
+
+void Cask::CdapOdbc::Connection::open(const std::string& connectionString) {
+  assert(!this->isOpen);
+}
+
+void Cask::CdapOdbc::Connection::close() {
+  assert(this->isOpen);
+  this->isOpen = false;
 }
