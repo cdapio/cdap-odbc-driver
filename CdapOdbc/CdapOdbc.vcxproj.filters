@@ -39,6 +39,9 @@
     <ClInclude Include="Argument.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="ConnectionParams.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -69,6 +72,9 @@
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="Argument.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionParams.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>
