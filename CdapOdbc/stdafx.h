@@ -39,3 +39,5 @@
 #include <locale>
 #include <string>
 #include <iterator>
+#include <sstream>
+#include <algorithm>

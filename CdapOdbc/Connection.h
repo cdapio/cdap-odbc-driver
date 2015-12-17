@@ -26,6 +26,9 @@ namespace Cask {
       std::mutex mutex;
       bool isOpen;
 
+      Connection(const Connection&) = delete;
+      void operator=(const Connection&) = delete;
+
     public:
       Connection(Environment* environment, SQLHDBC handle);
       ~Connection() = default;

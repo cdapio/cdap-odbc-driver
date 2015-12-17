@@ -23,6 +23,76 @@ namespace Cask {
      * Represents connection parameters parsed from connection string.
      */
     class ConnectionParams {
+      std::string host;
+      int port;
+      std::string authToken;
+      std::string namespace_;
+      bool sslEnabled;
+      bool verifySslCert;
+
+      void parse(const std::string& connectionString);
+
+      ConnectionParams(const ConnectionParams&) = delete;
+      void operator=(const ConnectionParams&) = delete;
+
+    public:
+
+      /**
+       * Creates an instance of connection params.
+       */
+      ConnectionParams(const std::string& connectionString);
+
+      /**
+       * Destructor.
+       */
+      ~ConnectionParams() = default;
+
+      /**
+       * Gets HOST connection parameter.
+       */
+      const std::string& getHost() const {
+        return this->host;
+      }
+
+      /**
+       * Gets PORT connection parameter.
+       */
+      int getPort() const {
+        return this->port;
+      }
+
+      /**
+       * Gets AUTH_TOKEN connection parameter.
+       */
+      const std::string& getAuthToken() const {
+        return this->authToken;
+      }
+
+      /**
+       * Gets NAMESPACE connection parameter.
+       */
+      const std::string& getNamespace() const {
+        return this->namespace_;
+      }
+
+      /**
+       * Gets SSL_ENABLED connection parameter.
+       */
+      bool getSslEnabled() const {
+        return this->sslEnabled;
+      }
+
+      /**
+       * Gets VERIFY_SSL_CERT connection parameter.
+       */
+      bool getVerifySslCert() const {
+        return this->verifySslCert;
+      }
+
+      /**
+       * Gets full version of connection string.
+       */
+      std::string getFullConnectionString() const;
     };
   }
 }

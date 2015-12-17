@@ -24,6 +24,9 @@ namespace Cask {
       Connection* connection;
       SQLHDESC handle;
 
+      Descriptor(const Descriptor&) = delete;
+      void operator=(const Descriptor&) = delete;
+
     public:
       Descriptor(Connection* connection, SQLHDESC handle);
       ~Descriptor() = default;
