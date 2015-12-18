@@ -17,62 +17,65 @@
 #include "stdafx.h"
 #include "ConnectionParams.h"
 
-void split(const std::string& str, char delim, std::vector<std::string>& tokens);
-std::string trim(const std::string& str);
-bool equals(const std::string& str1, const std::string& str2);
-bool parseBool(const std::string& str);
-int parseInt(const std::string& str);
+namespace {
 
-void split(const std::string& str, char delim, std::vector<std::string>& tokens) {
-  std::stringstream stream(str);
-  std::string item;
-  while (std::getline(stream, item, delim)) {
-    tokens.push_back(item);
-  }
-}
+  void split(const std::string& str, char delim, std::vector<std::string>& tokens);
+  std::string trim(const std::string& str);
+  bool equals(const std::string& str1, const std::string& str2);
+  bool parseBool(const std::string& str);
+  int parseInt(const std::string& str);
 
-std::string trim(std::string& str) {
-  std::string result = str;
-
-  // Trim trailing spaces
-  size_t endPos = result.find_last_not_of(" \t");
-  if (std::string::npos != endPos) {
-    result = result.substr(0, endPos + 1);
+  void split(const std::string& str, char delim, std::vector<std::string>& tokens) {
+    std::stringstream stream(str);
+    std::string item;
+    while (std::getline(stream, item, delim)) {
+      tokens.push_back(item);
+    }
   }
 
-  // Trim leading spaces
-  size_t startPos = result.find_first_not_of(" \t");
-  if (std::string::npos != startPos) {
-    result = result.substr(startPos);
+  std::string trim(const std::string& str) {
+    std::string result = str;
+
+    // Trim trailing spaces
+    size_t endPos = result.find_last_not_of(" \t");
+    if (std::string::npos != endPos) {
+      result = result.substr(0, endPos + 1);
+    }
+
+    // Trim leading spaces
+    size_t startPos = result.find_first_not_of(" \t");
+    if (std::string::npos != startPos) {
+      result = result.substr(startPos);
+    }
+
+    return result;
   }
 
-  return result;
-}
-
-bool equals(const std::string& str1, const std::string& str2) {
-  return _stricmp(str1.c_str(), str2.c_str()) == 0;
-}
-
-bool parseBool(const std::string& str) {
-  if (equals(str, "true")) {
-    return true;
+  bool equals(const std::string& str1, const std::string& str2) {
+    return _stricmp(str1.c_str(), str2.c_str()) == 0;
   }
 
-  if (equals(str, "false")) {
-    return false;
-  }
+  bool parseBool(const std::string& str) {
+    if (equals(str, "true")) {
+      return true;
+    }
 
-  throw std::invalid_argument("connectionString");
-}
+    if (equals(str, "false")) {
+      return false;
+    }
 
-int parseInt(const std::string& str) {
-  _set_errno(0);
-  int result = atoi(str.c_str());
-  if (errno != 0) {
     throw std::invalid_argument("connectionString");
   }
 
-  return result;
+  int parseInt(const std::string& str) {
+    _set_errno(0);
+    int result = atoi(str.c_str());
+    if (errno != 0) {
+      throw std::invalid_argument("connectionString");
+    }
+
+    return result;
+  }
 }
 
 void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString) {

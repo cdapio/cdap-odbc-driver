@@ -17,6 +17,7 @@
 #pragma once
 
 #include "ConnectionParams.h"
+#include "ExploreClient.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -28,6 +29,9 @@ namespace Cask {
       std::mutex mutex;
       bool isOpen;
       std::unique_ptr<ConnectionParams> params;
+      std::unique_ptr<ExploreClient> exploreClient;
+
+      web::http::uri resolveUri() const;
 
       Connection(const Connection&) = delete;
       void operator=(const Connection&) = delete;

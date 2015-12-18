@@ -26,6 +26,10 @@ namespace Cask {
      */
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
+
+      pplx::task<web::http::http_response> doRequest(web::http::method mhd, const utility::string_t& path);
+      pplx::task<web::http::http_response> doGet(const utility::string_t& path);
+
       ExploreClient(const ExploreClient&) = delete;
       void operator=(const ExploreClient&) = delete;
 

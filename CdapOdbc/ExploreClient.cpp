@@ -19,9 +19,34 @@
 
 using namespace Cask::CdapOdbc;
 
-Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& url) {
+pplx::task<web::http::http_response> Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path) {
+  using namespace web::http;
+  uri_builder requestUri(this->httpClient->base_uri());
+  requestUri.append_path(path);
+  http_request request(mhd);
+  request.set_request_uri(requestUri.to_uri());
+  //request.headers().add(header_names::authorization, L"Bearer " + this->authToken);
+  return this->httpClient->request(request);
+}
+
+pplx::task<web::http::http_response> Cask::CdapOdbc::ExploreClient::doGet(const utility::string_t& path) {
+  return this->doRequest(web::http::methods::GET, path);
+}
+
+Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
+  this->httpClient = std::make_unique<web::http::client::http_client>(baseUri);
 }
 
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
-  return false;
+  try {
+    pplx::task<bool> result = 
+      this->doGet(L"explore/status")
+        .then([](web::http::http_response response) {
+          return response.status_code() == web::http::status_codes::OK;
+        });
+    result.wait();
+    return result.get();
+  } catch (std::exception) {
+    return false;
+  }
 }
