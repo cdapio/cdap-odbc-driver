@@ -45,6 +45,9 @@
     <ClInclude Include="ExploreClient.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="InvalidHandleException.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -81,6 +84,9 @@
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="ExploreClient.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidHandleException.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>

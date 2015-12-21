@@ -20,6 +20,7 @@
 #include "Environment.h"
 #include "Connection.h"
 #include "Argument.h"
+#include "InvalidHandleException.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -115,10 +116,11 @@ SQLRETURN SQL_API SQLDriverConnectW(
   SQLSMALLINT *   StringLength2Ptr,
   SQLUSMALLINT    DriverCompletion) {
   try {
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
-    Driver::getInstance().getConnection(ConnectionHandle).open(connectionString);
+    connection.open(connectionString);
     return SQL_SUCCESS;
-  } catch (std::invalid_argument&) {
+  } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
     return SQL_ERROR;
@@ -136,10 +138,11 @@ SQLRETURN SQL_API SQLDriverConnectA(
   SQLUSMALLINT    DriverCompletion) {
 
   try {
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
-    Driver::getInstance().getConnection(ConnectionHandle).open(connectionString);
+    connection.open(connectionString);
     return SQL_SUCCESS;
-  } catch (std::invalid_argument&) {
+  } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
     return SQL_ERROR;
@@ -449,7 +452,7 @@ SQLRETURN SQL_API SQLDisconnect(
   try {
     Driver::getInstance().getConnection(ConnectionHandle).close();
     return SQL_SUCCESS;
-  } catch (std::invalid_argument&) {
+  } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
     return SQL_ERROR;
