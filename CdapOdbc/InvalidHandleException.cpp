@@ -17,7 +17,7 @@
 #include "stdafx.h"
 #include "InvalidHandleException.h"
 
-Cask::CdapOdbc::InvalidHandleException::InvalidHandleException(const char* what_arg, SQLHDBC handle)
+Cask::CdapOdbc::InvalidHandleException::InvalidHandleException(const char* what_arg, SQLHANDLE handle)
   : std::invalid_argument(what_arg)
   , handle(handle) {
 }

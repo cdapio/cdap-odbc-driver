@@ -77,7 +77,7 @@ SQLRETURN SQL_API SQLAllocHandle(
       default:
         return SQL_ERROR;
     }
-  } catch (std::invalid_argument&) {
+  } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
     return SQL_ERROR;
@@ -487,7 +487,7 @@ SQLRETURN SQL_API SQLFreeHandle(
       default:
         return SQL_ERROR;
     }
-  } catch (std::invalid_argument&) {
+  } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
     return SQL_ERROR;

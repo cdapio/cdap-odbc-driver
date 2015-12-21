@@ -29,7 +29,7 @@ namespace Cask {
       /**
        * Creates an instance.
        */
-      InvalidHandleException(const char *what_arg, SQLHDBC handle);
+      InvalidHandleException(const char *what_arg, SQLHANDLE handle);
       
       /**
        * Descructor.

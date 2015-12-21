@@ -20,6 +20,7 @@
 #include "Connection.h"
 #include "Statement.h"
 #include "Descriptor.h"
+#include "InvalidHandleException.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -37,7 +38,7 @@ Environment* Cask::CdapOdbc::Driver::findEnvironment(SQLHENV env) {
     return it->second.get();
   }
 
-  throw std::invalid_argument("env");
+  throw InvalidHandleException("env", env);
 }
 
 Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
@@ -46,7 +47,7 @@ Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
     return it->second.get();
   }
 
-  throw std::invalid_argument("dbc");
+  throw InvalidHandleException("dbc", dbc);
 }
 
 Driver& Cask::CdapOdbc::Driver::getInstance() {
@@ -70,7 +71,7 @@ Statement& Cask::CdapOdbc::Driver::getStatement(SQLHSTMT stmt) {
     return *(it->second);
   }
 
-  throw std::invalid_argument("stmt");
+  throw InvalidHandleException("stmt", stmt);
 }
 
 Descriptor & Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
@@ -80,7 +81,7 @@ Descriptor & Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
     return *(it->second);
   }
 
-  throw std::invalid_argument("desc");
+  throw InvalidHandleException("desc", desc);
 }
 
 SQLHENV Cask::CdapOdbc::Driver::allocEnvironment() {
@@ -117,27 +118,27 @@ SQLHDESC Cask::CdapOdbc::Driver::allocDescriptor(SQLHDBC dbc) {
 void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->environments.erase(env) == 0) {
-    throw std::invalid_argument("env");
+    throw InvalidHandleException("env", env);
   }
 }
 
 void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->connections.erase(dbc) == 0) {
-    throw std::invalid_argument("dbc");
+    throw InvalidHandleException("dbc", dbc);
   }
 }
 
 void Cask::CdapOdbc::Driver::freeStatement(SQLHSTMT stmt) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->statements.erase(stmt) == 0) {
-    throw std::invalid_argument("stmt");
+    throw InvalidHandleException("stmt", stmt);
   }
 }
 
 void Cask::CdapOdbc::Driver::freeDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->descriptors.erase(desc) == 0) {
-    throw std::invalid_argument("desc");
+    throw InvalidHandleException("desc", desc);
   }
 }

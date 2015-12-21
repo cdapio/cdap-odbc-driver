@@ -58,7 +58,23 @@ namespace Cask {
         return this->handle;
       }
 
+      /**
+       * Opens a connection to explore REST service.
+       *
+       * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2". 
+       * There are the following parameters:
+       *   HOST - server name
+       *   PORT - port number (default 0)
+       *   AUTH_TOKEN - authentication token (default "")
+       *   NAMESPACE - namespace name (default "default")
+       *   SSL_ENABLED - SSL enabled/disabled (default false)
+       *   VERIFY_SSL_CERT - server certificate verification (default true)
+       */
       void open(const std::string& connectionString);
+      
+      /*
+       * Closes a connection.
+       */
       void close();
     };
   }
