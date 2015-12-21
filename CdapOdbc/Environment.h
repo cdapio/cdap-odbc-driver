@@ -20,6 +20,9 @@ namespace Cask {
   namespace CdapOdbc {
     class Driver;
 
+    /**
+    * Represents an ODBC environment.
+    */
     class Environment {
       Driver* driver;
       SQLHENV handle;
@@ -28,9 +31,20 @@ namespace Cask {
       void operator=(const Environment&) = delete;
 
     public:
+
+      /*
+      * Creates an environment instance.
+      */
       Environment(Driver* driver, SQLHENV handle);
+      
+      /**
+      * Destructor.
+      */
       ~Environment() = default;
 
+      /**
+      * Gets an environment handle.
+      */
       SQLHENV getHandle() const {
         return this->handle;
       }

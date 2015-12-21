@@ -20,15 +20,29 @@ namespace Cask {
   namespace CdapOdbc {
     class Environment;
 
+    /**
+     * Represents a connection to a database.
+     */
     class Connection {
       Environment* environment;
       SQLHDBC handle;
       std::mutex mutex;
 
     public:
+
+      /**
+       * Creates a connection instance.
+       */
       Connection(Environment* environment, SQLHDBC handle);
+
+      /**
+       * Destructor.
+       */
       ~Connection() = default;
 
+      /**
+       * Gets a connection handle.
+       */
       SQLHDBC getHandle() const {
         return this->handle;
       }

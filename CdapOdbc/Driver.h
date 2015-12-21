@@ -24,9 +24,9 @@ namespace Cask {
     class Descriptor;
 
     /**
-      Represents root object of ODBC driver.
-      Implemented as a singleton.
-    */
+     * Represents root object of ODBC driver.
+     * Implemented as a singleton.
+     */
     class Driver {
       static std::unique_ptr<Driver> instance;
       static std::atomic_int lastHandleIndex;
@@ -40,31 +40,86 @@ namespace Cask {
 
       Environment* findEnvironment(SQLHENV env);
       Connection* findConnection(SQLHDBC dbc);
+      static SQLHANDLE generateNewHandle();
 
       Driver(const Driver&) = delete;
       void operator=(const Driver&) = delete;
 
     public:
 
+      /**
+       * Creates a driver instance.
+       */
       Driver() = default;
+
+      /**
+       * Destructor.
+       */
       ~Driver() = default;
 
+      /**
+       * Gets a driver instance.
+       */
       static Driver& getInstance();
-      static SQLHANDLE generateNewHandle();
 
+      /**
+      * Gets an environment by handle.
+      */
       Environment& getEnvironment(SQLHENV env);
+
+      /**
+      * Gets a connection by handle.
+      */
       Connection& getConnection(SQLHDBC dbc);
+
+      /**
+      * Gets a statement by handle.
+      */
       Statement& getStatement(SQLHSTMT stmt);
+
+      /**
+      * Gets a descriptor by handle.
+      */
       Descriptor& getDescriptor(SQLHDESC desc);
 
+      /**
+      * Allocates a new environment and returns its handle.
+      */
       SQLHENV allocEnvironment();
+
+      /**
+      * Allocates a new connection and returns its handle.
+      */
       SQLHDBC allocConnection(SQLHENV env);
+
+      /**
+      * Allocates a new statement and returns its handle.
+      */
       SQLHSTMT allocStatement(SQLHDBC dbc);
+
+      /**
+      * Allocates a new descriptor and returns its handle.
+      */
       SQLHDESC allocDescriptor(SQLHDBC dbc);
       
+      /**
+       * Destroys an environment freeing all allocated resources.
+       */
       void freeEnvironment(SQLHENV env);
+
+      /**
+      * Destroys a connection freeing all allocated resources.
+      */
       void freeConnection(SQLHDBC dbc);
+
+      /**
+      * Destroys a statement freeing all allocated resources.
+      */
       void freeStatement(SQLHSTMT stmt);
+
+      /**
+      * Destroys a descriptor freeing all allocated resources.
+      */
       void freeDescriptor(SQLHDESC desc);
     };
   }

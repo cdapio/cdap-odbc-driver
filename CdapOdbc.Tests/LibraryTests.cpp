@@ -64,15 +64,24 @@ namespace Cask {
         "SQLFreeHandle",
       };
 
+      /**
+       * Tests for validating library exports.
+       */
       TEST_CLASS(LibraryTests) {
       public:
 
+        /**
+         * Ensures that library can be successfully loaded.
+         */
         TEST_METHOD(LoadLibrarySucceeds) {
           HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
           Assert::IsNotNull(libraryHandle);
           FreeLibrary(libraryHandle);
         }
 
+        /**
+         * Ensures that every exported function can be loaded.
+         */
         TEST_METHOD(GetFunctionsSucceeds) {
           HMODULE libraryHandle = LoadLibraryW(L"CdapOdbc.dll");
           Assert::IsNotNull(libraryHandle);

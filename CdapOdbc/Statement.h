@@ -20,14 +20,28 @@ namespace Cask {
   namespace CdapOdbc {
     class Connection;
 
+    /**
+    * Represents a SQL statement which can be executed to return some data.
+    */
     class Statement {
       Connection* connection;
       SQLHSTMT handle;
 
     public:
+
+      /**
+      * Creates a statement instance.
+      */
       Statement(Connection* connection, SQLHSTMT handle);
+
+      /**
+      * Destructor.
+      */
       ~Statement() = default;
 
+      /**
+      * Gets ODBC statement handle.
+      */
       SQLHSTMT getHandle() const {
         return this->handle;
       }
