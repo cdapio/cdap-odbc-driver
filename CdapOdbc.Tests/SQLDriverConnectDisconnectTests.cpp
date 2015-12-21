@@ -87,6 +87,56 @@ namespace Cask {
 
           this->freeConnection(connectionInfo);
         }
+
+        /**
+        * Checks that passing empty connection string fails.
+        */
+        TEST_METHOD(EmptyConnectionStringFails) {
+          auto connectionInfo = this->allocConnection();
+          auto connectionHandle = std::get<1>(connectionInfo);
+
+          SQLRETURN result = SQLDriverConnectA(connectionHandle, nullptr, reinterpret_cast<SQLCHAR*>(""), 0, nullptr, 0, nullptr, 0);
+          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+
+          result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, L"", 0, nullptr, 0);
+          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+
+          this->freeConnection(connectionInfo);
+        }
+
+        /**
+        * Checks that passing invalid connection string fails.
+        */
+        TEST_METHOD(InvalidConnectionStringFails) {
+          auto connectionInfo = this->allocConnection();
+          auto connectionHandle = std::get<1>(connectionInfo);
+
+          char invalidConnectionString[] = { "INVALID=True" };
+          SQLRETURN result = SQLDriverConnectA(
+            connectionHandle, 
+            nullptr, 
+            reinterpret_cast<SQLCHAR*>(invalidConnectionString), 
+            sizeof(invalidConnectionString), 
+            nullptr, 
+            0, 
+            nullptr, 
+            0);
+          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+
+          wchar_t invalidConnectionStringW[] = { L"INVALID=True" };
+          result = SQLDriverConnectW(
+            connectionHandle, 
+            nullptr, 
+            nullptr, 
+            0, 
+            invalidConnectionStringW, 
+            sizeof(invalidConnectionStringW) / sizeof(wchar_t), 
+            nullptr, 
+            0);
+          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+
+          this->freeConnection(connectionInfo);
+        }
       };
     }
   }
