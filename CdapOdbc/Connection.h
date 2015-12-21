@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include "ConnectionParams.h"
+#include "ExploreClient.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
@@ -27,6 +30,14 @@ namespace Cask {
       Environment* environment;
       SQLHDBC handle;
       std::mutex mutex;
+      bool isOpen;
+      std::unique_ptr<ConnectionParams> params;
+      std::unique_ptr<ExploreClient> exploreClient;
+
+      web::http::uri resolveUri() const;
+
+      Connection(const Connection&) = delete;
+      void operator=(const Connection&) = delete;
 
     public:
 
@@ -46,6 +57,9 @@ namespace Cask {
       SQLHDBC getHandle() const {
         return this->handle;
       }
+
+      void open(const std::string& connectionString);
+      void close();
     };
   }
 }

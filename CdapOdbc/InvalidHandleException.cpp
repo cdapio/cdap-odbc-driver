@@ -14,14 +14,10 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "InvalidHandleException.h"
 
-#include "targetver.h"
-
-#include "CppUnitTest.h"
-
-#include <Windows.h>
-#include <sql.h>
-#include <sqlext.h>
-
-#include <tuple>
+Cask::CdapOdbc::InvalidHandleException::InvalidHandleException(const char* what_arg, SQLHDBC handle)
+  : std::invalid_argument(what_arg)
+  , handle(handle) {
+}

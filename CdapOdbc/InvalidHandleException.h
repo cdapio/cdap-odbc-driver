@@ -18,35 +18,29 @@
 
 namespace Cask {
   namespace CdapOdbc {
-    class Connection;
-
     /**
-     * Represents an ODBC descriptor which holds information 
-     * about either columns or dynamic parameters.
+     * Reports errors that arise because an SQLHANDLE argument value has not been accepted.
      */
-    class Descriptor {
-      Connection* connection;
-      SQLHDESC handle;
-
-      Descriptor(const Descriptor&) = delete;
-      void operator=(const Descriptor&) = delete;
+    class InvalidHandleException : public std::invalid_argument {
+      SQLHANDLE handle;
 
     public:
 
       /**
-       * Creates a descriptor instance.
+       * Creates an instance.
        */
-      Descriptor(Connection* connection, SQLHDESC handle);
+      InvalidHandleException(const char *what_arg, SQLHDBC handle);
       
       /**
-       * Desctructor.
-       */ 
-      ~Descriptor() = default;
+       * Descructor.
+       */
+      ~InvalidHandleException() = default;
+
 
       /**
-       * Gets a descriptor handle.
-       */
-      SQLHDESC getHandle() const {
+      * Gets a handle which value has not been accepted.
+      */
+      SQLHANDLE getHandle() const {
         return this->handle;
       }
     };

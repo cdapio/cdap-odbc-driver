@@ -38,3 +38,11 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iterator>
+#include <sstream>
+#include <algorithm>
+
+#include <cpprest/uri.h>
+#include <cpprest/uri_builder.h>
+#include <cpprest/http_client.h>
+#include <cpprest/http_headers.h>

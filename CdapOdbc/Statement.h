@@ -27,6 +27,9 @@ namespace Cask {
       Connection* connection;
       SQLHSTMT handle;
 
+      Statement(const Statement&) = delete;
+      void operator=(const Statement&) = delete;
+
     public:
 
       /**

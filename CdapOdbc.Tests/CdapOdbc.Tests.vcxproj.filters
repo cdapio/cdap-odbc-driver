@@ -8,5 +8,6 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="LibraryTests.cpp" />
     <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
+    <ClCompile Include="SQLDriverConnectDisconnectTests.cpp" />
   </ItemGroup>
 </Project>

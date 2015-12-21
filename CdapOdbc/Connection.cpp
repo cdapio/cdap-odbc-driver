@@ -17,12 +17,45 @@
 #include "stdafx.h"
 #include "Connection.h"
 #include "Environment.h"
+#include "Encoding.h"
 
 using namespace Cask::CdapOdbc;
 
+web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
+  web::http::uri_builder uri;
+  uri.set_scheme(this->params->getSslEnabled() ? L"https" : L"http");
+  uri.set_host(Encoding::toUtf16(this->params->getHost()));
+  uri.append_path(L"v3");
+  if (this->params->getPort() > 0) {
+    uri.set_port(this->params->getPort());
+  }
+
+  return uri.to_uri();
+}
+
 Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   : environment(environment)
-  , handle(handle) {
+  , handle(handle)
+  , isOpen(false) {
   assert(environment);
   assert(handle);
+}
+
+void Cask::CdapOdbc::Connection::open(const std::string& connectionString) {
+  assert(!this->isOpen);
+  this->params = std::make_unique<ConnectionParams>(connectionString);
+  auto baseUri = this->resolveUri();
+  this->exploreClient = std::make_unique<ExploreClient>(baseUri);
+  if (this->exploreClient->isAvailable()) {
+    this->isOpen = true;
+  } else {
+    throw std::exception("Service unavailable.");
+  }
+}
+
+void Cask::CdapOdbc::Connection::close() {
+  assert(this->isOpen);
+  this->exploreClient.reset();
+  this->params.reset();
+  this->isOpen = false;
 }
