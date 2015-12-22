@@ -46,6 +46,13 @@ namespace Cask {
       SQLHDBC getHandle() const {
         return this->handle;
       }
+
+      /**
+       * Gets parent environment.
+       */
+      Environment* getEnvironment() const {
+        return this->environment;
+      }
     };
   }
 }

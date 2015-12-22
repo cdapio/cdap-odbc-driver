@@ -49,6 +49,41 @@ Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
   throw std::invalid_argument("dbc");
 }
 
+void Cask::CdapOdbc::Driver::freeConnections(const Environment& env) {
+  auto it = this->connections.begin();
+  while (it != this->connections.end()) {
+    if (it->second->getEnvironment() == &env) {
+      this->freeDescriptors(*it->second);
+      this->freeStatements(*it->second);
+      it = this->connections.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+void Cask::CdapOdbc::Driver::freeStatements(const Connection& dbc) {
+  auto it = this->statements.begin();
+  while (it != this->statements.end()) {
+    if (it->second->getConnection() == &dbc) {
+      it = this->statements.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
+  auto it = this->descriptors.begin();
+  while (it != this->descriptors.end()) {
+    if (it->second->getConnection() == &dbc) {
+      it = this->descriptors.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
 Driver& Cask::CdapOdbc::Driver::getInstance() {
   return *instance;
 }
@@ -116,16 +151,27 @@ SQLHDESC Cask::CdapOdbc::Driver::allocDescriptor(SQLHDBC dbc) {
 
 void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
   std::lock_guard<std::mutex> lock(this->mutex);
-  if (this->environments.erase(env) == 0) {
+
+  auto it = this->environments.find(env);
+  if (it == this->environments.end()) {
     throw std::invalid_argument("env");
   }
+
+  this->freeConnections(*it->second);
+  this->environments.erase(it);
 }
 
 void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
   std::lock_guard<std::mutex> lock(this->mutex);
-  if (this->connections.erase(dbc) == 0) {
+
+  auto it = this->connections.find(dbc);
+  if (it == this->connections.end()) {
     throw std::invalid_argument("dbc");
   }
+
+  this->freeDescriptors(*it->second);
+  this->freeStatements(*it->second);
+  this->connections.erase(it);
 }
 
 void Cask::CdapOdbc::Driver::freeStatement(SQLHSTMT stmt) {

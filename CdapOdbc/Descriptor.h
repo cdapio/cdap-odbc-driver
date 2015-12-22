@@ -46,6 +46,13 @@ namespace Cask {
       SQLHDESC getHandle() const {
         return this->handle;
       }
+
+      /**
+       * Gets parent connection.
+       */
+      Connection* getConnection() const {
+        return this->connection;
+      }
     };
   }
 }
