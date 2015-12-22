@@ -46,3 +46,4 @@
 #include <cpprest/uri_builder.h>
 #include <cpprest/http_client.h>
 #include <cpprest/http_headers.h>
+#include <cpprest/json.h>

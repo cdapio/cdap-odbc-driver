@@ -30,12 +30,12 @@ namespace Cask {
         std::tuple<SQLHENV, SQLHDBC> allocConnection() {
           SQLHENV env = nullptr;
           SQLRETURN result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
           Assert::IsNotNull(env);
 
           SQLHDBC dbc = nullptr;
           result = SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
           Assert::IsNotNull(dbc);
 
           return std::make_tuple(env, dbc);
@@ -43,10 +43,18 @@ namespace Cask {
 
         void freeConnection(std::tuple<SQLHENV, SQLHDBC> connection) {
           SQLRETURN result = SQLFreeHandle(SQL_HANDLE_DBC, std::get<1>(connection));
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
 
           result = SQLFreeHandle(SQL_HANDLE_ENV, std::get<0>(connection));
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_SUCCESS));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
+        }
+
+        std::string getBaseConnectionStringA() {
+          return "Host=localhost;Port=49741";
+        }
+
+        std::wstring getBaseConnectionStringW() {
+          return L"Host=localhost;Port=49741";
         }
 
       public:
@@ -57,10 +65,10 @@ namespace Cask {
          */
         TEST_METHOD(NullConnectionHandleOnConnectFails) {
           SQLRETURN result = SQLDriverConnectA(nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_INVALID_HANDLE));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_INVALID_HANDLE), result);
 
           result = SQLDriverConnectW(nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_INVALID_HANDLE));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_INVALID_HANDLE), result);
         }
 
         /**
@@ -69,7 +77,7 @@ namespace Cask {
         */
         TEST_METHOD(NullConnectionHandleOnDisconnectFails) {
           SQLRETURN result = SQLDisconnect(nullptr);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_INVALID_HANDLE));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_INVALID_HANDLE), result);
         }
 
         /**
@@ -80,10 +88,10 @@ namespace Cask {
           auto connectionHandle = std::get<1>(connectionInfo);
 
           SQLRETURN result = SQLDriverConnectA(connectionHandle, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           this->freeConnection(connectionInfo);
         }
@@ -96,10 +104,10 @@ namespace Cask {
           auto connectionHandle = std::get<1>(connectionInfo);
 
           SQLRETURN result = SQLDriverConnectA(connectionHandle, nullptr, reinterpret_cast<SQLCHAR*>(""), 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, L"", 0, nullptr, 0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           this->freeConnection(connectionInfo);
         }
@@ -121,7 +129,7 @@ namespace Cask {
             0, 
             nullptr, 
             0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           wchar_t invalidConnectionStringW[] = { L"INVALID=True" };
           result = SQLDriverConnectW(
@@ -133,7 +141,45 @@ namespace Cask {
             sizeof(invalidConnectionStringW) / sizeof(wchar_t), 
             nullptr, 
             0);
-          Assert::AreEqual(result, static_cast<SQLRETURN>(SQL_ERROR));
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
+
+          this->freeConnection(connectionInfo);
+        }
+
+        /**
+        * Checks that open connection succeeds.
+        */
+        TEST_METHOD(OpenConnectionSucceeds) {
+          auto connectionInfo = this->allocConnection();
+          auto connectionHandle = std::get<1>(connectionInfo);
+
+          auto connectionStringA = this->getBaseConnectionStringA();
+          SQLRETURN result = SQLDriverConnectA(
+            connectionHandle,
+            nullptr,
+            reinterpret_cast<SQLCHAR*>(const_cast<char*>(connectionStringA.c_str())),
+            static_cast<SQLSMALLINT>(connectionStringA.size()),
+            nullptr,
+            0,
+            nullptr,
+            0);
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
+
+          SQLDisconnect(connectionHandle);
+
+          auto connectionStringW = this->getBaseConnectionStringW();
+          result = SQLDriverConnectW(
+            connectionHandle,
+            nullptr,
+            const_cast<wchar_t*>(connectionStringW.c_str()),
+            static_cast<SQLSMALLINT>(connectionStringW.size()),
+            nullptr,
+            0,
+            nullptr,
+            0);
+          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
+
+          SQLDisconnect(connectionHandle);
 
           this->freeConnection(connectionInfo);
         }

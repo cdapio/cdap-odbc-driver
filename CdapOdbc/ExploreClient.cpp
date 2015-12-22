@@ -21,7 +21,7 @@ using namespace Cask::CdapOdbc;
 
 pplx::task<web::http::http_response> Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path) {
   using namespace web::http;
-  uri_builder requestUri(this->httpClient->base_uri());
+  uri_builder requestUri;
   requestUri.append_path(path);
   http_request request(mhd);
   request.set_request_uri(requestUri.to_uri());
@@ -39,13 +39,18 @@ Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
 
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
   try {
-    pplx::task<bool> result = 
+    pplx::task<web::json::value> result =
       this->doGet(L"explore/status")
         .then([](web::http::http_response response) {
-          return response.status_code() == web::http::status_codes::OK;
+          if (response.status_code() == web::http::status_codes::OK) {
+            return response.extract_json();
+          } else {
+            return pplx::task_from_result(web::json::value());
+          }
         });
     result.wait();
-    return result.get();
+    auto value = result.get();
+    return value.at(L"status").as_string() == L"OK";
   } catch (std::exception) {
     return false;
   }
