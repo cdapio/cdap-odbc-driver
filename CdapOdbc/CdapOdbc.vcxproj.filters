@@ -48,6 +48,9 @@
     <ClInclude Include="InvalidHandleException.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="ColumnBinding.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -87,6 +90,9 @@
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="InvalidHandleException.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBinding.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>

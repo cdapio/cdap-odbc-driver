@@ -16,11 +16,12 @@
 
 #include "stdafx.h"
 #include "core.h"
+#include "InvalidHandleException.h"
 #include "Driver.h"
 #include "Environment.h"
 #include "Connection.h"
 #include "Argument.h"
-#include "InvalidHandleException.h"
+#include "Statement.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -325,7 +326,26 @@ SQLRETURN SQL_API SQLBindCol(
   SQLPOINTER     TargetValuePtr,
   SQLLEN         BufferLength,
   SQLLEN *       StrLen_or_Ind) {
-  return SQL_ERROR;
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    if (TargetValuePtr != nullptr) {
+      ColumnBinding binding;
+      binding.setColumnNumber(ColumnNumber);
+      binding.setTargetType(TargetType);
+      binding.setTargetValuePtr(TargetValuePtr);
+      binding.setBufferLength(BufferLength);
+      binding.setStrLenOrInd(StrLen_or_Ind);
+      statement.addColumnBinding(binding);
+    } else {
+      statement.removeColumnBinding(ColumnNumber);
+    }
+
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLFetch(

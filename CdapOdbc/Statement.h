@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "ColumnBinding.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Connection;
@@ -26,6 +28,7 @@ namespace Cask {
     class Statement {
       Connection* connection;
       SQLHSTMT handle;
+      std::vector<ColumnBinding> columnBindings;
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -48,6 +51,16 @@ namespace Cask {
       SQLHSTMT getHandle() const {
         return this->handle;
       }
+
+      /**
+       * Adds a column binding information to a statement.
+       */
+      void addColumnBinding(const ColumnBinding& binding);
+
+      /**
+       * Removes a column binding information from a statement.
+       */
+      void removeColumnBinding(SQLUSMALLINT columnNumber);
     };
   }
 }

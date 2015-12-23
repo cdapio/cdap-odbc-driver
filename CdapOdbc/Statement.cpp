@@ -26,3 +26,29 @@ Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   assert(connection);
   assert(handle);
 }
+
+void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
+  auto it = std::find_if(
+    this->columnBindings.begin(),
+    this->columnBindings.end(),
+    [binding](auto& b) { return b.getColumnNumber() == binding.getColumnNumber(); });
+  if (it != this->columnBindings.end()) {
+    // Replace existing binding. 
+    *it = binding;
+  } else {
+    // Add new binding. 
+    this->columnBindings.push_back(binding);
+  }
+}
+
+void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
+  auto it = std::find_if(
+    this->columnBindings.begin(), 
+    this->columnBindings.end(), 
+    [columnNumber](auto& b) { return b.getColumnNumber() == columnNumber; });
+  if (it == this->columnBindings.end()) {
+    throw std::invalid_argument("columnNumber");
+  }
+
+  this->columnBindings.erase(it);
+}
