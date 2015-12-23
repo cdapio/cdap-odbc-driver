@@ -434,8 +434,16 @@ SQLRETURN SQL_API SQLTablesW(
   SQLSMALLINT    NameLength3,
   SQLWCHAR *     TableType,
   SQLSMALLINT    NameLength4) {
-  return SQL_ERROR;
+  try {
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    return SQL_ERROR;
+  }
 }
+
+#include "ExploreClient.h"
 
 SQLRETURN SQL_API SQLTablesA(
   SQLHSTMT       StatementHandle,
@@ -447,7 +455,14 @@ SQLRETURN SQL_API SQLTablesA(
   SQLSMALLINT    NameLength3,
   SQLCHAR *      TableType,
   SQLSMALLINT    NameLength4) {
-  return SQL_ERROR;
+
+  try {
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLFreeStmt(

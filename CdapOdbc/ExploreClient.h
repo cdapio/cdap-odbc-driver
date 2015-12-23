@@ -19,6 +19,27 @@
 namespace Cask {
   namespace CdapOdbc {
 
+    using QueryHandle = utility::string_t;
+
+    enum class OpStatus {
+      INITIALIZED,
+      RUNNING,
+      FINISHED,
+      CANCELED,
+      CLOSED,
+      ERROR,
+      UNKNOWN,
+      PENDING,
+    };
+
+    /**
+     * Represents the status of a submitted query operation.
+     */
+    class QueryStatus {
+      OpStatus opStatus;
+      bool hasResults;
+    };
+
     /**
      * The methods of this class call the HTTP APIs exposed by explore 
      * and return the raw information
@@ -27,8 +48,10 @@ namespace Cask {
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
 
-      pplx::task<web::http::http_response> doRequest(web::http::method mhd, const utility::string_t& path);
-      pplx::task<web::http::http_response> doGet(const utility::string_t& path);
+      web::json::value doRequest(web::http::method mhd, const utility::string_t& path);
+      web::json::value doGet(const utility::string_t& path);
+      web::json::value doPost(const utility::string_t& path);
+      web::json::value doDelete(const utility::string_t& path);
 
       ExploreClient(const ExploreClient&) = delete;
       void operator=(const ExploreClient&) = delete;
@@ -49,6 +72,18 @@ namespace Cask {
        * Checks if CDAP service available.
        */
       bool isAvailable();
+
+      QueryStatus getQueryStatus(const QueryHandle& handle);
+
+      /**
+       * Closes a query.
+       */
+      void closeQuery(const QueryHandle& handle);
+
+      /**
+       * Retrieves the catalog names available in this database.
+       */
+      QueryHandle getCatalogs();
     };
   }
 }

@@ -19,18 +19,35 @@
 
 using namespace Cask::CdapOdbc;
 
-pplx::task<web::http::http_response> Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path) {
+web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path) {
   using namespace web::http;
   uri_builder requestUri;
   requestUri.append_path(path);
   http_request request(mhd);
   request.set_request_uri(requestUri.to_uri());
   //request.headers().add(header_names::authorization, L"Bearer " + this->authToken);
-  return this->httpClient->request(request);
+  auto task = this->httpClient->request(request)
+    .then([](web::http::http_response response) {
+      if (response.status_code() == web::http::status_codes::OK) {
+        return response.extract_json();
+      } else {
+        throw std::exception("Cannot get the response.");
+      }
+    });
+  task.wait();
+  return task.get();
 }
 
-pplx::task<web::http::http_response> Cask::CdapOdbc::ExploreClient::doGet(const utility::string_t& path) {
+web::json::value Cask::CdapOdbc::ExploreClient::doGet(const utility::string_t& path) {
   return this->doRequest(web::http::methods::GET, path);
+}
+
+web::json::value Cask::CdapOdbc::ExploreClient::doPost(const utility::string_t & path) {
+  return this->doRequest(web::http::methods::POST, path);
+}
+
+web::json::value Cask::CdapOdbc::ExploreClient::doDelete(const utility::string_t & path) {
+  return this->doRequest(web::http::methods::DEL, path);
 }
 
 Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
@@ -39,19 +56,20 @@ Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
 
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
   try {
-    pplx::task<web::json::value> result =
-      this->doGet(L"explore/status")
-        .then([](web::http::http_response response) {
-          if (response.status_code() == web::http::status_codes::OK) {
-            return response.extract_json();
-          } else {
-            return pplx::task_from_result(web::json::value());
-          }
-        });
-    result.wait();
-    auto value = result.get();
-    return value.at(L"status").as_string() == L"OK";
+    return (this->doGet(L"explore/status").at(L"status").as_string() == L"OK");
   } catch (std::exception) {
     return false;
   }
+}
+
+QueryStatus Cask::CdapOdbc::ExploreClient::getQueryStatus(const QueryHandle& handle) {
+  return QueryStatus();
+}
+
+void Cask::CdapOdbc::ExploreClient::closeQuery(const QueryHandle& handle) {
+  this->doDelete(L"data/explore/queries/" + handle);
+}
+
+QueryHandle Cask::CdapOdbc::ExploreClient::getCatalogs() {
+  return this->doPost(L"data/explore/jdbc/catalogs").at(L"handle").as_string();
 }

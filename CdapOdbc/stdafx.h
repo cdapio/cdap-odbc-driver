@@ -24,8 +24,17 @@
 // Windows Header Files:
 #include <windows.h>
 
+// Conflicts with query op status
+#undef ERROR
+
 #include <sql.h>
 #include <sqlext.h>
+
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _DEBUG
 
 #include <cassert>
 
