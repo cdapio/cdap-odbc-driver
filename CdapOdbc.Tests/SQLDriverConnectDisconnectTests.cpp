@@ -50,11 +50,11 @@ namespace Cask {
         }
 
         std::string getBaseConnectionStringA() {
-          return "Host=localhost;Port=49741";
+          return "Host=localhost;Port=10000";
         }
 
         std::wstring getBaseConnectionStringW() {
-          return L"Host=localhost;Port=49741";
+          return L"Host=localhost;Port=10000";
         }
 
       public:

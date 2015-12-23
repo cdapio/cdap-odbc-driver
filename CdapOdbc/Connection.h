@@ -64,7 +64,7 @@ namespace Cask {
        * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2". 
        * There are the following parameters:
        *   HOST - server name
-       *   PORT - port number (default 0)
+       *   PORT - port number (default 10000)
        *   AUTH_TOKEN - authentication token (default "")
        *   NAMESPACE - namespace name (default "default")
        *   SSL_ENABLED - SSL enabled/disabled (default false)

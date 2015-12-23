@@ -118,7 +118,7 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::string& connectionString)
   : host()
-  , port(0)
+  , port(10000)
   , authToken()
   , namespace_("default")
   , sslEnabled(false)
