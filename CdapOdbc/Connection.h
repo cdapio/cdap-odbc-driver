@@ -58,6 +58,13 @@ namespace Cask {
         return this->handle;
       }
 
+      /** 
+       * Gets an explore client instance.
+       */
+      ExploreClient& getExploreClient() const {
+        return *this->exploreClient;
+      }
+
       /**
        * Opens a connection to explore REST service.
        *

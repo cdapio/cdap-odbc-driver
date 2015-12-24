@@ -17,6 +17,7 @@
 #pragma once
 
 #include "ColumnBinding.h"
+#include "ExploreClient.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -29,6 +30,14 @@ namespace Cask {
       Connection* connection;
       SQLHSTMT handle;
       std::vector<ColumnBinding> columnBindings;
+      QueryHandle queryHandle;
+      int fetchSize;
+      int currentRowIndex;
+      bool open;
+
+      void openQuery();
+      void getNextResults();
+      void fetchRow();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -53,6 +62,20 @@ namespace Cask {
       }
 
       /**
+       * Gets a fetch size.
+       */
+      int getFetchSize() const {
+        return this->fetchSize;
+      }
+
+      /**
+       * Sets a fetch size.
+       */
+      void setFetchSize(int value) {
+        this->fetchSize = value;
+      }
+
+      /**
        * Adds a column binding information to a statement.
        */
       void addColumnBinding(const ColumnBinding& binding);
@@ -61,6 +84,22 @@ namespace Cask {
        * Removes a column binding information from a statement.
        */
       void removeColumnBinding(SQLUSMALLINT columnNumber);
+
+      /**
+       * Retrieves catalogs from a database.
+       */
+      void getCatalogs();
+
+      /**
+       * Retrieves the next row for the current statement 
+       * and updates column bindings.
+       */
+      void fetch();
+
+      /**
+       * Closes the statement.
+       */
+      void close();
     };
   }
 }

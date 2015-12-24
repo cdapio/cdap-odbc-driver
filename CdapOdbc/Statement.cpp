@@ -20,9 +20,21 @@
 
 using namespace Cask::CdapOdbc;
 
+void Cask::CdapOdbc::Statement::openQuery() {
+}
+
+void Cask::CdapOdbc::Statement::getNextResults() {
+}
+
+void Cask::CdapOdbc::Statement::fetchRow() {
+}
+
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   : connection(connection)
-  , handle(handle) {
+  , handle(handle)
+  , fetchSize(50)
+  , currentRowIndex(0)
+  , open(false) {
   assert(connection);
   assert(handle);
 }
@@ -51,4 +63,17 @@ void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
   }
 
   this->columnBindings.erase(it);
+}
+
+void Cask::CdapOdbc::Statement::getCatalogs() {
+  this->queryHandle = this->connection->getExploreClient().getCatalogs();
+}
+
+void Cask::CdapOdbc::Statement::fetch() {
+  if (this->open) {
+    auto nextRow = this->connection->getExploreClient().getQueryResult(this->queryHandle, 1);
+  }
+}
+
+void Cask::CdapOdbc::Statement::close() {
 }
