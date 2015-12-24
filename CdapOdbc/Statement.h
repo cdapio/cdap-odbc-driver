@@ -53,6 +53,13 @@ namespace Cask {
       }
 
       /**
+       * Gets parent connection.
+       */
+      Connection* getConnection() const {
+        return this->connection;
+      }
+
+      /**
        * Adds a column binding information to a statement.
        */
       void addColumnBinding(const ColumnBinding& binding);

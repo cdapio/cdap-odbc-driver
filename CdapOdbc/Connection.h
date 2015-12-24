@@ -59,6 +59,13 @@ namespace Cask {
       }
 
       /**
+       * Gets parent environment.
+       */
+      Environment* getEnvironment() const {
+        return this->environment;
+      }
+
+      /**
        * Opens a connection to explore REST service.
        *
        * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2". 
