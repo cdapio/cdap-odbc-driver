@@ -28,6 +28,9 @@ namespace Cask {
       Connection* connection;
       SQLHDESC handle;
 
+      Descriptor(const Descriptor&) = delete;
+      void operator=(const Descriptor&) = delete;
+
     public:
 
       /**
@@ -45,6 +48,13 @@ namespace Cask {
        */
       SQLHDESC getHandle() const {
         return this->handle;
+      }
+
+      /**
+       * Gets parent connection.
+       */
+      Connection* getConnection() const {
+        return this->connection;
       }
     };
   }

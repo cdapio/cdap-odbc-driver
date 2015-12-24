@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include "ConnectionParams.h"
+#include "ExploreClient.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
@@ -27,6 +30,14 @@ namespace Cask {
       Environment* environment;
       SQLHDBC handle;
       std::mutex mutex;
+      bool isOpen;
+      std::unique_ptr<ConnectionParams> params;
+      std::unique_ptr<ExploreClient> exploreClient;
+
+      web::http::uri resolveUri() const;
+
+      Connection(const Connection&) = delete;
+      void operator=(const Connection&) = delete;
 
     public:
 
@@ -46,6 +57,32 @@ namespace Cask {
       SQLHDBC getHandle() const {
         return this->handle;
       }
+
+      /**
+       * Gets parent environment.
+       */
+      Environment* getEnvironment() const {
+        return this->environment;
+      }
+
+      /**
+       * Opens a connection to explore REST service.
+       *
+       * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2". 
+       * There are the following parameters:
+       *   HOST - server name
+       *   PORT - port number (default 10000)
+       *   AUTH_TOKEN - authentication token (default "")
+       *   NAMESPACE - namespace name (default "default")
+       *   SSL_ENABLED - SSL enabled/disabled (default false)
+       *   VERIFY_SSL_CERT - server certificate verification (default true)
+       */
+      void open(const std::string& connectionString);
+      
+      /*
+       * Closes a connection.
+       */
+      void close();
     };
   }
 }

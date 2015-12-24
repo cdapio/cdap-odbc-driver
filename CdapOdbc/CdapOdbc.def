@@ -3,6 +3,8 @@ EXPORTS
     SQLAllocHandle
     SQLConnectA
     SQLConnectW
+    SQLDriverConnectA
+    SQLDriverConnectW
     SQLGetTypeInfoA
     SQLGetTypeInfoW
     SQLDataSourcesA

@@ -23,11 +23,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace Cask {
   namespace CdapOdbc {
     namespace Tests {
-      std::array<LPCSTR, 37> functions =
+      std::array<LPCSTR, 39> functions =
       {
         "SQLAllocHandle",
         "SQLConnectA",
         "SQLConnectW",
+		"SQLDriverConnectA",
+		"SQLDriverConnectW",
         "SQLGetTypeInfoA",
         "SQLGetTypeInfoW",
         "SQLDataSourcesA",
