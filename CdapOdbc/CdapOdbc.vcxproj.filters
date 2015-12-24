@@ -7,6 +7,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{49e0be68-730b-49dc-94c6-96ea0e0e4d58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Explore">
+      <UniqueIdentifier>{00e4425b-3718-4025-9e00-2b3fb5465c8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -42,14 +45,23 @@
     <ClInclude Include="ConnectionParams.h">
       <Filter>Driver</Filter>
     </ClInclude>
-    <ClInclude Include="ExploreClient.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
     <ClInclude Include="InvalidHandleException.h">
       <Filter>Driver</Filter>
     </ClInclude>
     <ClInclude Include="ColumnBinding.h">
       <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryResult.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryStatus.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="ExploreClient.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnDesc.h">
+      <Filter>Explore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,14 +98,23 @@
     <ClCompile Include="ConnectionParams.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
-    <ClCompile Include="ExploreClient.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
     <ClCompile Include="InvalidHandleException.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="ColumnBinding.cpp">
       <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryStatus.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryResult.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="ExploreClient.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnDesc.cpp">
+      <Filter>Explore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
