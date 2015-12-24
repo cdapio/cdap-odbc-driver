@@ -27,16 +27,28 @@ namespace Cask {
     * Represents a SQL statement which can be executed to return some data.
     */
     class Statement {
-      Connection* connection;
-      SQLHSTMT handle;
+  
+      enum class State {
+        INITIAL,
+        OPEN,
+        FETCH,
+        CLOSED,
+      };
+
       std::vector<ColumnBinding> columnBindings;
       QueryHandle queryHandle;
+      QueryResult queryResult;
+      State state;
+      Connection* connection;
+      SQLHSTMT handle;
       int fetchSize;
       int currentRowIndex;
-      bool open;
+      bool moreData;
 
+      void throwStateError();
       void openQuery();
-      void getNextResults();
+      void loadData();
+      bool getNextResults();
       void fetchRow();
 
       Statement(const Statement&) = delete;
@@ -102,11 +114,6 @@ namespace Cask {
        * and updates column bindings.
        */
       void fetch();
-
-      /**
-       * Closes the statement.
-       */
-      void close();
     };
   }
 }

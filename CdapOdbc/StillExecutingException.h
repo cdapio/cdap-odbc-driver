@@ -19,30 +19,20 @@
 namespace Cask {
   namespace CdapOdbc {
     /**
-     * Reports errors that arise because SQLHANDLE argument value has not been accepted.
+     * Reports errors that arise because query is still executing.
      */
-    class InvalidHandleException : public std::invalid_argument {
-      SQLHANDLE handle;
-
+    class StillExecutingException : public std::logic_error {
     public:
 
       /**
        * Creates an instance.
        */
-      InvalidHandleException(const char *what_arg, SQLHANDLE handle);
+      StillExecutingException(const char *what);
       
       /**
        * Descructor.
        */
-      ~InvalidHandleException() = default;
-
-
-      /**
-      * Gets a handle which value has not been accepted.
-      */
-      SQLHANDLE getHandle() const {
-        return this->handle;
-      }
+      ~StillExecutingException() = default;
     };
   }
 }

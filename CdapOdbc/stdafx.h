@@ -26,6 +26,8 @@
 
 // Conflicts with query op status
 #undef ERROR
+#undef max
+#undef min
 
 #include <sql.h>
 #include <sqlext.h>

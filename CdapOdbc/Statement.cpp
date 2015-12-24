@@ -17,29 +17,81 @@
 #include "stdafx.h"
 #include "Statement.h"
 #include "Connection.h"
+#include "StillExecutingException.h"
+#include "NoDataException.h"
 
 using namespace Cask::CdapOdbc;
 
-void Cask::CdapOdbc::Statement::openQuery() {
+void Cask::CdapOdbc::Statement::throwStateError() {
+  throw std::logic_error("Wrong statement state.");
 }
 
-void Cask::CdapOdbc::Statement::getNextResults() {
+void Cask::CdapOdbc::Statement::openQuery() {
+  auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
+  switch (status.getOperationStatus()) {
+    case OperationStatus::FINISHED:
+      if (status.hasResults()) {
+        this->moreData = true;
+      }
+
+      break;
+    case OperationStatus::INITIALIZED:
+    case OperationStatus::PENDING:
+    case OperationStatus::RUNNING:
+      throw StillExecutingException("The query is still executing.");
+    case OperationStatus::UNKNOWN:
+    case OperationStatus::ERROR:
+      throw std::exception("An error occured during query execution.");
+    case OperationStatus::CANCELED:
+      throw std::exception("Query canceled.");
+    case OperationStatus::CLOSED:
+      throw std::exception("Query closed.");
+  }
+}
+
+void Cask::CdapOdbc::Statement::loadData() {
+  this->queryResult = this->connection->getExploreClient().getQueryResult(this->queryHandle, this->fetchSize);
+  this->moreData = (this->queryResult.getColumns().size() < this->fetchSize);
+  this->currentRowIndex = 0;
+}
+
+bool Cask::CdapOdbc::Statement::getNextResults() {
+  if (this->moreData) {
+    bool dataLoaded = (this->queryResult.getColumns().size() > 0);
+    if (dataLoaded) {
+      ++this->currentRowIndex;
+      if (this->currentRowIndex == this->queryResult.getColumns().size()) {
+        // Need more data
+        this->loadData();
+      }
+    } else {
+      // Get 1st row - no data yet
+      this->loadData();
+    }
+  }
+
+  throw NoDataException("No more data in the query.");
 }
 
 void Cask::CdapOdbc::Statement::fetchRow() {
 }
 
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
-  : connection(connection)
+  : state(State::INITIAL)
+  , connection(connection)
   , handle(handle)
   , fetchSize(50)
   , currentRowIndex(0)
-  , open(false) {
+  , moreData(false) {
   assert(connection);
   assert(handle);
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
   auto it = std::find_if(
     this->columnBindings.begin(),
     this->columnBindings.end(),
@@ -54,6 +106,10 @@ void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
   auto it = std::find_if(
     this->columnBindings.begin(), 
     this->columnBindings.end(), 
@@ -66,14 +122,29 @@ void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
 }
 
 void Cask::CdapOdbc::Statement::getCatalogs() {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
   this->queryHandle = this->connection->getExploreClient().getCatalogs();
+  this->state = State::OPEN;
 }
 
 void Cask::CdapOdbc::Statement::fetch() {
-  if (this->open) {
-    auto nextRow = this->connection->getExploreClient().getQueryResult(this->queryHandle, 1);
+  if (this->state != State::OPEN && this->state != State::FETCH) {
+    this->throwStateError();
   }
-}
 
-void Cask::CdapOdbc::Statement::close() {
+  if (this->state == State::OPEN) {
+    this->openQuery();
+    this->state = State::FETCH;
+  } 
+  
+  if (this->state == State::FETCH) {
+    if (this->getNextResults()) {
+      this->fetchRow();
+    } else {
+      this->state = State::CLOSED;
+    }
+  }
 }
