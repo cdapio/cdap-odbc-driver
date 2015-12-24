@@ -30,6 +30,7 @@ void Cask::CdapOdbc::Statement::openQuery() {
   auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
   switch (status.getOperationStatus()) {
     case OperationStatus::FINISHED:
+      this->querySchema = this->connection->getExploreClient().getQuerySchema(this->queryHandle);
       if (status.hasResults()) {
         this->moreData = true;
       }

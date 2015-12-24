@@ -38,6 +38,7 @@ namespace Cask {
       std::vector<ColumnBinding> columnBindings;
       QueryHandle queryHandle;
       QueryResult queryResult;
+      std::vector<ColumnDesc> querySchema;
       State state;
       Connection* connection;
       SQLHSTMT handle;
