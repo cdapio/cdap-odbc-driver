@@ -48,6 +48,13 @@ namespace Cask {
       SQLHSTMT getHandle() const {
         return this->handle;
       }
+
+      /**
+       * Gets parent connection.
+       */
+      Connection* getConnection() const {
+        return this->connection;
+      }
     };
   }
 }

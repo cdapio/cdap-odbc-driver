@@ -38,9 +38,12 @@ namespace Cask {
 
       std::mutex mutex;
 
+      static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);
       Connection* findConnection(SQLHDBC dbc);
-      static SQLHANDLE generateNewHandle();
+      void freeConnections(const Environment& env);
+      void freeStatements(const Connection& dbc);
+      void freeDescriptors(const Connection& dbc);
 
       Driver(const Driver&) = delete;
       void operator=(const Driver&) = delete;
