@@ -18,42 +18,30 @@
 
 namespace Cask {
   namespace CdapOdbc {
-    class Connection;
-
     /**
-    * Represents a SQL statement which can be executed to return some data.
-    */
-    class Statement {
-      Connection* connection;
-      SQLHSTMT handle;
-
-      Statement(const Statement&) = delete;
-      void operator=(const Statement&) = delete;
+     * Reports errors that arise because an SQLHANDLE argument value has not been accepted.
+     */
+    class InvalidHandleException : public std::invalid_argument {
+      SQLHANDLE handle;
 
     public:
 
       /**
-      * Creates a statement instance.
-      */
-      Statement(Connection* connection, SQLHSTMT handle);
-
-      /**
-      * Destructor.
-      */
-      ~Statement() = default;
-
-      /**
-      * Gets ODBC statement handle.
-      */
-      SQLHSTMT getHandle() const {
-        return this->handle;
-      }
-
-      /**
-       * Gets parent connection.
+       * Creates an instance.
        */
-      Connection* getConnection() const {
-        return this->connection;
+      InvalidHandleException(const char *what_arg, SQLHANDLE handle);
+      
+      /**
+       * Descructor.
+       */
+      ~InvalidHandleException() = default;
+
+
+      /**
+      * Gets a handle which value has not been accepted.
+      */
+      SQLHANDLE getHandle() const {
+        return this->handle;
       }
     };
   }

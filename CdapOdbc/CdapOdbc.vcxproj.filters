@@ -36,6 +36,18 @@
     <ClInclude Include="Encoding.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="Argument.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionParams.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ExploreClient.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidHandleException.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -65,10 +77,23 @@
     <ClCompile Include="Encoding.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
+    <ClCompile Include="Argument.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionParams.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ExploreClient.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidHandleException.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
       <Filter>Driver</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
