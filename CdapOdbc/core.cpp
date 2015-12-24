@@ -17,6 +17,8 @@
 #include "stdafx.h"
 #include "core.h"
 #include "InvalidHandleException.h"
+#include "StillExecutingException.h"
+#include "NoDataException.h"
 #include "Driver.h"
 #include "Environment.h"
 #include "Connection.h"
@@ -350,7 +352,19 @@ SQLRETURN SQL_API SQLBindCol(
 
 SQLRETURN SQL_API SQLFetch(
   SQLHSTMT     StatementHandle) {
-  return SQL_ERROR;
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.fetch();
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (StillExecutingException&) {
+    return SQL_STILL_EXECUTING;
+  } catch (NoDataException&) {
+    return SQL_NO_DATA;
+  } catch (std::exception&) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLGetData(
@@ -435,15 +449,24 @@ SQLRETURN SQL_API SQLTablesW(
   SQLWCHAR *     TableType,
   SQLSMALLINT    NameLength4) {
   try {
-    return SQL_SUCCESS;
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    auto catalogName = Argument::toStdString(CatalogName, NameLength1);
+    auto schemaName = Argument::toStdString(SchemaName, NameLength2);
+    auto tableName = Argument::toStdString(TableName, NameLength3);
+    auto tableType = Argument::toStdString(TableType, NameLength4);
+
+    if (catalogName == SQL_ALL_CATALOGS && schemaName.size() == 0 && tableName.size() == 0) {
+      statement.getCatalogs();
+      return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
     return SQL_ERROR;
   }
 }
-
-#include "ExploreClient.h"
 
 SQLRETURN SQL_API SQLTablesA(
   SQLHSTMT       StatementHandle,
@@ -457,7 +480,18 @@ SQLRETURN SQL_API SQLTablesA(
   SQLSMALLINT    NameLength4) {
 
   try {
-    return SQL_SUCCESS;
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    auto catalogName = Argument::toStdString(CatalogName, NameLength1);
+    auto schemaName = Argument::toStdString(SchemaName, NameLength2);
+    auto tableName = Argument::toStdString(TableName, NameLength3);
+    auto tableType = Argument::toStdString(TableType, NameLength4);
+
+    if (catalogName == SQL_ALL_CATALOGS && schemaName.size() == 0 && tableName.size() == 0) {
+      statement.getCatalogs();
+      return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
