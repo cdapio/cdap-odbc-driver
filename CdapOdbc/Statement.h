@@ -48,7 +48,7 @@ namespace Cask {
 
       void throwStateError();
       void openQuery();
-      void loadData();
+      bool loadData();
       bool getNextResults();
       void fetchRow();
 

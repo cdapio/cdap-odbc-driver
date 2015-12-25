@@ -50,28 +50,35 @@ void Cask::CdapOdbc::Statement::openQuery() {
   }
 }
 
-void Cask::CdapOdbc::Statement::loadData() {
-  this->queryResult = this->connection->getExploreClient().getQueryResult(this->queryHandle, this->fetchSize);
-  this->moreData = (this->queryResult.getColumns().size() < this->fetchSize);
-  this->currentRowIndex = 0;
+bool Cask::CdapOdbc::Statement::loadData() {
+  if (this->moreData) {
+    this->queryResult = this->connection->getExploreClient().getQueryResult(this->queryHandle, this->fetchSize);
+    this->moreData = (this->queryResult.getSize() == this->fetchSize);
+    this->currentRowIndex = 0;
+    // True if there are some records 
+    return (this->queryResult.getSize() > 0);
+  } else {
+    return false;
+  }
 }
 
 bool Cask::CdapOdbc::Statement::getNextResults() {
-  if (this->moreData) {
-    bool dataLoaded = (this->queryResult.getColumns().size() > 0);
-    if (dataLoaded) {
-      ++this->currentRowIndex;
-      if (this->currentRowIndex == this->queryResult.getColumns().size()) {
-        // Need more data
-        this->loadData();
-      }
+  bool result = false;
+  bool dataLoaded = (this->queryResult.getSize() > 0);
+  if (dataLoaded) {
+    ++this->currentRowIndex;
+    if (this->currentRowIndex == this->queryResult.getSize()) {
+      // Need more data
+      result = this->loadData();
     } else {
-      // Get 1st row - no data yet
-      this->loadData();
+      result = true;
     }
+  } else {
+    // Get 1st row - no data yet
+    result = this->loadData();
   }
 
-  throw NoDataException("No more data in the query.");
+  return result;
 }
 
 void Cask::CdapOdbc::Statement::fetchRow() {
@@ -146,6 +153,7 @@ void Cask::CdapOdbc::Statement::fetch() {
       this->fetchRow();
     } else {
       this->state = State::CLOSED;
+      throw NoDataException("No more data in the query.");
     }
   }
 }

@@ -43,6 +43,14 @@ namespace Cask {
       const web::json::array& getColumns() {
         return this->columns.as_array();
       }
+
+      size_t getSize() const {
+        if (this->columns.is_array()) {
+          return this->columns.as_array().size();
+        } else {
+          return 0;
+        }
+      }
     };
   }
 }

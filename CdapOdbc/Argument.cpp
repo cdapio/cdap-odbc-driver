@@ -19,12 +19,21 @@
 #include "Encoding.h"
 
 std::string Cask::CdapOdbc::Argument::toStdString(SQLCHAR* string, SQLSMALLINT length) {
-  return std::string(reinterpret_cast<const char*>(string), static_cast<size_t>(length));
+  if (length == SQL_NTS) {
+    return std::string(reinterpret_cast<const char*>(string));
+  } else {
+    return std::string(reinterpret_cast<const char*>(string), static_cast<size_t>(length));
+  }
 }
 
 std::string Cask::CdapOdbc::Argument::toStdString(SQLWCHAR* string, SQLSMALLINT length) {
-  std::wstring temp(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
-  return Encoding::toUtf8(temp);
+  if (length == SQL_NTS) {
+    std::wstring temp(reinterpret_cast<const wchar_t*>(string));
+    return Encoding::toUtf8(temp);
+  } else {
+    std::wstring temp(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
+    return Encoding::toUtf8(temp);
+  }
 }
 
 void Cask::CdapOdbc::Argument::fromStdString(const std::string& input, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
