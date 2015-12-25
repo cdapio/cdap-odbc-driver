@@ -1,0 +1,21 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers]
+"CDAP ODBC"="Installed"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC]
+"UsageCount"=dword:00000001
+"Driver"="C:\\Program Files\\Cask\\CDAP ODBC Driver\\cdapodbc.dll"
+"Setup"="C:\\Program Files\\Cask\\CDAP ODBC Driver\\cdapodbc.dll"
+"SQLLevel"="0"
+"FileUsage"="0"
+"DriverODBCVer"="03.80"
+"ConnectFunctions"="NYN"
+"APILevel"="0"
+"CpTimeout"="120"
+
+[HKEY_CURRENT_USER\Software\ODBC\ODBC.INI\ODBC Data Sources]
+"CDAP Datasets"="CDAP ODBC"
+
+[HKEY_CURRENT_USER\Software\ODBC\ODBC.INI\CDAP Datasets]
+"Driver"="C:\\Program Files\\Cask\\CDAP ODBC Driver\\cdapodbc.dll"
