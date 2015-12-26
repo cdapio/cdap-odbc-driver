@@ -120,9 +120,18 @@ SQLRETURN SQL_API SQLDriverConnectW(
   SQLUSMALLINT    DriverCompletion) {
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
-    connection.open(connectionString);
-    return SQL_SUCCESS;
+    switch (DriverCompletion) {
+      case SQL_DRIVER_PROMPT:
+      case SQL_DRIVER_COMPLETE:
+      case SQL_DRIVER_COMPLETE_REQUIRED:
+        return SQL_ERROR;
+      case SQL_DRIVER_NOPROMPT:
+        std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
+        connection.open(connectionString);
+        return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
@@ -139,7 +148,6 @@ SQLRETURN SQL_API SQLDriverConnectA(
   SQLSMALLINT     BufferLength,
   SQLSMALLINT *   StringLength2Ptr,
   SQLUSMALLINT    DriverCompletion) {
-
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);

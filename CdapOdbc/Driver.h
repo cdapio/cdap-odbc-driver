@@ -53,7 +53,7 @@ namespace Cask {
       /**
        * Creates a driver instance.
        */
-      Driver() = default;
+      Driver();
 
       /**
        * Destructor.

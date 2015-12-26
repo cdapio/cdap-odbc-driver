@@ -85,6 +85,9 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
   }
 }
 
+Cask::CdapOdbc::Driver::Driver() {
+}
+
 Driver& Cask::CdapOdbc::Driver::getInstance() {
   return *instance;
 }
@@ -109,7 +112,7 @@ Statement& Cask::CdapOdbc::Driver::getStatement(SQLHSTMT stmt) {
   throw InvalidHandleException("stmt", stmt);
 }
 
-Descriptor & Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
+Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   auto it = this->descriptors.find(desc);
   if (it != this->descriptors.end()) {
