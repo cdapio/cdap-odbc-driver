@@ -60,7 +60,7 @@ void Cask::CdapOdbc::Argument::fromStdString(const std::string& input, SQLWCHAR*
 
   // Determine max output string length
   size_t maxLength = static_cast<size_t>(bufferLength) - 1;
-  size_t size = (convertedInput.size() > maxLength) ? convertedInput.size() : maxLength;
+  size_t size = (convertedInput.size() < maxLength) ? convertedInput.size() : maxLength;
 
   // Copy string to output buffer
   if (outConnectionString != nullptr) {

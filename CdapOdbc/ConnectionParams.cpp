@@ -96,7 +96,9 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString
       throw std::invalid_argument("connectionString");
     }
 
-    if (equals(key, "host")) {
+    if (equals(key, "driver")) {
+      this->driver = trim(values[1]);
+    } else if (equals(key, "host")) {
       this->host = trim(values[1]);
     } else if (equals(key, "port")) {
       this->port = parseInt(trim(values[1]));
@@ -117,7 +119,8 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString
 }
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::string& connectionString)
-  : host()
+  : driver()
+  , host()
   , port(10000)
   , authToken()
   , namespace_("default")
@@ -128,6 +131,12 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::string& connection
 
 std::string Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
   std::string result;
+
+  if (this->driver.size() > 0) {
+    result += "Driver=";
+    result += this->driver;
+    result += ";";
+  }
 
   result += "Host=";
   result += this->host;

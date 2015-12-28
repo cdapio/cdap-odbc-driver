@@ -120,13 +120,19 @@ SQLRETURN SQL_API SQLDriverConnectW(
   SQLUSMALLINT    DriverCompletion) {
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::string connectionString;
     switch (DriverCompletion) {
       case SQL_DRIVER_PROMPT:
+        connectionString = Argument::toStdString(InConnectionString, StringLength1);
+        connectionString += "HOST=localhost;PORT=10000";
+        connection.open(connectionString);
+        Argument::fromStdString(connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        return SQL_SUCCESS;
       case SQL_DRIVER_COMPLETE:
       case SQL_DRIVER_COMPLETE_REQUIRED:
         return SQL_ERROR;
       case SQL_DRIVER_NOPROMPT:
-        std::string connectionString = Argument::toStdString(InConnectionString, StringLength1);
+        connectionString = Argument::toStdString(InConnectionString, StringLength1);
         connection.open(connectionString);
         return SQL_SUCCESS;
     }
@@ -158,6 +164,16 @@ SQLRETURN SQL_API SQLDriverConnectA(
   } catch (std::exception) {
     return SQL_ERROR;
   }
+}
+
+SQLRETURN SQL_API SQLBrowseConnectW(
+  SQLHDBC         ConnectionHandle,
+  SQLCHAR *       InConnectionString,
+  SQLSMALLINT     StringLength1,
+  SQLCHAR *       OutConnectionString,
+  SQLSMALLINT     BufferLength,
+  SQLSMALLINT *   StringLength2Ptr) {
+  return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLGetTypeInfoW(
@@ -194,6 +210,150 @@ SQLRETURN SQL_API SQLDataSourcesA(
   SQLSMALLINT      BufferLength2,
   SQLSMALLINT *    NameLength2Ptr) {
   return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetInfoW(
+  SQLHDBC         ConnectionHandle,
+  SQLUSMALLINT    InfoType,
+  SQLPOINTER      InfoValuePtr,
+  SQLSMALLINT     BufferLength,
+  SQLSMALLINT *   StringLengthPtr) {
+  try {
+    Driver::getInstance().getConnection(ConnectionHandle);
+    switch (InfoType) {
+      case SQL_DRIVER_ODBC_VER:
+        Argument::fromStdString("03.80", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
+}
+
+SQLRETURN SQL_API SQLDriversW(
+  SQLHENV         EnvironmentHandle,
+  SQLUSMALLINT    Direction,
+  SQLCHAR *       DriverDescription,
+  SQLSMALLINT     BufferLength1,
+  SQLSMALLINT *   DescriptionLengthPtr,
+  SQLCHAR *       DriverAttributes,
+  SQLSMALLINT     BufferLength2,
+  SQLSMALLINT *   AttributesLengthPtr) {
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetFunctions(
+  SQLHDBC           ConnectionHandle,
+  SQLUSMALLINT      FunctionId,
+  SQLUSMALLINT *    SupportedPtr) {
+  try {
+    Driver::getInstance().getConnection(ConnectionHandle);
+    if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
+      // ANSI
+      SupportedPtr[SQL_API_SQLALLOCHANDLE] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLGETDESCFIELD
+      SupportedPtr[SQL_API_SQLBINDCOL] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLGETDESCREC
+      SupportedPtr[SQL_API_SQLCANCEL] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLGETDIAGFIELD
+      //SupportedPtr[SQL_API_SQLCLOSECURSOR
+      //SupportedPtr[SQL_API_SQLGETDIAGREC
+      SupportedPtr[SQL_API_SQLCOLATTRIBUTE] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLGETENVATTR
+      //SupportedPtr[SQL_API_SQLCONNECT
+      SupportedPtr[SQL_API_SQLGETFUNCTIONS] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLCOPYDESC
+      SupportedPtr[SQL_API_SQLGETINFO] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLDATASOURCES
+      //SupportedPtr[SQL_API_SQLGETSTMTATTR
+      SupportedPtr[SQL_API_SQLDESCRIBECOL] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLGETTYPEINFO] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLDISCONNECT] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLNUMRESULTCOLS] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLDRIVERS] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLPARAMDATA] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLENDTRAN
+      SupportedPtr[SQL_API_SQLPREPARE] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLEXECDIRECT] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLPUTDATA] = SQL_TRUE;
+      SupportedPtr[SQL_API_SQLEXECUTE] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLROWCOUNT
+      SupportedPtr[SQL_API_SQLFETCH] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSETCONNECTATTR
+      //SupportedPtr[SQL_API_SQLFETCHSCROLL
+      //SupportedPtr[SQL_API_SQLSETCURSORNAME
+      SupportedPtr[SQL_API_SQLFREEHANDLE] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSETDESCFIELD
+      SupportedPtr[SQL_API_SQLFREESTMT] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSETDESCREC
+      //SupportedPtr[SQL_API_SQLGETCONNECTATTR
+      //SupportedPtr[SQL_API_SQLSETENVATTR
+      //SupportedPtr[SQL_API_SQLGETCURSORNAME
+      //SupportedPtr[SQL_API_SQLSETSTMTATTR
+      SupportedPtr[SQL_API_SQLGETDATA] = SQL_TRUE;
+
+      // Open Group
+      SupportedPtr[SQL_API_SQLCOLUMNS] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSTATISTICS] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSPECIALCOLUMNS
+      SupportedPtr[SQL_API_SQLTABLES] = SQL_TRUE;
+
+      // ODBC
+      SupportedPtr[SQL_API_SQLBINDPARAMETER] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLNATIVESQL
+      //SupportedPtr[SQL_API_SQLBROWSECONNECT
+      SupportedPtr[SQL_API_SQLNUMPARAMS] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLBULKOPERATIONS[1]
+      //SupportedPtr[SQL_API_SQLPRIMARYKEYS
+      //SupportedPtr[SQL_API_SQLCOLUMNPRIVILEGES
+      //SupportedPtr[SQL_API_SQLPROCEDURECOLUMNS
+      //SupportedPtr[SQL_API_SQLDESCRIBEPARAM
+      //SupportedPtr[SQL_API_SQLPROCEDURES
+      SupportedPtr[SQL_API_SQLDRIVERCONNECT] = SQL_TRUE;
+      //SupportedPtr[SQL_API_SQLSETPOS
+      //SupportedPtr[SQL_API_SQLFOREIGNKEYS
+      //SupportedPtr[SQL_API_SQLTABLEPRIVILEGES
+      SupportedPtr[SQL_API_SQLMORERESULTS] = SQL_TRUE;
+      return SQL_SUCCESS;
+    } else if (FunctionId >= 0 && FunctionId < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE) {
+      switch (FunctionId) {
+        case SQL_API_SQLALLOCHANDLE:
+        case SQL_API_SQLBINDCOL:
+        case SQL_API_SQLCANCEL:
+        case SQL_API_SQLGETFUNCTIONS:
+        case SQL_API_SQLGETINFO:
+        case SQL_API_SQLDISCONNECT:
+        case SQL_API_SQLPREPARE:
+        case SQL_API_SQLEXECDIRECT:
+        case SQL_API_SQLEXECUTE:
+        case SQL_API_SQLFETCH:
+        case SQL_API_SQLFREEHANDLE:
+        case SQL_API_SQLFREESTMT:
+        case SQL_API_SQLCOLUMNS:
+        case SQL_API_SQLTABLES:
+        case SQL_API_SQLBINDPARAMETER:
+        case SQL_API_SQLNUMPARAMS:
+        case SQL_API_SQLDRIVERCONNECT:
+        case SQL_API_SQLMORERESULTS:
+          *SupportedPtr = SQL_TRUE;
+          break;
+        default:
+          *SupportedPtr = SQL_FALSE;
+      }
+
+      return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLSetConnectAttrW(

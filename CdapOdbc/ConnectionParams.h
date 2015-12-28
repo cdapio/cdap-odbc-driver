@@ -23,6 +23,7 @@ namespace Cask {
      * Represents connection parameters parsed from connection string.
      */
     class ConnectionParams {
+      std::string driver;
       std::string host;
       int port;
       std::string authToken;
@@ -46,6 +47,13 @@ namespace Cask {
        * Destructor.
        */
       ~ConnectionParams() = default;
+
+      /**
+      * Gets DRIVER connection parameter.
+      */
+      const std::string& getDriver() const {
+        return this->driver;
+      }
 
       /**
        * Gets HOST connection parameter.

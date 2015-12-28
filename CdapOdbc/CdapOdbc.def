@@ -5,10 +5,15 @@ EXPORTS
     SQLConnectW
     SQLDriverConnectA
     SQLDriverConnectW
+    SQLBrowseConnectW
     SQLGetTypeInfoA
     SQLGetTypeInfoW
     SQLDataSourcesA
     SQLDataSourcesW
+    SQLDriversW
+    SQLGetInfoW
+    SQLGetFunctions
+    SQLSetConnectAttrW
     SQLPrepareA
     SQLPrepareW
     SQLBindParameter
