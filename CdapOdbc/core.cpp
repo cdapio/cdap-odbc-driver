@@ -168,9 +168,9 @@ SQLRETURN SQL_API SQLDriverConnectA(
 
 SQLRETURN SQL_API SQLBrowseConnectW(
   SQLHDBC         ConnectionHandle,
-  SQLCHAR *       InConnectionString,
+  SQLWCHAR *      InConnectionString,
   SQLSMALLINT     StringLength1,
-  SQLCHAR *       OutConnectionString,
+  SQLWCHAR *      OutConnectionString,
   SQLSMALLINT     BufferLength,
   SQLSMALLINT *   StringLength2Ptr) {
   return SQL_ERROR;
@@ -237,10 +237,10 @@ SQLRETURN SQL_API SQLGetInfoW(
 SQLRETURN SQL_API SQLDriversW(
   SQLHENV         EnvironmentHandle,
   SQLUSMALLINT    Direction,
-  SQLCHAR *       DriverDescription,
+  SQLWCHAR *       DriverDescription,
   SQLSMALLINT     BufferLength1,
   SQLSMALLINT *   DescriptionLengthPtr,
-  SQLCHAR *       DriverAttributes,
+  SQLWCHAR *       DriverAttributes,
   SQLSMALLINT     BufferLength2,
   SQLSMALLINT *   AttributesLengthPtr) {
   return SQL_ERROR;
@@ -253,71 +253,74 @@ SQLRETURN SQL_API SQLGetFunctions(
   try {
     Driver::getInstance().getConnection(ConnectionHandle);
     if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
-      // ANSI
-      SupportedPtr[SQL_API_SQLALLOCHANDLE] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLGETDESCFIELD
-      SupportedPtr[SQL_API_SQLBINDCOL] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLGETDESCREC
-      SupportedPtr[SQL_API_SQLCANCEL] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLGETDIAGFIELD
-      //SupportedPtr[SQL_API_SQLCLOSECURSOR
-      //SupportedPtr[SQL_API_SQLGETDIAGREC
-      SupportedPtr[SQL_API_SQLCOLATTRIBUTE] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLGETENVATTR
-      //SupportedPtr[SQL_API_SQLCONNECT
-      SupportedPtr[SQL_API_SQLGETFUNCTIONS] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLCOPYDESC
-      SupportedPtr[SQL_API_SQLGETINFO] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLDATASOURCES
-      //SupportedPtr[SQL_API_SQLGETSTMTATTR
-      SupportedPtr[SQL_API_SQLDESCRIBECOL] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLGETTYPEINFO] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLDISCONNECT] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLNUMRESULTCOLS] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLDRIVERS] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLPARAMDATA] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLENDTRAN
-      SupportedPtr[SQL_API_SQLPREPARE] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLEXECDIRECT] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLPUTDATA] = SQL_TRUE;
-      SupportedPtr[SQL_API_SQLEXECUTE] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLROWCOUNT
-      SupportedPtr[SQL_API_SQLFETCH] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSETCONNECTATTR
-      //SupportedPtr[SQL_API_SQLFETCHSCROLL
-      //SupportedPtr[SQL_API_SQLSETCURSORNAME
-      SupportedPtr[SQL_API_SQLFREEHANDLE] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSETDESCFIELD
-      SupportedPtr[SQL_API_SQLFREESTMT] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSETDESCREC
-      //SupportedPtr[SQL_API_SQLGETCONNECTATTR
-      //SupportedPtr[SQL_API_SQLSETENVATTR
-      //SupportedPtr[SQL_API_SQLGETCURSORNAME
-      //SupportedPtr[SQL_API_SQLSETSTMTATTR
-      SupportedPtr[SQL_API_SQLGETDATA] = SQL_TRUE;
+      for (SQLUSMALLINT i = 0; i < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE; i++) {
+        SupportedPtr[i] = SQL_TRUE;
+      }
+      ////// ANSI
+      ////SupportedPtr[SQL_API_SQLALLOCHANDLE] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLGETDESCFIELD] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLBINDCOL] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLGETDESCREC] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLCANCEL] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLGETDIAGFIELD] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLCLOSECURSOR] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETDIAGREC] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLCOLATTRIBUTE] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLGETENVATTR] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLCONNECT] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETFUNCTIONS] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLCOPYDESC] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETINFO] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLDATASOURCES] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETSTMTATTR] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLDESCRIBECOL] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLGETTYPEINFO] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLDISCONNECT] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLNUMRESULTCOLS] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLDRIVERS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLPARAMDATA] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLENDTRAN] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLPREPARE] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLEXECDIRECT] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLPUTDATA] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLEXECUTE] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLROWCOUNT] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLFETCH] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLSETCONNECTATTR] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLFETCHSCROLL] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLSETCURSORNAME] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLFREEHANDLE] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLSETDESCFIELD] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLFREESTMT] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLSETDESCREC] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETCONNECTATTR] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLSETENVATTR] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETCURSORNAME] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLSETSTMTATTR] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLGETDATA] = SQL_TRUE;
 
-      // Open Group
-      SupportedPtr[SQL_API_SQLCOLUMNS] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSTATISTICS] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSPECIALCOLUMNS
-      SupportedPtr[SQL_API_SQLTABLES] = SQL_TRUE;
+      ////// Open Group
+      ////SupportedPtr[SQL_API_SQLCOLUMNS] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLSTATISTICS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLSPECIALCOLUMNS] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLTABLES] = SQL_TRUE;
 
-      // ODBC
-      SupportedPtr[SQL_API_SQLBINDPARAMETER] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLNATIVESQL
-      //SupportedPtr[SQL_API_SQLBROWSECONNECT
-      SupportedPtr[SQL_API_SQLNUMPARAMS] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLBULKOPERATIONS[1]
-      //SupportedPtr[SQL_API_SQLPRIMARYKEYS
-      //SupportedPtr[SQL_API_SQLCOLUMNPRIVILEGES
-      //SupportedPtr[SQL_API_SQLPROCEDURECOLUMNS
-      //SupportedPtr[SQL_API_SQLDESCRIBEPARAM
-      //SupportedPtr[SQL_API_SQLPROCEDURES
-      SupportedPtr[SQL_API_SQLDRIVERCONNECT] = SQL_TRUE;
-      //SupportedPtr[SQL_API_SQLSETPOS
-      //SupportedPtr[SQL_API_SQLFOREIGNKEYS
-      //SupportedPtr[SQL_API_SQLTABLEPRIVILEGES
-      SupportedPtr[SQL_API_SQLMORERESULTS] = SQL_TRUE;
+      ////// ODBC
+      ////SupportedPtr[SQL_API_SQLBINDPARAMETER] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLNATIVESQL] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLBROWSECONNECT] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLNUMPARAMS] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLBULKOPERATIONS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLPRIMARYKEYS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLCOLUMNPRIVILEGES] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLPROCEDURECOLUMNS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLDESCRIBEPARAM] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLPROCEDURES] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLDRIVERCONNECT] = SQL_TRUE;
+      ////SupportedPtr[SQL_API_SQLSETPOS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLFOREIGNKEYS] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLTABLEPRIVILEGES] = SQL_TRUE; // not real
+      ////SupportedPtr[SQL_API_SQLMORERESULTS] = SQL_TRUE;
       return SQL_SUCCESS;
     } else if (FunctionId >= 0 && FunctionId < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE) {
       switch (FunctionId) {
@@ -374,6 +377,24 @@ SQLRETURN SQL_API SQLSetConnectAttrA(
   // Attrs not supported 
   // Always report success 
   return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetConnectAttrW(
+  SQLHDBC        ConnectionHandle,
+  SQLINTEGER     Attribute,
+  SQLPOINTER     ValuePtr,
+  SQLINTEGER     BufferLength,
+  SQLINTEGER *   StringLengthPtr) {
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetStmtAttrW(
+  SQLHSTMT        StatementHandle,
+  SQLINTEGER      Attribute,
+  SQLPOINTER      ValuePtr,
+  SQLINTEGER      BufferLength,
+  SQLINTEGER *    StringLengthPtr) {
+  return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLPrepareW(
@@ -665,6 +686,20 @@ SQLRETURN SQL_API SQLTablesA(
   } catch (std::exception&) {
     return SQL_ERROR;
   }
+}
+
+SQLRETURN SQL_API SQLSpecialColumnsW(
+  SQLHSTMT      StatementHandle,
+  SQLSMALLINT   IdentifierType,
+  SQLWCHAR *    CatalogName,
+  SQLSMALLINT   NameLength1,
+  SQLWCHAR *    SchemaName,
+  SQLSMALLINT   NameLength2,
+  SQLWCHAR *    TableName,
+  SQLSMALLINT   NameLength3,
+  SQLSMALLINT   Scope,
+  SQLSMALLINT   Nullable) {
+  return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLFreeStmt(

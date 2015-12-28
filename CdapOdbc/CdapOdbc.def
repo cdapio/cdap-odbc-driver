@@ -14,6 +14,8 @@ EXPORTS
     SQLGetInfoW
     SQLGetFunctions
     SQLSetConnectAttrW
+    SQLGetConnectAttrW
+    SQLGetStmtAttrW
     SQLPrepareA
     SQLPrepareW
     SQLBindParameter
@@ -39,6 +41,7 @@ EXPORTS
     SQLPrimaryKeysW
     SQLTablesA
     SQLTablesW
+    SQLSpecialColumnsW
     SQLFreeStmt
     SQLCloseCursor
     SQLCancel
