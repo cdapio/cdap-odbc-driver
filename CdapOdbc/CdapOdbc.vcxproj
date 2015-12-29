@@ -91,7 +91,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -105,7 +104,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
