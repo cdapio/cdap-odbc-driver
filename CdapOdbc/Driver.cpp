@@ -203,6 +203,9 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
     throw std::invalid_argument("bitset");
   }
 
+  auto it = stdext::make_checked_array_iterator(bitset, SQL_API_ODBC3_ALL_FUNCTIONS_SIZE);
+  std::fill(it, it + SQL_API_ODBC3_ALL_FUNCTIONS_SIZE, 0);
+
   setFunction(bitset, SQL_API_SQLALLOCHANDLE);
   //setFunction(SQL_API_SQLGETDESCFIELD);; // not real
   setFunction(bitset, SQL_API_SQLBINDCOL);

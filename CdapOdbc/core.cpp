@@ -229,14 +229,17 @@ SQLRETURN SQL_API SQLGetInfoW(
         Argument::fromStdString("", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_GETDATA_EXTENSIONS:
+        assert(BufferLength == sizeof(SQLUINTEGER));
         *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
         return SQL_SUCCESS;
       case SQL_CURSOR_COMMIT_BEHAVIOR:
       case SQL_CURSOR_ROLLBACK_BEHAVIOR:
+        assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CB_DELETE;
         return SQL_SUCCESS;
       case SQL_ACTIVE_STATEMENTS:
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 100;
+        assert(BufferLength == sizeof(SQLUSMALLINT));
+        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 0;
         return SQL_SUCCESS;
       case SQL_DATA_SOURCE_READ_ONLY:
         Argument::fromStdString("Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
@@ -245,19 +248,22 @@ SQLRETURN SQL_API SQLGetInfoW(
         Argument::fromStdString("CDAP ODBC", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_CORRELATION_NAME:
+        assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_ANY;
         return SQL_SUCCESS;
       case SQL_NON_NULLABLE_COLUMNS:
+        assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
         return SQL_SUCCESS;
       case SQL_QUALIFIER_NAME_SEPARATOR:
         Argument::fromStdString(".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_FILE_USAGE:
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_NOT_SUPPORTED;
+        assert(BufferLength == sizeof(SQLUSMALLINT));
+        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
         return SQL_SUCCESS;
       case SQL_QUALIFIER_TERM:
-        Argument::fromStdString("catalog", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString("CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_DATABASE_NAME:
         Argument::fromStdString("", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
@@ -365,7 +371,27 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
   SQLPOINTER      ValuePtr,
   SQLINTEGER      BufferLength,
   SQLINTEGER *    StringLengthPtr) {
-  return SQL_ERROR;
+  try {
+    switch (Attribute) {
+      case SQL_ATTR_APP_PARAM_DESC:
+      case SQL_ATTR_APP_ROW_DESC:
+      case SQL_ATTR_IMP_ROW_DESC:
+      case SQL_ATTR_IMP_PARAM_DESC:
+        assert(BufferLength == SQL_IS_POINTER);
+        *(reinterpret_cast<void**>(ValuePtr)) = nullptr;
+        return SQL_SUCCESS;
+      case SQL_ATTR_ASYNC_ENABLE:
+        assert(BufferLength == sizeof(SQLULEN));
+        *(reinterpret_cast<SQLULEN*>(ValuePtr)) = SQL_ASYNC_ENABLE_OFF;
+        return SQL_SUCCESS;
+    }
+
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLPrepareW(
