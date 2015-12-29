@@ -214,7 +214,7 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   //setFunction(SQL_API_SQLGETDIAGFIELD); // not real
   //setFunction(SQL_API_SQLCLOSECURSOR); // not real
   //setFunction(SQL_API_SQLGETDIAGREC); // not real
-  setFunction(bitset, SQL_API_SQLCOLATTRIBUTE);
+  //setFunction(bitset, SQL_API_SQLCOLATTRIBUTE);
   //setFunction(SQL_API_SQLGETENVATTR); // not real
   //setFunction(SQL_API_SQLCONNECT); // not real
   setFunction(bitset, SQL_API_SQLGETFUNCTIONS);
@@ -235,14 +235,14 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   setFunction(bitset, SQL_API_SQLEXECUTE);
   //setFunction(SQL_API_SQLROWCOUNT); // not real
   setFunction(bitset, SQL_API_SQLFETCH);
-  setFunction(bitset, SQL_API_SQLSETCONNECTATTR);
+  //setFunction(bitset, SQL_API_SQLSETCONNECTATTR);
   //setFunction(SQL_API_SQLFETCHSCROLL); // not real
   //setFunction(SQL_API_SQLSETCURSORNAME); // not real
   setFunction(bitset, SQL_API_SQLFREEHANDLE);
   //setFunction(SQL_API_SQLSETDESCFIELD); // not real
   //setFunction(SQL_API_SQLFREESTMT); // not real
   //setFunction(SQL_API_SQLSETDESCREC); // not real
-  setFunction(bitset, SQL_API_SQLGETCONNECTATTR);
+  //setFunction(bitset, SQL_API_SQLGETCONNECTATTR);
   //setFunction(SQL_API_SQLSETENVATTR); // not real
   //setFunction(SQL_API_SQLGETCURSORNAME); // not real
   //setFunction(SQL_API_SQLSETSTMTATTR); // not real

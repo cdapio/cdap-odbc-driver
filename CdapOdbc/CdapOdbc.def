@@ -13,8 +13,6 @@ EXPORTS
     SQLDriversW
     SQLGetInfoW
     SQLGetFunctions
-    SQLSetConnectAttrW
-    SQLGetConnectAttrW
     SQLPrepareA
     SQLPrepareW
     SQLBindParameter
