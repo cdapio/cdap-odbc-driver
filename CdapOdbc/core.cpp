@@ -123,6 +123,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
     std::string connectionString;
     switch (DriverCompletion) {
       case SQL_DRIVER_PROMPT:
+        // DRIVER
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
         connectionString += "HOST=localhost;PORT=10000";
         connection.open(connectionString);
@@ -130,8 +131,13 @@ SQLRETURN SQL_API SQLDriverConnectW(
         return SQL_SUCCESS;
       case SQL_DRIVER_COMPLETE:
       case SQL_DRIVER_COMPLETE_REQUIRED:
-        return SQL_ERROR;
+        // DSN
+        connectionString = Argument::toStdString(InConnectionString, StringLength1);
+        connection.open("HOST=localhost;PORT=10000");
+        Argument::fromStdString(connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        return SQL_SUCCESS;
       case SQL_DRIVER_NOPROMPT:
+        // DRIVER 2
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
         connection.open(connectionString);
         return SQL_SUCCESS;
@@ -222,51 +228,53 @@ SQLRETURN SQL_API SQLGetInfoW(
     Driver::getInstance().getConnection(ConnectionHandle);
     switch (InfoType) {
       case SQL_DRIVER_ODBC_VER:
-        Argument::fromStdString("03.80", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_DATA_SOURCE_NAME:
+        Argument::fromStdString(L"CDAP Datasets", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        return SQL_SUCCESS;
       case SQL_SEARCH_PATTERN_ESCAPE:
-        Argument::fromStdString("", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_GETDATA_EXTENSIONS:
         assert(BufferLength == sizeof(SQLUINTEGER));
-        *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+        *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND;
         return SQL_SUCCESS;
       case SQL_CURSOR_COMMIT_BEHAVIOR:
       case SQL_CURSOR_ROLLBACK_BEHAVIOR:
         assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CB_DELETE;
+        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CB_PRESERVE;
         return SQL_SUCCESS;
       case SQL_ACTIVE_STATEMENTS:
         assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 0;
         return SQL_SUCCESS;
       case SQL_DATA_SOURCE_READ_ONLY:
-        Argument::fromStdString("Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_DRIVER_NAME:
-        Argument::fromStdString("CDAP ODBC", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"CDAP ODBC", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_CORRELATION_NAME:
         assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_ANY;
+        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
         return SQL_SUCCESS;
       case SQL_NON_NULLABLE_COLUMNS:
         assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
         return SQL_SUCCESS;
       case SQL_QUALIFIER_NAME_SEPARATOR:
-        Argument::fromStdString(".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_FILE_USAGE:
         assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
         return SQL_SUCCESS;
       case SQL_QUALIFIER_TERM:
-        Argument::fromStdString("CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
       case SQL_DATABASE_NAME:
-        Argument::fromStdString("", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         return SQL_SUCCESS;
     }
 

@@ -50,6 +50,12 @@ namespace Cask {
       Used for output arguments.
       */
       static void fromStdString(const std::string& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
+
+      /**
+      Copies std::wstring to SQL wide string.
+      Used for output arguments.
+      */
+      static void fromStdString(const std::wstring& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
     };
   }
 }

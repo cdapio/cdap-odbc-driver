@@ -38,12 +38,12 @@ namespace Cask {
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
           Assert::IsNotNull(dbc);
 
-          auto connectionStringA = this->getBaseConnectionStringA();
-          result = SQLDriverConnectA(
+          auto connectionStringW = this->getBaseConnectionStringW();
+          result = SQLDriverConnectW(
             dbc,
             nullptr,
-            reinterpret_cast<SQLCHAR*>(const_cast<char*>(connectionStringA.c_str())),
-            static_cast<SQLSMALLINT>(connectionStringA.size()),
+            const_cast<wchar_t*>(connectionStringW.c_str()),
+            static_cast<SQLSMALLINT>(connectionStringW.size()),
             nullptr,
             0,
             nullptr,
@@ -71,8 +71,8 @@ namespace Cask {
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
         }
 
-        std::string getBaseConnectionStringA() {
-          return "Host=localhost;Port=10000";
+        std::wstring getBaseConnectionStringW() {
+          return L"Host=localhost;Port=10000";
         }
 
       public:
@@ -100,7 +100,7 @@ namespace Cask {
             Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
           }
           
-          result = SQLTablesA(stmt, (SQLCHAR*)SQL_ALL_CATALOGS, SQL_NTS, (SQLCHAR*)"", SQL_NTS, (SQLCHAR*)"", SQL_NTS, (SQLCHAR*)"", SQL_NTS);
+          result = SQLTablesW(stmt, (SQLWCHAR*)SQL_ALL_CATALOGS, SQL_NTS, L"", SQL_NTS, L"", SQL_NTS, L"", SQL_NTS);
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
           
           for (result = SQLFetch(stmt); result == SQL_SUCCESS; result = SQLFetch(stmt)) {

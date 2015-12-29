@@ -1,42 +1,31 @@
 LIBRARY CdapOdbc
 EXPORTS
     SQLAllocHandle
-    SQLConnectA
     SQLConnectW
-    SQLDriverConnectA
     SQLDriverConnectW
     SQLBrowseConnectW
-    SQLGetTypeInfoA
     SQLGetTypeInfoW
-    SQLDataSourcesA
     SQLDataSourcesW
     SQLDriversW
     SQLGetInfoW
     SQLGetFunctions
-    SQLPrepareA
     SQLPrepareW
     SQLBindParameter
     SQLExecute
-    SQLExecDirectA
     SQLExecDirectW
     SQLNumParams
     SQLParamData
     SQLPutData
     SQLNumResultCols
-    SQLDescribeColA
     SQLDescribeColW
-    SQLColAttributeA
     SQLColAttributeW
     SQLBindCol
     SQLFetch
     SQLGetData
     SQLSetPos
     SQLMoreResults
-    SQLColumnsA
     SQLColumnsW
-    SQLPrimaryKeysA
     SQLPrimaryKeysW
-    SQLTablesA
     SQLTablesW
     SQLSpecialColumnsW
     SQLFreeStmt
