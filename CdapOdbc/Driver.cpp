@@ -218,7 +218,7 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   //setFunction(SQL_API_SQLGETENVATTR); // not real
   //setFunction(SQL_API_SQLCONNECT); // not real
   setFunction(bitset, SQL_API_SQLGETFUNCTIONS);
-  //setFunction(SQL_API_SQLCOPYDESC); // not real
+  setFunction(bitset, SQL_API_SQLCOPYDESC);
   setFunction(bitset, SQL_API_SQLGETINFO);
   //setFunction(SQL_API_SQLDATASOURCES); // not real
   //setFunction(bitset, SQL_API_SQLGETSTMTATTR);

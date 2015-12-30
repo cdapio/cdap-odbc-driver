@@ -143,34 +143,10 @@ SQLRETURN SQL_API SQLDriverConnectW(
   }
  }
 
-SQLRETURN SQL_API SQLBrowseConnectW(
-  SQLHDBC         ConnectionHandle,
-  SQLWCHAR *      InConnectionString,
-  SQLSMALLINT     StringLength1,
-  SQLWCHAR *      OutConnectionString,
-  SQLSMALLINT     BufferLength,
-  SQLSMALLINT *   StringLength2Ptr) {
-  TRACE(L"SQLBrowseConnectW\n");
-  return SQL_ERROR;
-}
-
 SQLRETURN SQL_API SQLGetTypeInfoW(
   SQLHSTMT      StatementHandle,
   SQLSMALLINT   DataType) {
   TRACE(L"SQLGetTypeInfoW\n");
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLDataSourcesW(
-  SQLHENV          EnvironmentHandle,
-  SQLUSMALLINT     Direction,
-  SQLWCHAR *       ServerName,
-  SQLSMALLINT      BufferLength1,
-  SQLSMALLINT *    NameLength1Ptr,
-  SQLWCHAR *       Description,
-  SQLSMALLINT      BufferLength2,
-  SQLSMALLINT *    NameLength2Ptr) {
-  TRACE(L"SQLDataSourcesW\n");
   return SQL_ERROR;
 }
 
@@ -650,4 +626,113 @@ SQLRETURN SQL_API SQLFreeHandle(
   } catch (std::exception&) {
     return SQL_ERROR;
   }
+}
+
+SQLRETURN SQL_API SQLCopyDesc(
+  SQLHDESC     SourceDescHandle,
+  SQLHDESC     TargetDescHandle) {
+  TRACE(L"SQLCopyDesc\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLEndTran(
+  SQLSMALLINT   HandleType,
+  SQLHANDLE     Handle,
+  SQLSMALLINT   CompletionType) {
+  TRACE(L"SQLEndTran\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLBulkOperations(
+  SQLHSTMT       StatementHandle,
+  SQLUSMALLINT   Operation) {
+  TRACE(L"SQLBulkOperations\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLExtendedFetch(
+  SQLHSTMT         StatementHandle,
+  SQLUSMALLINT     FetchOrientation,
+  SQLLEN           FetchOffset,
+  SQLULEN *        RowCountPtr,
+  SQLUSMALLINT *   RowStatusArray) {
+  TRACE(L"SQLExtendedFetch\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLPutData(
+  SQLHSTMT     StatementHandle,
+  SQLPOINTER   DataPtr,
+  SQLLEN       StrLen_or_Ind) {
+  TRACE(L"SQLPutData\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLFetchScroll(
+  SQLHSTMT      StatementHandle,
+  SQLSMALLINT   FetchOrientation,
+  SQLLEN        FetchOffset) {
+  TRACE(L"SQLFetchScroll\n");
+  return SQL_ERROR;
+ }
+
+SQLRETURN SQL_API SQLGetCursorNameW(
+  SQLHSTMT StatementHandle,
+  SQLWCHAR *CursorName,
+  SQLSMALLINT BufferLength,
+  SQLSMALLINT *NameLengthPtr) {
+  TRACE(L"SQLGetCursorNameW\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetDescFieldW(
+  SQLHDESC DescriptorHandle,
+  SQLSMALLINT RecNumber,
+  SQLSMALLINT FieldIdentifier,
+  SQLPOINTER Value,
+  SQLINTEGER BufferLength,
+  SQLINTEGER *StringLength) {
+  TRACE(L"SQLGetDescFieldW\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetDescRecW(
+  SQLHDESC DescriptorHandle,
+  SQLSMALLINT RecNumber,
+  SQLWCHAR *Name,
+  SQLSMALLINT BufferLength,
+  SQLSMALLINT *StringLengthPtr,
+  SQLSMALLINT *TypePtr,
+  SQLSMALLINT *SubTypePtr,
+  SQLLEN *LengthPtr,
+  SQLSMALLINT *PrecisionPtr,
+  SQLSMALLINT *ScalePtr,
+  SQLSMALLINT *NullablePtr) {
+  TRACE(L"SQLGetDescRecW\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetDiagFieldW(
+  SQLSMALLINT HandleType,
+  SQLHANDLE Handle,
+  SQLSMALLINT RecNumber,
+  SQLSMALLINT DiagIdentifier,
+  SQLPOINTER DiagInfo,
+  SQLSMALLINT BufferLength,
+  SQLSMALLINT *StringLength) {
+  TRACE(L"SQLGetDiagFieldW\n");
+  return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLGetDiagRecW(
+  SQLSMALLINT HandleType,
+  SQLHANDLE Handle,
+  SQLSMALLINT RecNumber,
+  SQLWCHAR *Sqlstate,
+  SQLINTEGER *NativeError,
+  SQLWCHAR* MessageText,
+  SQLSMALLINT BufferLength,
+  SQLSMALLINT *TextLength) {
+  TRACE(L"SQLGetDiagRecW\n");
+  return SQL_ERROR;
 }

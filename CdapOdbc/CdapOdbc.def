@@ -1,35 +1,44 @@
 LIBRARY CdapOdbc
 EXPORTS
     SQLAllocHandle
-    SQLConnectW
-    SQLDriverConnectW
-    SQLBrowseConnectW
-    SQLGetTypeInfoW
-    SQLDataSourcesW
-    SQLDriversW
-    SQLGetInfoW
-    SQLGetFunctions
-    SQLPrepareW
-    SQLBindParameter
-    SQLExecute
-    SQLExecDirectW
-    SQLNumParams
-    SQLParamData
-    SQLPutData
-    SQLNumResultCols
-    SQLDescribeColW
-    SQLColAttributeW
     SQLBindCol
-    SQLFetch
-    SQLGetData
-    SQLSetPos
-    SQLMoreResults
-    SQLColumnsW
-    SQLPrimaryKeysW
-    SQLTablesW
-    SQLSpecialColumnsW
-    SQLFreeStmt
-    SQLCloseCursor
+    SQLBindParameter
+    SQLBulkOperations
     SQLCancel
+    SQLCloseCursor
+    SQLColAttributeW
+    SQLColumnsW
+    SQLConnectW
+    SQLCopyDesc
+    SQLDescribeColW
     SQLDisconnect
+    SQLDriverConnectW
+    SQLDriversW
+    SQLEndTran
+    SQLExecDirectW
+    SQLExecute
+    SQLExtendedFetch
+    SQLFetch
+    SQLFetchScroll
     SQLFreeHandle
+    SQLFreeStmt
+    SQLGetConnectAttrW
+    SQLGetCursorNameW
+    SQLGetData
+    SQLGetDescFieldW
+    SQLGetDescRecW
+    SQLGetDiagFieldW
+    SQLGetDiagRecW
+    SQLGetFunctions
+    SQLGetInfoW
+    SQLGetTypeInfoW
+    SQLMoreResults
+    SQLNumParams
+    SQLNumResultCols
+    SQLParamData
+    SQLPrepareW
+    SQLPrimaryKeysW
+    SQLPutData
+    SQLSetPos
+    SQLSpecialColumnsW
+    SQLTablesW
