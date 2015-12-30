@@ -19,57 +19,57 @@
 
 namespace {
 
-  void split(const std::string& str, char delim, std::vector<std::string>& tokens);
-  std::string trim(const std::string& str);
-  bool equals(const std::string& str1, const std::string& str2);
-  bool parseBool(const std::string& str);
-  int parseInt(const std::string& str);
+  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+  std::wstring trim(const std::wstring& str);
+  bool equals(const std::wstring& str1, const std::wstring& str2);
+  bool parseBool(const std::wstring& str);
+  int parseInt(const std::wstring& str);
 
-  void split(const std::string& str, char delim, std::vector<std::string>& tokens) {
-    std::stringstream stream(str);
-    std::string item;
+  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens) {
+    std::wstringstream stream(str);
+    std::wstring item;
     while (std::getline(stream, item, delim)) {
       tokens.push_back(item);
     }
   }
 
-  std::string trim(const std::string& str) {
-    std::string result = str;
+  std::wstring trim(const std::wstring& str) {
+    std::wstring result = str;
 
     // Trim trailing spaces
-    size_t endPos = result.find_last_not_of(" \t");
-    if (std::string::npos != endPos) {
+    size_t endPos = result.find_last_not_of(L" \t");
+    if (std::wstring::npos != endPos) {
       result = result.substr(0, endPos + 1);
     }
 
     // Trim leading spaces
-    size_t startPos = result.find_first_not_of(" \t");
-    if (std::string::npos != startPos) {
+    size_t startPos = result.find_first_not_of(L" \t");
+    if (std::wstring::npos != startPos) {
       result = result.substr(startPos);
     }
 
     return result;
   }
 
-  bool equals(const std::string& str1, const std::string& str2) {
-    return _stricmp(str1.c_str(), str2.c_str()) == 0;
+  bool equals(const std::wstring& str1, const std::wstring& str2) {
+    return _wcsicmp(str1.c_str(), str2.c_str()) == 0;
   }
 
-  bool parseBool(const std::string& str) {
-    if (equals(str, "true")) {
+  bool parseBool(const std::wstring& str) {
+    if (equals(str, L"true")) {
       return true;
     }
 
-    if (equals(str, "false")) {
+    if (equals(str, L"false")) {
       return false;
     }
 
     throw std::invalid_argument("connectionString");
   }
 
-  int parseInt(const std::string& str) {
+  int parseInt(const std::wstring& str) {
     _set_errno(0);
-    int result = atoi(str.c_str());
+    int result = _wtoi(str.c_str());
     if (errno != 0) {
       throw std::invalid_argument("connectionString");
     }
@@ -78,15 +78,15 @@ namespace {
   }
 }
 
-void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString) {
-  std::vector<std::string> params;
-  std::vector<std::string> values;
-  std::string key;
+void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionString) {
+  std::vector<std::wstring> params;
+  std::vector<std::wstring> values;
+  std::wstring key;
 
-  split(connectionString, ';', params);
+  split(connectionString, L';', params);
   for (auto& item : params) {
     values.clear();
-    split(item, '=', values);
+    split(item, L'=', values);
     if (values.size() != 2) {
       throw std::invalid_argument("connectionString");
     }
@@ -96,19 +96,19 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString
       throw std::invalid_argument("connectionString");
     }
 
-    if (equals(key, "driver")) {
+    if (equals(key, L"driver")) {
       this->driver = trim(values[1]);
-    } else if (equals(key, "host")) {
+    } else if (equals(key, L"host")) {
       this->host = trim(values[1]);
-    } else if (equals(key, "port")) {
+    } else if (equals(key, L"port")) {
       this->port = parseInt(trim(values[1]));
-    } else if (equals(key, "auth_token")) {
+    } else if (equals(key, L"auth_token")) {
       this->authToken = trim(values[1]);
-    } else if (equals(key, "namespace")) {
+    } else if (equals(key, L"namespace")) {
       this->namespace_ = trim(values[1]);
-    } else if (equals(key, "ssl_enabled")) {
+    } else if (equals(key, L"ssl_enabled")) {
       this->sslEnabled = parseBool(trim(values[1]));
-    } else if (equals(key, "verify_ssl_cert")) {
+    } else if (equals(key, L"verify_ssl_cert")) {
       this->verifySslCert = parseBool(trim(values[1]));
     }
   }
@@ -118,54 +118,54 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::string& connectionString
   }
 }
 
-Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::string& connectionString)
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectionString)
   : driver()
   , host()
   , port(10000)
   , authToken()
-  , namespace_("default")
+  , namespace_(L"default")
   , sslEnabled(false)
   , verifySslCert(true) {
   this->parse(connectionString);
 }
 
-std::string Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
-  std::string result;
+std::wstring Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
+  std::wstring result;
 
   if (this->driver.size() > 0) {
-    result += "Driver=";
+    result += L"Driver=";
     result += this->driver;
-    result += ";";
+    result += L";";
   }
 
-  result += "Host=";
+  result += L"Host=";
   result += this->host;
-  result += ";";
+  result += L";";
 
   if (this->port > 0) {
-    result += "Port=";
+    result += L"Port=";
     result += this->port;
-    result += ";";
+    result += L";";
   }
 
   if (this->authToken.size() > 0) {
-    result += "Auth_Token=";
+    result += L"Auth_Token=";
     result += this->authToken;
-    result += ";";
+    result += L";";
   }
 
-  if (!equals(this->namespace_, "default")) {
-    result += "Namespace=";
+  if (!equals(this->namespace_, L"default")) {
+    result += L"Namespace=";
     result += this->namespace_;
-    result += ";";
+    result += L";";
   }
 
   if (sslEnabled) {
-    result += "SSL_Enabled=True;";
+    result += L"SSL_Enabled=True;";
   }
 
   if (!verifySslCert) {
-    result += "Verify_SSL_Cert=False;";
+    result += L"Verify_SSL_Cert=False;";
   }
 
   return result;

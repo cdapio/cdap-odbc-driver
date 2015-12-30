@@ -20,41 +20,23 @@ namespace Cask {
   namespace CdapOdbc {
 
     /**
-      Utility class for converting arguments from and to SQL formats.
-    */
+     * Utility class for converting arguments from and to SQL formats.
+     */
     class Argument {
       Argument() = delete;
 
     public:
 
       /**
-        Converts SQL string to std::string.
-    Used for input arguments.
-      */
-      static std::string toStdString(SQLCHAR* string, SQLSMALLINT length);
+       * Converts SQL wide string to std::string.
+       * Used for input arguments.
+       */
+      static std::wstring toStdString(SQLWCHAR* string, SQLSMALLINT length);
 
       /**
-        Converts SQL wide string to std::string.
-      Used for input arguments.
-      */
-      static std::string toStdString(SQLWCHAR* string, SQLSMALLINT length);
-
-      /**
-      Copies std::string to SQL string.
-      Used for output arguments.
-      */
-      static void fromStdString(const std::string& input, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
-
-      /**
-      Copies std::string to SQL wide string.
-      Used for output arguments.
-      */
-      static void fromStdString(const std::string& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
-
-      /**
-      Copies std::wstring to SQL wide string.
-      Used for output arguments.
-      */
+       * Copies std::wstring to SQL wide string.
+       * Used for output arguments.
+       */
       static void fromStdString(const std::wstring& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
     };
   }

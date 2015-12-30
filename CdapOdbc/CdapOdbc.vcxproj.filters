@@ -72,6 +72,9 @@
     <ClInclude Include="NoDataException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">

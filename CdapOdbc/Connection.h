@@ -84,7 +84,7 @@ namespace Cask {
        *   SSL_ENABLED - SSL enabled/disabled (default false)
        *   VERIFY_SSL_CERT - server certificate verification (default true)
        */
-      void open(const std::string& connectionString);
+      void open(const std::wstring& connectionString);
       
       /*
        * Closes a connection.

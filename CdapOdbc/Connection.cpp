@@ -24,7 +24,7 @@ using namespace Cask::CdapOdbc;
 web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
   web::http::uri_builder uri;
   uri.set_scheme(this->params->getSslEnabled() ? L"https" : L"http");
-  uri.set_host(Encoding::toUtf16(this->params->getHost()));
+  uri.set_host(this->params->getHost());
   uri.append_path(L"v3");
   if (this->params->getPort() > 0) {
     uri.set_port(this->params->getPort());
@@ -41,7 +41,7 @@ Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   assert(handle);
 }
 
-void Cask::CdapOdbc::Connection::open(const std::string& connectionString) {
+void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
   assert(!this->isOpen);
   this->params = std::make_unique<ConnectionParams>(connectionString);
   auto baseUri = this->resolveUri();
