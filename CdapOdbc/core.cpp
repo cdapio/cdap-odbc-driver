@@ -193,7 +193,7 @@ SQLRETURN SQL_API SQLGetInfoW(
     Driver::getInstance().getConnection(ConnectionHandle);
 
     if (InfoValuePtr == nullptr) {
-      TRACE(L"SQLGetInfoW returns SQL_ERROR");
+      TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
       return SQL_ERROR;
     }
 
@@ -263,13 +263,13 @@ SQLRETURN SQL_API SQLGetInfoW(
         return SQL_SUCCESS;
     }
 
-    TRACE(L"SQLGetInfoW returns SQL_ERROR");
+    TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
-    TRACE(L"SQLGetInfoW returns SQL_INVALID_HANDLE");
+    TRACE(L"SQLGetInfoW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
-    TRACE(L"SQLGetInfoW returns SQL_ERROR");
+    TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
