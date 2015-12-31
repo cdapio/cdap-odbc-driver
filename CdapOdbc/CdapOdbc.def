@@ -31,14 +31,26 @@ EXPORTS
     SQLGetDiagRecW
     SQLGetFunctions
     SQLGetInfoW
+    SQLGetStmtAttrW
     SQLGetTypeInfoW
     SQLMoreResults
+    SQLNativeSqlW
     SQLNumParams
     SQLNumResultCols
     SQLParamData
     SQLPrepareW
+    SQLProcedureColumnsW
+    SQLProceduresW
     SQLPrimaryKeysW
     SQLPutData
+    SQLRowCount
+    SQLSetConnectAttrW
+    SQLSetCursorNameW
+    SQLSetDescFieldW
+    SQLSetDescRec
+    SQLSetEnvAttr
     SQLSetPos
+    SQLSetStmtAttrW
     SQLSpecialColumnsW
+    SQLStatisticsW
     SQLTablesW

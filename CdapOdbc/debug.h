@@ -17,7 +17,17 @@
 #pragma once
 
 #ifdef _DEBUG
-#define TRACE(msg) OutputDebugStringW(msg)
+
+void inline debugFPrint(const wchar_t* fmtString, ...) {
+  va_list argList;
+  va_start(argList, fmtString);
+  wchar_t buf[4096];
+  _vsnwprintf_s(buf, sizeof(buf), fmtString, argList);
+  OutputDebugStringW(buf);
+  va_end(argList);
+}
+
+#define TRACE(msg, ...) debugFPrint(msg, __VA_ARGS__)
 #else
 #define TRACE(msg)
 #endif
