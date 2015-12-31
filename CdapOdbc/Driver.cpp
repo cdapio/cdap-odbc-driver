@@ -207,67 +207,57 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   std::fill(it, it + SQL_API_ODBC3_ALL_FUNCTIONS_SIZE, 0);
 
   setFunction(bitset, SQL_API_SQLALLOCHANDLE);
-  //setFunction(SQL_API_SQLGETDESCFIELD);; // not real
   setFunction(bitset, SQL_API_SQLBINDCOL);
-  //setFunction(SQL_API_SQLGETDESCREC); // not real
-  setFunction(bitset, SQL_API_SQLCANCEL);
-  //setFunction(SQL_API_SQLGETDIAGFIELD); // not real
-  //setFunction(SQL_API_SQLCLOSECURSOR); // not real
-  //setFunction(SQL_API_SQLGETDIAGREC); // not real
-  //setFunction(bitset, SQL_API_SQLCOLATTRIBUTE);
-  //setFunction(SQL_API_SQLGETENVATTR); // not real
-  //setFunction(SQL_API_SQLCONNECT); // not real
-  setFunction(bitset, SQL_API_SQLGETFUNCTIONS);
-  setFunction(bitset, SQL_API_SQLCOPYDESC);
-  setFunction(bitset, SQL_API_SQLGETINFO);
-  //setFunction(SQL_API_SQLDATASOURCES); // not real
-  //setFunction(bitset, SQL_API_SQLGETSTMTATTR);
-  setFunction(bitset, SQL_API_SQLDESCRIBECOL);
-  setFunction(bitset, SQL_API_SQLGETTYPEINFO);
-  setFunction(bitset, SQL_API_SQLDISCONNECT);
-  setFunction(bitset, SQL_API_SQLNUMRESULTCOLS);
-  //setFunction(SQL_API_SQLDRIVERS); // not real
-  setFunction(bitset, SQL_API_SQLPARAMDATA);
-  //setFunction(SQL_API_SQLENDTRAN); // not real
-  setFunction(bitset, SQL_API_SQLPREPARE);
-  setFunction(bitset, SQL_API_SQLEXECDIRECT);
-  setFunction(bitset, SQL_API_SQLPUTDATA);
-  setFunction(bitset, SQL_API_SQLEXECUTE);
-  //setFunction(SQL_API_SQLROWCOUNT); // not real
-  setFunction(bitset, SQL_API_SQLFETCH);
-  //setFunction(bitset, SQL_API_SQLSETCONNECTATTR);
-  //setFunction(SQL_API_SQLFETCHSCROLL); // not real
-  //setFunction(SQL_API_SQLSETCURSORNAME); // not real
-  setFunction(bitset, SQL_API_SQLFREEHANDLE);
-  //setFunction(SQL_API_SQLSETDESCFIELD); // not real
-  //setFunction(SQL_API_SQLFREESTMT); // not real
-  //setFunction(SQL_API_SQLSETDESCREC); // not real
-  //setFunction(bitset, SQL_API_SQLGETCONNECTATTR);
-  //setFunction(SQL_API_SQLSETENVATTR); // not real
-  //setFunction(SQL_API_SQLGETCURSORNAME); // not real
-  //setFunction(SQL_API_SQLSETSTMTATTR); // not real
-  setFunction(bitset, SQL_API_SQLGETDATA);
-
-  // Open Group
-  setFunction(bitset, SQL_API_SQLCOLUMNS);
-  //setFunction(SQL_API_SQLSTATISTICS); // not real
-  setFunction(bitset, SQL_API_SQLSPECIALCOLUMNS);
-  setFunction(bitset, SQL_API_SQLTABLES);
-
-  // ODBC
   setFunction(bitset, SQL_API_SQLBINDPARAMETER);
-  //setFunction(SQL_API_SQLNATIVESQL}; // not real
-  //setFunction(SQL_API_SQLBROWSECONNECT}; // not real
-  setFunction(bitset, SQL_API_SQLNUMPARAMS);
-  //setFunction(SQL_API_SQLBULKOPERATIONS}; // not real
-  //setFunction(SQL_API_SQLPRIMARYKEYS}; // not real
-  //setFunction(SQL_API_SQLCOLUMNPRIVILEGES}; // not real
-  //setFunction(SQL_API_SQLPROCEDURECOLUMNS}; // not real
-  //setFunction(SQL_API_SQLDESCRIBEPARAM}; // not real
-  //setFunction(SQL_API_SQLPROCEDURES}; // not real
+  setFunction(bitset, SQL_API_SQLBULKOPERATIONS);
+  setFunction(bitset, SQL_API_SQLCANCEL);
+  setFunction(bitset, SQL_API_SQLCLOSECURSOR);
+  setFunction(bitset, SQL_API_SQLCOLATTRIBUTE);
+  setFunction(bitset, SQL_API_SQLCOLUMNS);
+  setFunction(bitset, SQL_API_SQLCONNECT);
+  setFunction(bitset, SQL_API_SQLCOPYDESC);
+  setFunction(bitset, SQL_API_SQLDESCRIBECOL);
+  setFunction(bitset, SQL_API_SQLDISCONNECT);
   setFunction(bitset, SQL_API_SQLDRIVERCONNECT);
-  //setFunction(SQL_API_SQLSETPOS);; // not real
-  //setFunction(SQL_API_SQLFOREIGNKEYS);; // not real
-  //setFunction(SQL_API_SQLTABLEPRIVILEGES);; // not real
+  setFunction(bitset, SQL_API_SQLDRIVERS);
+  setFunction(bitset, SQL_API_SQLENDTRAN);
+  setFunction(bitset, SQL_API_SQLEXECDIRECT);
+  setFunction(bitset, SQL_API_SQLEXECUTE);
+  setFunction(bitset, SQL_API_SQLEXTENDEDFETCH);
+  setFunction(bitset, SQL_API_SQLFETCH);
+  setFunction(bitset, SQL_API_SQLFETCHSCROLL);
+  setFunction(bitset, SQL_API_SQLFREEHANDLE);
+  setFunction(bitset, SQL_API_SQLFREESTMT);
+  setFunction(bitset, SQL_API_SQLGETCONNECTATTR);
+  setFunction(bitset, SQL_API_SQLGETCURSORNAME);
+  setFunction(bitset, SQL_API_SQLGETDATA);
+  setFunction(bitset, SQL_API_SQLGETDESCFIELD);
+  setFunction(bitset, SQL_API_SQLGETDESCREC);
+  setFunction(bitset, SQL_API_SQLGETDIAGFIELD);
+  setFunction(bitset, SQL_API_SQLGETDIAGREC);
+  setFunction(bitset, SQL_API_SQLGETFUNCTIONS);
+  setFunction(bitset, SQL_API_SQLGETINFO);
+  setFunction(bitset, SQL_API_SQLGETSTMTATTR);
+  setFunction(bitset, SQL_API_SQLGETTYPEINFO);
   setFunction(bitset, SQL_API_SQLMORERESULTS);
+  setFunction(bitset, SQL_API_SQLNATIVESQL);
+  setFunction(bitset, SQL_API_SQLNUMPARAMS);
+  setFunction(bitset, SQL_API_SQLNUMRESULTCOLS);
+  setFunction(bitset, SQL_API_SQLPARAMDATA);
+  setFunction(bitset, SQL_API_SQLPREPARE);
+  setFunction(bitset, SQL_API_SQLPROCEDURECOLUMNS);
+  setFunction(bitset, SQL_API_SQLPROCEDURES);
+  setFunction(bitset, SQL_API_SQLPRIMARYKEYS);
+  setFunction(bitset, SQL_API_SQLPUTDATA);
+  setFunction(bitset, SQL_API_SQLROWCOUNT);
+  setFunction(bitset, SQL_API_SQLSETCONNECTATTR);
+  setFunction(bitset, SQL_API_SQLSETCURSORNAME);
+  setFunction(bitset, SQL_API_SQLSETDESCFIELD);
+  setFunction(bitset, SQL_API_SQLSETDESCREC);
+  setFunction(bitset, SQL_API_SQLSETENVATTR);
+  setFunction(bitset, SQL_API_SQLSETPOS);
+  setFunction(bitset, SQL_API_SQLSETSTMTATTR);
+  setFunction(bitset, SQL_API_SQLSPECIALCOLUMNS);
+  setFunction(bitset, SQL_API_SQLSTATISTICS);
+  setFunction(bitset, SQL_API_SQLTABLES);
 }

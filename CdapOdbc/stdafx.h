@@ -31,6 +31,7 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <odbcinst.h>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC

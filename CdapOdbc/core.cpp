@@ -128,6 +128,10 @@ SQLRETURN SQL_API SQLDriverConnectW(
     InConnectionString,
     DriverCompletion);
   try {
+    if (StringLength2Ptr) {
+      *StringLength2Ptr = 0;
+    }
+
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::wstring connectionString;
     switch (DriverCompletion) {
@@ -182,7 +186,17 @@ SQLRETURN SQL_API SQLGetInfoW(
   SQLSMALLINT *   StringLengthPtr) {
   TRACE(L"SQLGetInfoW(ConnectionHandle = %X, InfoType = %d)\n", ConnectionHandle, InfoType);
   try {
+    if (StringLengthPtr) {
+      *StringLengthPtr = 0;
+    }
+
     Driver::getInstance().getConnection(ConnectionHandle);
+
+    if (InfoValuePtr == nullptr) {
+      TRACE(L"SQLGetInfoW returns SQL_ERROR");
+      return SQL_ERROR;
+    }
+
     switch (InfoType) {
       case SQL_DRIVER_ODBC_VER:
         Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
@@ -217,7 +231,7 @@ SQLRETURN SQL_API SQLGetInfoW(
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
       case SQL_DRIVER_NAME:
-        Argument::fromStdString(L"CDAP ODBC", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
       case SQL_CORRELATION_NAME:
@@ -328,7 +342,7 @@ SQLRETURN SQL_API SQLSetConnectAttrW(
   TRACE(L"SQLSetConnectAttrW(ConnectionHandle = %X, Attribute = %d)\n", ConnectionHandle, Attribute);
   // Attrs not supported 
   // Always report success 
-  TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS");
+  TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
   return SQL_SUCCESS;
 }
 
@@ -348,26 +362,34 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
   SQLPOINTER      ValuePtr,
   SQLINTEGER      BufferLength,
   SQLINTEGER *    StringLengthPtr) {
-  TRACE(L"SQLGetStmtAttrW\n");
+
+  // Dummy address for setting dummy statement descriptors.
+  static char dummyDesc = '\0';
+
+  TRACE(L"SQLGetStmtAttrW(StatementHandle = %X, Attribute = %d)\n", StatementHandle, Attribute);
   try {
+    Driver::getInstance().getStatement(StatementHandle);
+
     switch (Attribute) {
       case SQL_ATTR_APP_PARAM_DESC:
       case SQL_ATTR_APP_ROW_DESC:
       case SQL_ATTR_IMP_ROW_DESC:
       case SQL_ATTR_IMP_PARAM_DESC:
         assert(BufferLength == SQL_IS_POINTER);
-        *(reinterpret_cast<void**>(ValuePtr)) = nullptr;
-        return SQL_SUCCESS;
-      case SQL_ATTR_ASYNC_ENABLE:
-        assert(BufferLength == sizeof(SQLULEN));
-        *(reinterpret_cast<SQLULEN*>(ValuePtr)) = SQL_ASYNC_ENABLE_OFF;
+        // Requires by MSQUERY to be not null.
+        // Set to dummy pointer.
+        *(static_cast<SQLHDESC*>(ValuePtr)) = &dummyDesc;
+        TRACE(L"SQLGetStmtAttrW returns SQL_SUCCESS, *ValuePtr = nullptr\n");
         return SQL_SUCCESS;
     }
 
+    TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
+    TRACE(L"SQLGetStmtAttrW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
+    TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
@@ -900,4 +922,14 @@ SQLRETURN SQL_API SQLStatisticsW(
   SQLUSMALLINT Reserved) {
   TRACE(L"SQLStatisticsW\n");
   return SQL_ERROR;
+}
+
+BOOL INSTAPI ConfigDSN(
+  HWND     hwndParent,
+  WORD     fRequest,
+  LPCSTR   lpszDriver,
+  LPCSTR   lpszAttributes) {
+  TRACE(L"ConfigDSN(hwndParent = %X, fRequest = %d, lpszDriver = %s)\n", hwndParent, fRequest, lpszDriver);
+  TRACE(L"ConfigDSN returns TRUE\n");
+  return TRUE;
 }
