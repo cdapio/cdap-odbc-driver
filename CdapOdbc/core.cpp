@@ -261,6 +261,11 @@ SQLRETURN SQL_API SQLGetInfoW(
         Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
+      case SQL_MAX_OWNER_NAME_LEN:
+        assert(BufferLength == sizeof(SQLUSMALLINT));
+        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 128;
+        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
+        return SQL_SUCCESS;
     }
 
     TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
@@ -379,7 +384,7 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
         // Requires by MSQUERY to be not null.
         // Set to dummy pointer.
         *(static_cast<SQLHDESC*>(ValuePtr)) = &dummyDesc;
-        TRACE(L"SQLGetStmtAttrW returns SQL_SUCCESS, *ValuePtr = nullptr\n");
+        TRACE(L"SQLGetStmtAttrW returns SQL_SUCCESS, *ValuePtr = dummy descriptor\n");
         return SQL_SUCCESS;
     }
 
@@ -588,23 +593,41 @@ SQLRETURN SQL_API SQLTablesW(
   SQLSMALLINT    NameLength3,
   SQLWCHAR *     TableType,
   SQLSMALLINT    NameLength4) {
-  TRACE(L"SQLTablesW\n");
+  TRACE(
+    L"SQLTablesW(StatementHandle = %X, CatalogName = %s, SchemaName = %s, TableName = %s, TableType = %s)\n",
+    StatementHandle,
+    CatalogName,
+    SchemaName,
+    TableName,
+    TableType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     auto catalogName = Argument::toStdString(CatalogName, NameLength1);
     auto schemaName = Argument::toStdString(SchemaName, NameLength2);
     auto tableName = Argument::toStdString(TableName, NameLength3);
-    auto tableType = Argument::toStdString(TableType, NameLength4);
+    auto tableTypes = Argument::toStdString(TableType, NameLength4);
 
     if (catalogName == L"%" && schemaName.size() == 0 && tableName.size() == 0) {
       statement.getCatalogs();
+      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } else if (catalogName.size() == 0 && schemaName == L"%" && tableName.size() == 0) {
+      statement.getSchemas(catalogName, schemaName);
+      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } else if (catalogName.size() == 0 && schemaName.size() == 0 && tableName.size() == 0 && tableTypes.size() > 0) {
+      statement.getTables(catalogName, schemaName, tableName, tableTypes);
+      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     }
 
+    TRACE(L"SQLTablesW returns SQL_ERROR\n");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
+    TRACE(L"SQLTablesW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
+    TRACE(L"SQLTablesW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
@@ -627,8 +650,33 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
 SQLRETURN SQL_API SQLFreeStmt(
   SQLHSTMT       StatementHandle,
   SQLUSMALLINT   Option) {
-  TRACE(L"SQLFreeStmt\n");
-  return SQL_ERROR;
+  TRACE(L"SQLFreeStmt(StatementHandle = %X, Option = %d)\n", StatementHandle, Option);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    switch (Option) {
+      case SQL_CLOSE:
+        statement.reset();
+        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      case SQL_UNBIND:
+        statement.unbindColumns();
+        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      case SQL_RESET_PARAMS:
+        statement.resetParameters();
+        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+    }
+
+    TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLFreeStmt returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLCloseCursor(

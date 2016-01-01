@@ -111,10 +111,39 @@ namespace Cask {
       void getCatalogs();
 
       /**
+       * Retrieves schemas from a database.
+       */
+      void getSchemas(const std::wstring& catalog, const std::wstring& schemaPattern);
+
+      /**
+      * Retrieves tables from a database.
+      */
+      void getTables(
+        const std::wstring& catalog,
+        const std::wstring& schemaPattern,
+        const std::wstring& tableNamePattern,
+        const std::wstring& tableTypes);
+
+      /**
        * Retrieves the next row for the current statement 
        * and updates column bindings.
        */
       void fetch();
+
+      /**
+       * Resets statement to initial state.
+       */
+      void reset();
+
+      /**
+       * Unbinds all column bindings.
+       */
+      void unbindColumns();
+
+      /**
+       * Resets parameters.
+       */
+      void resetParameters();
     };
   }
 }

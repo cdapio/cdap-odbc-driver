@@ -19,8 +19,19 @@
 #include "Connection.h"
 #include "StillExecutingException.h"
 #include "NoDataException.h"
+#include "String.h"
 
 using namespace Cask::CdapOdbc;
+
+namespace {
+  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens) {
+    std::wstringstream stream(str);
+    std::wstring item;
+    while (std::getline(stream, item, delim)) {
+      tokens.push_back(item);
+    }
+  }
+}
 
 void Cask::CdapOdbc::Statement::throwStateError() {
   throw std::logic_error("Wrong statement state.");
@@ -96,7 +107,7 @@ Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
-  if (this->state != State::INITIAL) {
+  if (this->state != State::INITIAL && this->state != State::OPEN) {
     this->throwStateError();
   }
 
@@ -114,7 +125,7 @@ void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
-  if (this->state != State::INITIAL) {
+  if (this->state != State::INITIAL && this->state != State::OPEN) {
     this->throwStateError();
   }
 
@@ -138,6 +149,30 @@ void Cask::CdapOdbc::Statement::getCatalogs() {
   this->state = State::OPEN;
 }
 
+void Cask::CdapOdbc::Statement::getSchemas(const std::wstring& catalog, const std::wstring& schemaPattern) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  this->queryHandle = this->connection->getExploreClient().getSchemas(catalog, schemaPattern);
+  this->state = State::OPEN;
+}
+
+void Cask::CdapOdbc::Statement::getTables(
+  const std::wstring& catalog, 
+  const std::wstring& schemaPattern, 
+  const std::wstring& tableNamePattern, 
+  const std::wstring& tableTypes) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  std::vector<std::wstring> tableTypeArgs;
+  String::split(tableTypes, L',', tableTypeArgs);
+  this->queryHandle = this->connection->getExploreClient().getTables(catalog, schemaPattern, tableNamePattern, tableTypeArgs);
+  this->state = State::OPEN;
+}
+
 void Cask::CdapOdbc::Statement::fetch() {
   if (this->state != State::OPEN && this->state != State::FETCH) {
     this->throwStateError();
@@ -155,5 +190,32 @@ void Cask::CdapOdbc::Statement::fetch() {
       this->state = State::CLOSED;
       throw NoDataException("No more data in the query.");
     }
+  }
+}
+
+void Cask::CdapOdbc::Statement::reset() {
+  if (this->state != State::INITIAL) {
+    if (this->state == State::OPEN || this->state == State::FETCH) {
+      this->connection->getExploreClient().closeQuery(this->queryHandle);
+    }
+
+    this->queryHandle.clear();
+    this->currentRowIndex = 0;
+    this->moreData = false;
+    this->state = State::INITIAL;
+  }
+}
+
+void Cask::CdapOdbc::Statement::unbindColumns() {
+  if (this->state != State::INITIAL && this->state != State::OPEN) {
+    this->throwStateError();
+  }
+
+  this->columnBindings.clear();
+}
+
+void Cask::CdapOdbc::Statement::resetParameters() {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
   }
 }

@@ -16,40 +16,13 @@
 
 #include "stdafx.h"
 #include "ConnectionParams.h"
+#include "String.h"
 
 namespace {
 
-  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
-  std::wstring trim(const std::wstring& str);
   bool equals(const std::wstring& str1, const std::wstring& str2);
   bool parseBool(const std::wstring& str);
   int parseInt(const std::wstring& str);
-
-  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens) {
-    std::wstringstream stream(str);
-    std::wstring item;
-    while (std::getline(stream, item, delim)) {
-      tokens.push_back(item);
-    }
-  }
-
-  std::wstring trim(const std::wstring& str) {
-    std::wstring result = str;
-
-    // Trim trailing spaces
-    size_t endPos = result.find_last_not_of(L" \t");
-    if (std::wstring::npos != endPos) {
-      result = result.substr(0, endPos + 1);
-    }
-
-    // Trim leading spaces
-    size_t startPos = result.find_first_not_of(L" \t");
-    if (std::wstring::npos != startPos) {
-      result = result.substr(startPos);
-    }
-
-    return result;
-  }
 
   bool equals(const std::wstring& str1, const std::wstring& str2) {
     return _wcsicmp(str1.c_str(), str2.c_str()) == 0;
@@ -83,33 +56,33 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
   std::vector<std::wstring> values;
   std::wstring key;
 
-  split(connectionString, L';', params);
+  String::split(connectionString, L';', params);
   for (auto& item : params) {
     values.clear();
-    split(item, L'=', values);
+    String::split(item, L'=', values);
     if (values.size() != 2) {
       throw std::invalid_argument("connectionString");
     }
 
-    key = trim(values[0]);
+    key = String::trim(values[0]);
     if (key.size() == 0) {
       throw std::invalid_argument("connectionString");
     }
 
     if (equals(key, L"driver")) {
-      this->driver = trim(values[1]);
+      this->driver = String::trim(values[1]);
     } else if (equals(key, L"host")) {
-      this->host = trim(values[1]);
+      this->host = String::trim(values[1]);
     } else if (equals(key, L"port")) {
-      this->port = parseInt(trim(values[1]));
+      this->port = parseInt(String::trim(values[1]));
     } else if (equals(key, L"auth_token")) {
-      this->authToken = trim(values[1]);
+      this->authToken = String::trim(values[1]);
     } else if (equals(key, L"namespace")) {
-      this->namespace_ = trim(values[1]);
+      this->namespace_ = String::trim(values[1]);
     } else if (equals(key, L"ssl_enabled")) {
-      this->sslEnabled = parseBool(trim(values[1]));
+      this->sslEnabled = parseBool(String::trim(values[1]));
     } else if (equals(key, L"verify_ssl_cert")) {
-      this->verifySslCert = parseBool(trim(values[1]));
+      this->verifySslCert = parseBool(String::trim(values[1]));
     }
   }
 
