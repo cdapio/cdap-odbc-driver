@@ -612,7 +612,9 @@ SQLRETURN SQL_API SQLTablesW(
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } else if (catalogName.size() == 0 && schemaName == L"%" && tableName.size() == 0) {
-      statement.getSchemas(catalogName, schemaName);
+      // Java String.format("%s", str) prints 'null' if str is null
+      // Null schema pattern means get all schemas
+      statement.getSchemas(catalogName, L"null");
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } else if (catalogName.size() == 0 && schemaName.size() == 0 && tableName.size() == 0 && tableTypes.size() > 0) {
@@ -659,7 +661,7 @@ SQLRETURN SQL_API SQLFreeStmt(
         TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       case SQL_UNBIND:
-        statement.unbindColumns();
+        // Release some descriptor bindings not supported by the driver.
         TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       case SQL_RESET_PARAMS:
