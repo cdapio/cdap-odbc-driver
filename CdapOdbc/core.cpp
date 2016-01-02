@@ -490,7 +490,12 @@ SQLRETURN SQL_API SQLBindCol(
   SQLPOINTER     TargetValuePtr,
   SQLLEN         BufferLength,
   SQLLEN *       StrLen_or_Ind) {
-  TRACE(L"SQLBindCol\n");
+  TRACE(
+    L"SQLBindCol(StatementHandle = %X, ColumnNumber = %d, TargetType = %d, BufferLength = %d)\n",
+    StatementHandle,
+    ColumnNumber,
+    TargetType,
+    BufferLength);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     if (TargetValuePtr != nullptr) {
@@ -505,28 +510,36 @@ SQLRETURN SQL_API SQLBindCol(
       statement.removeColumnBinding(ColumnNumber);
     }
 
+    TRACE(L"SQLBindCol returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
+    TRACE(L"SQLBindCol returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
+    TRACE(L"SQLBindCol returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
 
 SQLRETURN SQL_API SQLFetch(
   SQLHSTMT     StatementHandle) {
-  TRACE(L"SQLFetch\n");
+  TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     statement.fetch();
+    TRACE(L"SQLFetch returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
-  } catch (InvalidHandleException&) {
-    return SQL_INVALID_HANDLE;
   } catch (StillExecutingException&) {
+    TRACE(L"SQLFetch returns SQL_STILL_EXECUTING\n");
     return SQL_STILL_EXECUTING;
   } catch (NoDataException&) {
+    TRACE(L"SQLFetch returns SQL_NO_DATA\n");
     return SQL_NO_DATA;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLFetch returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
   } catch (std::exception&) {
+    TRACE(L"SQLFetch returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
