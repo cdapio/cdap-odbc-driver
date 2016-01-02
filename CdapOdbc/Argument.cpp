@@ -18,13 +18,13 @@
 #include "Argument.h"
 #include "Encoding.h"
 
-std::wstring Cask::CdapOdbc::Argument::toStdString(SQLWCHAR* string, SQLSMALLINT length) {
-  if (length == SQL_NTS) {
-    std::wstring temp(reinterpret_cast<const wchar_t*>(string));
-    return temp;
+std::unique_ptr<std::wstring> Cask::CdapOdbc::Argument::toStdString(SQLWCHAR* string, SQLSMALLINT length) {
+  if (string == nullptr) {
+    return nullptr;
+  } else if (length == SQL_NTS) {
+    return std::make_unique<std::wstring>(reinterpret_cast<const wchar_t*>(string));
   } else {
-    std::wstring temp(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
-    return temp;
+    return std::make_unique<std::wstring>(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
   }
 }
 

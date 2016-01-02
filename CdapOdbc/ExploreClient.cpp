@@ -19,6 +19,20 @@
 
 using namespace Cask::CdapOdbc;
 
+namespace {
+  web::json::value toJson(const utility::string_t* str) {
+    return (str != nullptr) ? web::json::value::string(*str) : web::json::value::null();
+  }
+
+  utility::string_t toUriPath(const utility::string_t* str) {
+    if (str == nullptr) {
+      return L"null";
+    } else {
+      return *str;
+    }
+  }
+}
+
 web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_request& request) {
   auto task = this->httpClient->request(request)
     .then([](web::http::http_response response) {
@@ -108,28 +122,34 @@ QueryHandle Cask::CdapOdbc::ExploreClient::getCatalogs() {
   return this->doPost(L"data/explore/jdbc/catalogs").at(L"handle").as_string();
 }
 
-QueryHandle Cask::CdapOdbc::ExploreClient::getSchemas(const std::wstring& catalog, const std::wstring& schemaPattern) {
+QueryHandle Cask::CdapOdbc::ExploreClient::getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern) {
   web::json::value schemaArgs;
-  schemaArgs[L"catalog"] = web::json::value::string(catalog);
-  schemaArgs[L"schemaPattern"] = web::json::value::string(schemaPattern);
+  schemaArgs[L"catalog"] = toJson(catalog);
+  schemaArgs[L"schemaPattern"] = toJson(schemaPattern);
 
-  auto value = this->doPost(L"namespaces/" + schemaPattern + L"/data/explore/jdbc/schemas", schemaArgs);
+  auto value = this->doPost(L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/schemas", schemaArgs);
   return value.at(L"handle").as_string();
 }
 
-QueryHandle Cask::CdapOdbc::ExploreClient::getTables(const std::wstring& catalog, const std::wstring& schemaPattern, const std::wstring& tableNamePattern, const std::vector<std::wstring>& tableTypes) {
+QueryHandle Cask::CdapOdbc::ExploreClient::getTables(const std::wstring* catalog, const std::wstring* schemaPattern, const std::wstring* tableNamePattern, const std::vector<std::wstring>* tableTypes) {
   web::json::value tablesArgs;
-  std::vector<web::json::value> tableTypeArgs;
 
-  for (auto& item : tableTypes) {
-    tableTypeArgs.push_back(web::json::value::string(item));
+  tablesArgs[L"catalog"] = toJson(catalog);
+  tablesArgs[L"schemaPattern"] = toJson(schemaPattern);
+  tablesArgs[L"tableNamePattern"] = toJson(tableNamePattern);
+
+  if (tableTypes) {
+    std::vector<web::json::value> tableTypeArgs;
+
+    for (auto& item : *tableTypes) {
+      tableTypeArgs.push_back(web::json::value::string(item));
+    }
+
+    tablesArgs[L"tableTypes"] = web::json::value::array(tableTypeArgs);
+  } else {
+    tablesArgs[L"tableTypes"] = web::json::value::null();
   }
 
-  tablesArgs[L"catalog"] = web::json::value::string(catalog);
-  tablesArgs[L"schemaPattern"] = web::json::value::string(schemaPattern);
-  tablesArgs[L"tableNamePattern"] = web::json::value::string(tableNamePattern);
-  tablesArgs[L"tableTypes"] = web::json::value::array(tableTypeArgs);
-
-  auto value = this->doPost(L"namespaces/" + schemaPattern + L"/data/explore/jdbc/tables", tablesArgs);
+  auto value = this->doPost(L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/tables", tablesArgs);
   return value.at(L"handle").as_string();
 }

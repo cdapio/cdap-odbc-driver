@@ -133,14 +133,14 @@ SQLRETURN SQL_API SQLDriverConnectW(
     }
 
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    std::wstring connectionString;
+    std::unique_ptr<std::wstring> connectionString;
     switch (DriverCompletion) {
       case SQL_DRIVER_PROMPT:
         // DRIVER
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        connectionString += L"HOST=localhost;PORT=10000";
-        connection.open(connectionString);
-        Argument::fromStdString(connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        *connectionString += L"HOST=localhost;PORT=10000";
+        connection.open(*connectionString);
+        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
         return SQL_SUCCESS;
       case SQL_DRIVER_COMPLETE:
@@ -148,14 +148,14 @@ SQLRETURN SQL_API SQLDriverConnectW(
         // DSN
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
         connection.open(L"HOST=localhost;PORT=10000");
-        Argument::fromStdString(connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
         return SQL_SUCCESS;
       case SQL_DRIVER_NOPROMPT:
         // DRIVER 2
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        connection.open(connectionString);
-        Argument::fromStdString(connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        connection.open(*connectionString);
+        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
         return SQL_SUCCESS;
     }
@@ -620,18 +620,12 @@ SQLRETURN SQL_API SQLTablesW(
     auto tableName = Argument::toStdString(TableName, NameLength3);
     auto tableTypes = Argument::toStdString(TableType, NameLength4);
 
-    if (catalogName == L"%" && schemaName.size() == 0 && tableName.size() == 0) {
-      statement.getCatalogs();
+    if (schemaName && *schemaName == L"%") {
+      statement.getSchemas(catalogName.get(), schemaName.get());
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
-    } else if (catalogName.size() == 0 && schemaName == L"%" && tableName.size() == 0) {
-      // Java String.format("%s", str) prints 'null' if str is null
-      // Null schema pattern means get all schemas
-      statement.getSchemas(catalogName, L"null");
-      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
-      return SQL_SUCCESS;
-    } else if (catalogName.size() == 0 && schemaName.size() == 0 && tableName.size() == 0 && tableTypes.size() > 0) {
-      statement.getTables(catalogName, schemaName, tableName, tableTypes);
+    } else if (tableTypes) {
+      statement.getTables(catalogName.get(), schemaName.get(), tableName.get(), tableTypes.get());
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     }

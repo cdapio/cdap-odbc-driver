@@ -112,17 +112,19 @@ namespace Cask {
 
       /**
        * Retrieves schemas from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
        */
-      void getSchemas(const std::wstring& catalog, const std::wstring& schemaPattern);
+      void getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern);
 
       /**
-      * Retrieves tables from a database.
-      */
+       * Retrieves tables from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
+       */
       void getTables(
-        const std::wstring& catalog,
-        const std::wstring& schemaPattern,
-        const std::wstring& tableNamePattern,
-        const std::wstring& tableTypes);
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
 
       /**
        * Retrieves the next row for the current statement 

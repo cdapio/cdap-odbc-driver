@@ -16,28 +16,25 @@
 
 #pragma once
 
+#include "ColumnDesc.h"
+#include "ColumnBinding.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Utility class for converting arguments from and to SQL formats.
+     * Represents mappings of columns from Explore to ODBC datasets.
      */
-    class Argument {
-      Argument() = delete;
+    class ColumnMapper {
+      std::vector<ColumnDesc> columnDescs;
+      std::vector<ColumnBinding> columnBindings;
 
     public:
 
       /**
-       * Converts SQL wide string to std::string.
-       * Used for input arguments.
+       * Creates an instance of ColumnMapper.
        */
-      static std::unique_ptr<std::wstring> toStdString(SQLWCHAR* string, SQLSMALLINT length);
-
-      /**
-       * Copies std::wstring to SQL wide string.
-       * Used for output arguments.
-       */
-      static void fromStdString(const std::wstring& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
+      ColumnMapper() = default;
     };
   }
 }

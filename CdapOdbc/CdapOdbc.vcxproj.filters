@@ -13,17 +13,11 @@
     <Filter Include="Exceptions">
       <UniqueIdentifier>{4c377402-8356-4754-9efd-fd3b249fda1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{bfa9e0b2-0ea5-4bc5-bcfe-433249ecdef8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="core.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
     <ClInclude Include="Driver.h">
       <Filter>Driver</Filter>
     </ClInclude>
@@ -72,21 +66,27 @@
     <ClInclude Include="NoDataException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="debug.h">
+    <ClInclude Include="String.h">
       <Filter>Driver</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
+    <ClInclude Include="targetver.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnMapper.h">
       <Filter>Driver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="core.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="Driver.cpp">
@@ -138,6 +138,15 @@
       <Filter>Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="String.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnMapper.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>

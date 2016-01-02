@@ -24,11 +24,13 @@
 using namespace Cask::CdapOdbc;
 
 namespace {
-  void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens) {
-    std::wstringstream stream(str);
-    std::wstring item;
-    while (std::getline(stream, item, delim)) {
-      tokens.push_back(item);
+  const std::wstring* convertPattern(const std::wstring* pattern) {
+    // '%' means all in ODBC and NULL means all in Explore
+    // Convert '%' to NULL
+    if (pattern && *pattern == L"%") {
+      return nullptr;
+    } else {
+      return pattern;
     }
   }
 }
@@ -93,6 +95,9 @@ bool Cask::CdapOdbc::Statement::getNextResults() {
 }
 
 void Cask::CdapOdbc::Statement::fetchRow() {
+  for (auto& item : this->columnBindings) {
+    item.getColumnNumber();
+  }
 }
 
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
@@ -149,27 +154,38 @@ void Cask::CdapOdbc::Statement::getCatalogs() {
   this->state = State::OPEN;
 }
 
-void Cask::CdapOdbc::Statement::getSchemas(const std::wstring& catalog, const std::wstring& schemaPattern) {
+void Cask::CdapOdbc::Statement::getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern) {
   if (this->state != State::INITIAL) {
     this->throwStateError();
   }
 
-  this->queryHandle = this->connection->getExploreClient().getSchemas(catalog, schemaPattern);
+  this->queryHandle = this->connection->getExploreClient().getSchemas(
+    convertPattern(catalog), 
+    convertPattern(schemaPattern));
   this->state = State::OPEN;
 }
 
 void Cask::CdapOdbc::Statement::getTables(
-  const std::wstring& catalog, 
-  const std::wstring& schemaPattern, 
-  const std::wstring& tableNamePattern, 
-  const std::wstring& tableTypes) {
+  const std::wstring* catalog, 
+  const std::wstring* schemaPattern, 
+  const std::wstring* tableNamePattern, 
+  const std::wstring* tableTypes) {
   if (this->state != State::INITIAL) {
     this->throwStateError();
   }
 
-  std::vector<std::wstring> tableTypeArgs;
-  String::split(tableTypes, L',', tableTypeArgs);
-  this->queryHandle = this->connection->getExploreClient().getTables(catalog, schemaPattern, tableNamePattern, tableTypeArgs);
+  std::unique_ptr<std::vector<std::wstring>> tableTypeArgs;
+
+  if (tableTypes) {
+    tableTypeArgs = std::make_unique<std::vector<std::wstring>>();
+    String::split(*tableTypes, L',', *tableTypeArgs);
+  }
+
+  this->queryHandle = this->connection->getExploreClient().getTables(
+    convertPattern(catalog), 
+    convertPattern(schemaPattern),
+    convertPattern(tableNamePattern), 
+    tableTypeArgs.get());
   this->state = State::OPEN;
 }
 

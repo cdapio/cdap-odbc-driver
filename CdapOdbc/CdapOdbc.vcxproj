@@ -148,6 +148,7 @@
     <ClInclude Include="Argument.h" />
     <ClInclude Include="ColumnBinding.h" />
     <ClInclude Include="ColumnDesc.h" />
+    <ClInclude Include="ColumnMapper.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="core.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="ColumnBinding.cpp" />
     <ClCompile Include="ColumnDesc.cpp" />
+    <ClCompile Include="ColumnMapper.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="core.cpp" />
