@@ -229,6 +229,7 @@ void Cask::CdapOdbc::Statement::reset() {
     }
 
     this->queryHandle.clear();
+    this->queryResult = QueryResult();
     this->mapper.reset();
     this->currentRowIndex = 0;
     this->moreData = false;

@@ -122,9 +122,9 @@ SQLRETURN SQL_API SQLDriverConnectW(
   SQLSMALLINT *   StringLength2Ptr,
   SQLUSMALLINT    DriverCompletion) {
   TRACE(
-    L"SQLDriverConnectW(ConnectionHandle = %X, WindowHandle = %X, InConnectionString = %s, DriverCompletion = %d)\n", 
-    ConnectionHandle, 
-    WindowHandle, 
+    L"SQLDriverConnectW(ConnectionHandle = %X, WindowHandle = %X, InConnectionString = %s, DriverCompletion = %d)\n",
+    ConnectionHandle,
+    WindowHandle,
     InConnectionString,
     DriverCompletion);
   try {
@@ -169,7 +169,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
- }
+}
 
 SQLRETURN SQL_API SQLGetTypeInfoW(
   SQLHSTMT      StatementHandle,
@@ -248,6 +248,10 @@ SQLRETURN SQL_API SQLGetInfoW(
         Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
+      case SQL_IDENTIFIER_QUOTE_CHAR:
+        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+        return SQL_SUCCESS;
       case SQL_FILE_USAGE:
         assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
@@ -265,6 +269,29 @@ SQLRETURN SQL_API SQLGetInfoW(
         assert(BufferLength == sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 128;
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
+        return SQL_SUCCESS;
+      case SQL_CONVERT_BIGINT:
+      case SQL_CONVERT_BINARY:
+      case SQL_CONVERT_BIT:
+      case SQL_CONVERT_CHAR:
+      case SQL_CONVERT_DATE:
+      case SQL_CONVERT_DECIMAL:
+      case SQL_CONVERT_DOUBLE:
+      case SQL_CONVERT_FLOAT:
+      case SQL_CONVERT_INTEGER:
+      case SQL_CONVERT_LONGVARCHAR:
+      case SQL_CONVERT_NUMERIC:
+      case SQL_CONVERT_REAL:
+      case SQL_CONVERT_SMALLINT:
+      case SQL_CONVERT_TIME:
+      case SQL_CONVERT_TIMESTAMP:
+      case SQL_CONVERT_TINYINT:
+      case SQL_CONVERT_VARBINARY:
+      case SQL_CONVERT_VARCHAR:
+      case SQL_CONVERT_LONGVARBINARY:
+        assert(BufferLength == sizeof(SQLUINTEGER));
+        *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
         return SQL_SUCCESS;
     }
 
@@ -702,13 +729,16 @@ SQLRETURN SQL_API SQLCancel(
 
 SQLRETURN SQL_API SQLDisconnect(
   SQLHDBC     ConnectionHandle) {
-  TRACE(L"SQLDisconnect\n");
+  TRACE(L"SQLDisconnect(ConnectionHandle = %X)\n", ConnectionHandle);
   try {
     Driver::getInstance().getConnection(ConnectionHandle).close();
+    TRACE(L"SQLDisconnect returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
+    TRACE(L"SQLDisconnect returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
+    TRACE(L"SQLDisconnect returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
@@ -803,7 +833,7 @@ SQLRETURN SQL_API SQLFetchScroll(
   SQLLEN        FetchOffset) {
   TRACE(L"SQLFetchScroll\n");
   return SQL_ERROR;
- }
+}
 
 SQLRETURN SQL_API SQLGetCursorNameW(
   SQLHSTMT StatementHandle,
