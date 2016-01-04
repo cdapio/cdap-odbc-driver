@@ -159,6 +159,7 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
+    <ClInclude Include="MetadataColumnMapper.h" />
     <ClInclude Include="NoDataException.h" />
     <ClInclude Include="QueryResult.h" />
     <ClInclude Include="QueryStatus.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
+    <ClCompile Include="MetadataColumnMapper.cpp" />
     <ClCompile Include="NoDataException.cpp" />
     <ClCompile Include="QueryResult.cpp" />
     <ClCompile Include="QueryStatus.cpp" />

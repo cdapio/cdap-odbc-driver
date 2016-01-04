@@ -18,5 +18,5 @@
 #include "QueryResult.h"
 
 Cask::CdapOdbc::QueryResult::QueryResult(const web::json::value& value)
-  : columns(value) {
+  : rows(value) {
 }

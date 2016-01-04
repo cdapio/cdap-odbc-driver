@@ -18,6 +18,7 @@
 
 #include "ColumnBinding.h"
 #include "ExploreClient.h"
+#include "ColumnMapper.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -38,19 +39,21 @@ namespace Cask {
       std::vector<ColumnBinding> columnBindings;
       QueryHandle queryHandle;
       QueryResult queryResult;
-      std::vector<ColumnDesc> querySchema;
       State state;
       Connection* connection;
       SQLHSTMT handle;
       int fetchSize;
       int currentRowIndex;
       bool moreData;
+      std::unique_ptr<ColumnMapper> mapper;
 
       void throwStateError();
       void openQuery();
       bool loadData();
       bool getNextResults();
       void fetchRow();
+      void setupMetadataMapper();
+      void setupSimpleMapper();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;

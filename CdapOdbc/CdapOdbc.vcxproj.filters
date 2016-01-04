@@ -84,6 +84,9 @@
     <ClInclude Include="ColumnMapper.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="MetadataColumnMapper.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -147,6 +150,9 @@
       <Filter>Library</Filter>
     </ClCompile>
     <ClCompile Include="ColumnMapper.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="MetadataColumnMapper.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>

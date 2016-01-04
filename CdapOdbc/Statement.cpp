@@ -20,6 +20,7 @@
 #include "StillExecutingException.h"
 #include "NoDataException.h"
 #include "String.h"
+#include "MetadataColumnMapper.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -43,9 +44,11 @@ void Cask::CdapOdbc::Statement::openQuery() {
   auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
   switch (status.getOperationStatus()) {
     case OperationStatus::FINISHED:
-      this->querySchema = this->connection->getExploreClient().getQuerySchema(this->queryHandle);
       if (status.hasResults()) {
         this->moreData = true;
+        auto querySchema = this->connection->getExploreClient().getQuerySchema(this->queryHandle);
+        this->mapper->setColumnBindings(this->columnBindings);
+        this->mapper->setColumnDescs(querySchema);
       }
 
       break;
@@ -95,9 +98,16 @@ bool Cask::CdapOdbc::Statement::getNextResults() {
 }
 
 void Cask::CdapOdbc::Statement::fetchRow() {
-  for (auto& item : this->columnBindings) {
-    item.getColumnNumber();
-  }
+  auto columns = this->queryResult.getRows().at(this->currentRowIndex).at(L"columns");
+  this->mapper->map(columns);
+}
+
+void Cask::CdapOdbc::Statement::setupMetadataMapper() {
+  this->mapper = std::make_unique<MetadataColumnMapper>();
+}
+
+void Cask::CdapOdbc::Statement::setupSimpleMapper() {
+  this->mapper = std::make_unique<ColumnMapper>();
 }
 
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
@@ -150,6 +160,7 @@ void Cask::CdapOdbc::Statement::getCatalogs() {
     this->throwStateError();
   }
 
+  this->setupMetadataMapper();
   this->queryHandle = this->connection->getExploreClient().getCatalogs();
   this->state = State::OPEN;
 }
@@ -159,6 +170,7 @@ void Cask::CdapOdbc::Statement::getSchemas(const std::wstring* catalog, const st
     this->throwStateError();
   }
 
+  this->setupMetadataMapper();
   this->queryHandle = this->connection->getExploreClient().getSchemas(
     convertPattern(catalog), 
     convertPattern(schemaPattern));
@@ -181,6 +193,7 @@ void Cask::CdapOdbc::Statement::getTables(
     String::split(*tableTypes, L',', *tableTypeArgs);
   }
 
+  this->setupMetadataMapper();
   this->queryHandle = this->connection->getExploreClient().getTables(
     convertPattern(catalog), 
     convertPattern(schemaPattern),
@@ -216,6 +229,7 @@ void Cask::CdapOdbc::Statement::reset() {
     }
 
     this->queryHandle.clear();
+    this->mapper.reset();
     this->currentRowIndex = 0;
     this->moreData = false;
     this->state = State::INITIAL;

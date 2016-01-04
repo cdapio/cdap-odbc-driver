@@ -43,28 +43,28 @@ namespace Cask {
       /**
        * Gets a column name.
        */
-      const utility::string_t& getName() {
+      const utility::string_t& getName() const {
         return this->name;
       }
 
       /**
       * Gets a column type.
       */
-      const utility::string_t& getType() {
+      const utility::string_t& getType() const {
         return this->type;
       }
 
       /**
       * Gets a column position.
       */
-      int getPosition() {
+      int getPosition() const {
         return this->position;
       }
 
       /**
       * Gets a column comment.
       */
-      const utility::string_t& getComment() {
+      const utility::string_t& getComment() const {
         return this->comment;
       }
 

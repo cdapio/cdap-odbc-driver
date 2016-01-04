@@ -16,41 +16,20 @@
 
 #pragma once
 
+#include "ColumnMapper.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Represents a query result.
+     * Represents metadata mappings of columns from Explore to ODBC datasets.
      */
-    class QueryResult {
-      web::json::value rows;
-    
-    public:
+    class MetadataColumnMapper : public ColumnMapper {
 
-      /**
-       * Creates an instance of QueryResult.
-       */
-      QueryResult() = default;
+    protected:
 
-      /**
-      * Creates an instance of QueryResult from JSON.
-      */
-      QueryResult(const web::json::value& value);
+      virtual const ColumnDesc* getDesc(const ColumnBinding& binding) const override;
 
-      /**
-       * Gets a query data.
-       */
-      const web::json::array& getRows() {
-        return this->rows.as_array();
-      }
-
-      size_t getSize() const {
-        if (this->rows.is_array()) {
-          return this->rows.as_array().size();
-        } else {
-          return 0;
-        }
-      }
     };
   }
 }

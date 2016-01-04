@@ -29,12 +29,44 @@ namespace Cask {
       std::vector<ColumnDesc> columnDescs;
       std::vector<ColumnBinding> columnBindings;
 
+    protected:
+
+      const std::vector<ColumnDesc>& getColumnDescs() const {
+        return this->columnDescs;
+      }
+
+      virtual const ColumnDesc* getDesc(const ColumnBinding& binding) const;
+
     public:
+
+      /**
+       * Destructor
+       */
+      virtual ~ColumnMapper() = default;
 
       /**
        * Creates an instance of ColumnMapper.
        */
       ColumnMapper() = default;
+
+      /**
+       * Sets column bindings.
+       */
+      void setColumnBindings(const std::vector<ColumnBinding>& value) {
+        this->columnBindings = value;
+      }
+
+      /**
+      * Sets column descriptors.
+      */
+      void setColumnDescs(const std::vector<ColumnDesc>& value) {
+        this->columnDescs = value;
+      }
+
+      /**
+       * Maps data to column bindings.
+       */
+      void map(const web::json::value& data);
     };
   }
 }
