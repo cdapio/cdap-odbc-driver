@@ -21,6 +21,7 @@
 #include "NoDataException.h"
 #include "String.h"
 #include "MetadataColumnMapper.h"
+#include "Encoding.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -36,13 +37,15 @@ namespace {
   }
 
   void copyString(const std::wstring* str, SQLPOINTER outStr, SQLLEN bufferLength, SQLLEN* lenOrInd) {
+
     if (str) {
+      std::string ansiStr = Encoding::toUtf8(*str);
       size_t maxLength = static_cast<size_t>(bufferLength) - 1;
-      size_t size = (str->size() < maxLength) ? str->size() : maxLength;
+      size_t size = (ansiStr.size() < maxLength) ? ansiStr.size() : maxLength;
       if (outStr) {
-        wchar_t* outString = static_cast<wchar_t*>(outStr);
-        auto it = stdext::make_checked_array_iterator<wchar_t*>(outString, size);
-        std::copy(str->begin(), str->begin() + size, it);
+        char* outString = static_cast<char*>(outStr);
+        auto it = stdext::make_checked_array_iterator<char*>(outString, size);
+        std::copy(ansiStr.begin(), ansiStr.begin() + size, it);
         outString[size] = 0;
       }
 
@@ -55,7 +58,7 @@ namespace {
       }
     } else {
       if (outStr && bufferLength > 0) {
-        wchar_t* outString = static_cast<wchar_t*>(outStr);
+        char* outString = static_cast<char*>(outStr);
         outString[0] = 0;
       }
 
@@ -145,7 +148,7 @@ bool Cask::CdapOdbc::Statement::getNextResults() {
   ////  result = this->loadData();
   ////}
 
-  ////return result;
+  return false;
 }
 
 void Cask::CdapOdbc::Statement::fetchRow() {
@@ -153,6 +156,7 @@ void Cask::CdapOdbc::Statement::fetchRow() {
   ////this->mapper->map(columns);
 
   if (this->requestType == RequestType::TABLES) {
+    std::wstring empty;
     std::wstring name;
     std::wstring type = L"TABLE";
     for (auto& item : this->columnBindings) {
@@ -160,7 +164,7 @@ void Cask::CdapOdbc::Statement::fetchRow() {
         case 1: // TABLE_CAT 
         case 2: // TABLE_SCHEM 
         case 5: // REMARKS 
-          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&empty, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
           break;
         case 3: // TABLE_NAME 
           name = this->queryResult.getRows().at(this->currentRowIndex - 1).at(L"name").as_string();
