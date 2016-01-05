@@ -174,8 +174,19 @@ SQLRETURN SQL_API SQLDriverConnectW(
 SQLRETURN SQL_API SQLGetTypeInfoW(
   SQLHSTMT      StatementHandle,
   SQLSMALLINT   DataType) {
-  TRACE(L"SQLGetTypeInfoW\n");
-  return SQL_ERROR;
+  TRACE(L"SQLGetTypeInfoW(StatementHandle = %X, DataType = %d)\n", StatementHandle, DataType);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getDataTypes();
+    TRACE(L"SQLGetTypeInfoW returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLGetTypeInfoW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLGetInfoW(
@@ -222,7 +233,7 @@ SQLRETURN SQL_API SQLGetInfoW(
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_CB_PRESERVE\n");
         return SQL_SUCCESS;
       case SQL_ACTIVE_STATEMENTS:
-        assert(BufferLength == sizeof(SQLUSMALLINT));
+        assert(BufferLength >= sizeof(SQLUSMALLINT));
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 0;
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
         return SQL_SUCCESS;

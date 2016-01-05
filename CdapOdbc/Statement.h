@@ -36,6 +36,15 @@ namespace Cask {
         CLOSED,
       };
 
+      enum class RequestType {
+        UNKNOWN,
+        CATALOGS,
+        SCHEMAS,
+        TABLES,
+        TYPES,
+        DATA
+      };
+
       std::vector<ColumnBinding> columnBindings;
       QueryHandle queryHandle;
       QueryResult queryResult;
@@ -46,6 +55,7 @@ namespace Cask {
       int currentRowIndex;
       bool moreData;
       std::unique_ptr<ColumnMapper> mapper;
+      RequestType requestType;
 
       void throwStateError();
       void openQuery();
@@ -128,6 +138,11 @@ namespace Cask {
         const std::wstring* schemaPattern,
         const std::wstring* tableNamePattern,
         const std::wstring* tableTypes);
+
+      /**
+       * Retrieves data type information.
+       */
+      void getDataTypes();
 
       /**
        * Retrieves the next row for the current statement 

@@ -92,13 +92,18 @@ namespace Cask {
       QueryHandle getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern);
 
       /**
-      * Retrieves table names available in a database.
-      */
+       * Retrieves table names available in a database.
+       */
       QueryHandle getTables(
         const std::wstring* catalog,
         const std::wstring* schemaPattern,
         const std::wstring* tableNamePattern,
         const std::vector<std::wstring>* tableTypes);
+
+      /**
+       * Retrieves a list of streams.
+       */
+      QueryResult getStreams();
     };
   }
 }

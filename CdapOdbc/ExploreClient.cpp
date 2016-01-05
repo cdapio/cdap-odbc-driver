@@ -153,3 +153,8 @@ QueryHandle Cask::CdapOdbc::ExploreClient::getTables(const std::wstring* catalog
   auto value = this->doPost(L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/tables", tablesArgs);
   return value.at(L"handle").as_string();
 }
+
+QueryResult Cask::CdapOdbc::ExploreClient::getStreams() {
+  auto value = this->doGet(L"namespaces/default/streams");
+  return QueryResult(value);
+}
