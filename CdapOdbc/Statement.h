@@ -42,6 +42,7 @@ namespace Cask {
         SCHEMAS,
         TABLES,
         TYPES,
+        COLUMNS,
         DATA
       };
 
@@ -56,6 +57,7 @@ namespace Cask {
       bool moreData;
       std::unique_ptr<ColumnMapper> mapper;
       RequestType requestType;
+      std::wstring tableName;
 
       void throwStateError();
       void openQuery();
@@ -143,6 +145,11 @@ namespace Cask {
        * Retrieves data type information.
        */
       void getDataTypes();
+
+      /**
+       * Retrieves column information for a table.
+       */
+      void getColumns(const std::wstring& tableName);
 
       /**
        * Retrieves the next row for the current statement 

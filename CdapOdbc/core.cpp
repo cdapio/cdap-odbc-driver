@@ -618,8 +618,31 @@ SQLRETURN SQL_API SQLColumnsW(
   SQLSMALLINT    NameLength3,
   SQLWCHAR *      ColumnName,
   SQLSMALLINT    NameLength4) {
-  TRACE(L"SQLColumnsW\n");
-  return SQL_ERROR;
+  TRACE(
+    L"SQLColumnsW(StatementHandle = %X, CatalogName = %s, SchemaName = %s, TableName = %s, ColumnName = %s)\n",
+    StatementHandle,
+    CatalogName,
+    SchemaName,
+    TableName,
+    ColumnName);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    auto tableName = Argument::toStdString(TableName, NameLength3);
+    if (tableName) {
+      statement.getColumns(*tableName);
+      TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    }
+
+    TRACE(L"SQLColumnsW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLColumnsW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLColumnsW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLPrimaryKeysW(

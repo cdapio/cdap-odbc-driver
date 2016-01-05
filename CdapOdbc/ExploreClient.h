@@ -104,6 +104,11 @@ namespace Cask {
        * Retrieves a list of streams.
        */
       QueryResult getStreams();
+
+      /**
+       * Retrieves a list 
+       */
+      QueryResult getStreamFields(const std::wstring& streamName);
     };
   }
 }

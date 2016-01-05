@@ -158,3 +158,8 @@ QueryResult Cask::CdapOdbc::ExploreClient::getStreams() {
   auto value = this->doGet(L"namespaces/default/streams");
   return QueryResult(value);
 }
+
+QueryResult Cask::CdapOdbc::ExploreClient::getStreamFields(const std::wstring& streamName) {
+  auto value = this->doGet(L"namespaces/default/streams/" + streamName).at(L"format").at(L"schema").at(L"fields");
+  return QueryResult(value);
+}

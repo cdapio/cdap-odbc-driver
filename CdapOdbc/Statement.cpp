@@ -83,6 +83,9 @@ void Cask::CdapOdbc::Statement::openQuery() {
       break;
     case RequestType::TYPES:
       break;
+    case RequestType::COLUMNS:
+      this->queryResult = this->connection->getExploreClient().getStreamFields(this->tableName);
+      break;
 
     ////case RequestType::DATA:
     ////  auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
@@ -127,7 +130,7 @@ bool Cask::CdapOdbc::Statement::loadData() {
 
 bool Cask::CdapOdbc::Statement::getNextResults() {
   ++this->currentRowIndex;
-  if (this->requestType == RequestType::TABLES) {
+  if (this->requestType == RequestType::TABLES || this->requestType == RequestType::COLUMNS) {
     return (this->currentRowIndex <= this->queryResult.getSize());
   } else if (this->requestType == RequestType::TYPES) {
     return this->currentRowIndex <= 1;
@@ -164,7 +167,7 @@ void Cask::CdapOdbc::Statement::fetchRow() {
         case 1: // TABLE_CAT 
         case 2: // TABLE_SCHEM 
         case 5: // REMARKS 
-          copyString(&empty, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
           break;
         case 3: // TABLE_NAME 
           name = this->queryResult.getRows().at(this->currentRowIndex - 1).at(L"name").as_string();
@@ -214,6 +217,24 @@ void Cask::CdapOdbc::Statement::fetchRow() {
           break;
         case 11: // FIXED_PREC_SCALE   
           *(reinterpret_cast<SQLSMALLINT*>(item.getTargetValuePtr())) = SQL_FALSE;
+          break;
+      }
+    }
+  } else if (this->requestType == RequestType::COLUMNS) {
+    auto& record = this->queryResult.getRows().at(this->currentRowIndex - 1);
+    std::wstring name;
+    for (auto& item : this->columnBindings) {
+      switch (item.getColumnNumber()) {
+        case 1: // TABLE_CAT 
+        case 2: // TABLE_SCHEM 
+          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          break;
+        case 3: // TABLE_NAME 
+          copyString(&this->tableName, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          break;
+        case 4: // COLUMN_NAME 
+          name = record.at(L"name").as_string();
+          copyString(&name, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
           break;
       }
     }
@@ -314,6 +335,16 @@ void Cask::CdapOdbc::Statement::getDataTypes() {
   this->state = State::OPEN;
 }
 
+void Cask::CdapOdbc::Statement::getColumns(const std::wstring& tableName) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  this->requestType = RequestType::COLUMNS;
+  this->tableName = tableName;
+  this->state = State::OPEN;
+}
+
 void Cask::CdapOdbc::Statement::fetch() {
   if (this->state != State::OPEN && this->state != State::FETCH) {
     this->throwStateError();
@@ -346,6 +377,7 @@ void Cask::CdapOdbc::Statement::reset() {
     this->currentRowIndex = 0;
     this->moreData = false;
     this->requestType = RequestType::UNKNOWN;
+    this->tableName.clear();
     this->state = State::INITIAL;
   }
 }
