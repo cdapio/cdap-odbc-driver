@@ -729,7 +729,7 @@ SQLRETURN SQL_API SQLFreeStmt(
         TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       case SQL_UNBIND:
-        // Release some descriptor bindings not supported by the driver.
+        statement.unbindColumns();
         TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       case SQL_RESET_PARAMS:

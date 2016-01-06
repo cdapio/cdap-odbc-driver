@@ -36,35 +36,110 @@ namespace {
     }
   }
 
-  void copyString(const std::wstring* str, SQLPOINTER outStr, SQLLEN bufferLength, SQLLEN* lenOrInd) {
+  void copyString(const std::wstring* str, const ColumnBinding& binding) {
 
     if (str) {
       std::string ansiStr = Encoding::toUtf8(*str);
-      size_t maxLength = static_cast<size_t>(bufferLength) - 1;
+      size_t maxLength = static_cast<size_t>(binding.getBufferLength()) - 1;
       size_t size = (ansiStr.size() < maxLength) ? ansiStr.size() : maxLength;
-      if (outStr) {
-        char* outString = static_cast<char*>(outStr);
+      if (binding.getTargetValuePtr()) {
+        char* outString = static_cast<char*>(binding.getTargetValuePtr());
         auto it = stdext::make_checked_array_iterator<char*>(outString, size);
         std::copy(ansiStr.begin(), ansiStr.begin() + size, it);
         outString[size] = 0;
       }
 
-      if (lenOrInd) {
+      if (binding.getStrLenOrInd()) {
         if (size <= maxLength) {
-          *lenOrInd = size;
+          *binding.getStrLenOrInd() = size;
         } else {
-          *lenOrInd = SQL_NO_TOTAL;
+          *binding.getStrLenOrInd() = SQL_NO_TOTAL;
         }
       }
     } else {
-      if (outStr && bufferLength > 0) {
-        char* outString = static_cast<char*>(outStr);
+      if (binding.getTargetValuePtr() && binding.getBufferLength() > 0) {
+        char* outString = static_cast<char*>(binding.getTargetValuePtr());
         outString[0] = 0;
       }
 
-      if (lenOrInd) {
-        *lenOrInd = SQL_NULL_DATA;
+      if (binding.getStrLenOrInd()) {
+        *binding.getStrLenOrInd() = SQL_NULL_DATA;
       }
+    }
+  }
+
+  SQLSMALLINT getDataType(const web::json::value& value) {
+    std::wstring typeName;
+    if (value.is_string()) {
+      typeName = value.as_string();
+    } else if (value.is_array()) {
+      typeName = value.as_array().at(0).as_string();
+    }
+
+    if (typeName == L"string") {
+      return SQL_VARCHAR;
+    } else if (typeName == L"int") {
+      return SQL_INTEGER;
+    } else if (typeName == L"double") {
+      return SQL_DOUBLE;
+    } else {
+      return SQL_UNKNOWN_TYPE;
+    }
+  }
+
+  SQLSMALLINT getIsNull(const web::json::value& value) {
+    if (value.is_array() && value.as_array().at(1).as_string() == L"null") {
+      return SQL_NULLABLE;
+    } else {
+      return SQL_NO_NULLS;
+    }
+  }
+
+  std::wstring getTypeName(const web::json::value& value) {
+    std::wstring typeName;
+    if (value.is_string()) {
+      typeName = value.as_string();
+    } else if (value.is_array()) {
+      typeName = value.as_array().at(0).as_string();
+    }
+
+    return typeName;
+  }
+
+  int getColumnSize(const web::json::value& value) {
+    switch (getDataType(value)) {
+      case SQL_VARCHAR:
+        return std::numeric_limits<std::int32_t>::max();
+      case SQL_INTEGER:
+        return std::numeric_limits<std::int32_t>::digits;
+      case SQL_DOUBLE:
+        return std::numeric_limits<double>::digits;
+      default:
+        return 0;
+    }
+  }
+
+  int getBufferLength(const web::json::value& value) {
+    switch (getDataType(value)) {
+      case SQL_VARCHAR:
+        return std::numeric_limits<std::int32_t>::max();
+      case SQL_INTEGER:
+        return sizeof(std::int32_t);
+      case SQL_DOUBLE:
+        return sizeof(double);
+      default:
+        return 0;
+    }
+  }
+
+  int getRadix(const web::json::value& value) {
+    switch (getDataType(value)) {
+      case SQL_INTEGER:
+        return std::numeric_limits<std::int32_t>::radix;
+      case SQL_DOUBLE:
+        return std::numeric_limits<double>::radix;
+      default:
+        return 0;
     }
   }
 }
@@ -167,14 +242,14 @@ void Cask::CdapOdbc::Statement::fetchRow() {
         case 1: // TABLE_CAT 
         case 2: // TABLE_SCHEM 
         case 5: // REMARKS 
-          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(nullptr, item);
           break;
         case 3: // TABLE_NAME 
           name = this->queryResult.getRows().at(this->currentRowIndex - 1).at(L"name").as_string();
-          copyString(&name, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&name, item);
           break;
         case 4: // TABLE_TYPE 
-          copyString(&type, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&type, item);
           break;
       }
     }
@@ -184,7 +259,7 @@ void Cask::CdapOdbc::Statement::fetchRow() {
     for (auto& item : this->columnBindings) {
       switch (item.getColumnNumber()) {
         case 1: // TYPE_NAME
-          copyString(&typeName, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&typeName, item);
           break;
         case 2: // DATA_TYPE 
         case 16: // SQL_DATA_TYPE   
@@ -202,9 +277,9 @@ void Cask::CdapOdbc::Statement::fetchRow() {
         case 17: // SQL_DATETIME_SUB 
         case 18: // NUM_PREC_RADIX 
         case 19: // INTERVAL_PRECISION 
-          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(nullptr, item);
         case 6: // CREATE_PARAMS 
-          copyString(&createParams, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&createParams, item);
           break;
         case 7: // NULLABLE  
           *(reinterpret_cast<SQLSMALLINT*>(item.getTargetValuePtr())) = SQL_NULLABLE;
@@ -223,18 +298,64 @@ void Cask::CdapOdbc::Statement::fetchRow() {
   } else if (this->requestType == RequestType::COLUMNS) {
     auto& record = this->queryResult.getRows().at(this->currentRowIndex - 1);
     std::wstring name;
-    for (auto& item : this->columnBindings) {
+    std::wstring typeName;
+    std::wstring no = L"NO";
+    std::wstring yes = L"YES";
+    SQLSMALLINT radix = 0;
+    for (auto &item : this->columnBindings) {
       switch (item.getColumnNumber()) {
         case 1: // TABLE_CAT 
         case 2: // TABLE_SCHEM 
-          copyString(nullptr, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+        case 9: // DECIMAL_DIGITS 
+        case 12: // REMARKS 
+        case 13: // COLUMN_DEF 
+        case 15: // SQL_DATETIME_SUB 
+        case 16: // CHAR_OCTET_LENGTH 
+          copyString(nullptr, item);
           break;
         case 3: // TABLE_NAME 
-          copyString(&this->tableName, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&this->tableName, item);
           break;
         case 4: // COLUMN_NAME 
           name = record.at(L"name").as_string();
-          copyString(&name, item.getTargetValuePtr(), item.getBufferLength(), item.getStrLenOrInd());
+          copyString(&name, item);
+          break;
+        case 5: // DATA_TYPE
+        case 14: // SQL_DATA_TYPE 
+          *(reinterpret_cast<SQLSMALLINT*>(item.getTargetValuePtr())) = getDataType(record.at(L"type"));
+          break;
+        case 6: // TYPE_NAME 
+          typeName = getTypeName(record.at(L"type"));
+          copyString(&typeName, item);
+          break;
+        case 7: // COLUMN_SIZE 
+          *(reinterpret_cast<SQLINTEGER*>(item.getTargetValuePtr())) = getColumnSize(record.at(L"type"));
+          break;
+        case 8: // BUFFER_LENGTH 
+          *(reinterpret_cast<SQLINTEGER*>(item.getTargetValuePtr())) = getBufferLength(record.at(L"type"));
+          break;
+        case 10: // NUM_PREC_RADIX 
+          radix = getRadix(record.at(L"type"));
+          if (radix > 0) {
+            *(reinterpret_cast<SQLSMALLINT*>(item.getTargetValuePtr())) = radix;
+          } else {
+            copyString(nullptr, item);
+          }
+
+          break;
+        case 11: // NULLABLE
+          *(reinterpret_cast<SQLSMALLINT*>(item.getTargetValuePtr())) = getIsNull(record.at(L"type"));
+          break;
+        case 17: // ORDINAL_POSITION 
+          *(reinterpret_cast<SQLINTEGER*>(item.getTargetValuePtr())) = currentRowIndex;
+          break;
+        case 18: // IS_NULLABLE 
+          if (getIsNull(record.at(L"type")) == SQL_NO_NULLS) {
+            copyString(&no, item);
+          } else {
+            copyString(&yes, item);
+          }
+
           break;
       }
     }
