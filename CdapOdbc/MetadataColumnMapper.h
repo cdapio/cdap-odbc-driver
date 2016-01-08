@@ -16,5 +16,20 @@
 
 #pragma once
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+#include "ColumnMapper.h"
+
+namespace Cask {
+  namespace CdapOdbc {
+
+    /**
+     * Represents metadata mappings of columns from Explore to ODBC datasets.
+     */
+    class MetadataColumnMapper : public ColumnMapper {
+
+    protected:
+
+      virtual const ColumnDesc* getDesc(const ColumnBinding& binding) const override;
+
+    };
+  }
+}

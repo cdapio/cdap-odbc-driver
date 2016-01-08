@@ -16,8 +16,14 @@
 
 #pragma once
 
+#include "ColumnDesc.h"
+#include "QueryStatus.h"
+#include "QueryResult.h"
+
 namespace Cask {
   namespace CdapOdbc {
+
+    using QueryHandle = utility::string_t;
 
     /**
      * The methods of this class call the HTTP APIs exposed by explore 
@@ -27,8 +33,13 @@ namespace Cask {
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
 
-      pplx::task<web::http::http_response> doRequest(web::http::method mhd, const utility::string_t& path);
-      pplx::task<web::http::http_response> doGet(const utility::string_t& path);
+      web::json::value doRequest(web::http::http_request& request);
+      web::json::value doRequest(web::http::method mhd, const utility::string_t& path);
+      web::json::value doRequest(web::http::method mhd, const utility::string_t& path, web::json::value body);
+      web::json::value doGet(const utility::string_t& path);
+      web::json::value doPost(const utility::string_t& path);
+      web::json::value doPost(const utility::string_t& path, web::json::value body);
+      web::json::value doDelete(const utility::string_t& path);
 
       ExploreClient(const ExploreClient&) = delete;
       void operator=(const ExploreClient&) = delete;
@@ -49,6 +60,55 @@ namespace Cask {
        * Checks if CDAP service available.
        */
       bool isAvailable();
+
+      /**
+       * Retrieves a query status.
+       */
+      QueryStatus getQueryStatus(const QueryHandle& handle);
+
+      /**
+       * Retrieves a query schema.
+       */
+      std::vector<ColumnDesc> getQuerySchema(const QueryHandle& handle);
+
+      /**
+       * Retrieves the next query result.
+       */
+      QueryResult getQueryResult(const QueryHandle& handle, int rows);
+
+      /**
+       * Closes a query.
+       */
+      void closeQuery(const QueryHandle& handle);
+
+      /**
+       * Retrieves catalog names available in a database.
+       */
+      QueryHandle getCatalogs();
+
+      /**
+       * Retrieves schema names available in a database.
+       */
+      QueryHandle getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern);
+
+      /**
+       * Retrieves table names available in a database.
+       */
+      QueryHandle getTables(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::vector<std::wstring>* tableTypes);
+
+      /**
+       * Retrieves a list of streams.
+       */
+      QueryResult getStreams();
+
+      /**
+       * Retrieves a list 
+       */
+      QueryResult getStreamFields(const std::wstring& streamName);
     };
   }
 }

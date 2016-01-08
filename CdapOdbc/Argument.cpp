@@ -18,46 +18,26 @@
 #include "Argument.h"
 #include "Encoding.h"
 
-std::string Cask::CdapOdbc::Argument::toStdString(SQLCHAR* string, SQLSMALLINT length) {
-  return std::string(reinterpret_cast<const char*>(string), static_cast<size_t>(length));
+std::unique_ptr<std::wstring> Cask::CdapOdbc::Argument::toStdString(SQLWCHAR* string, SQLSMALLINT length) {
+  if (string == nullptr) {
+    return nullptr;
+  } else if (length == SQL_NTS) {
+    return std::make_unique<std::wstring>(reinterpret_cast<const wchar_t*>(string));
+  } else {
+    return std::make_unique<std::wstring>(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
+  }
 }
 
-std::string Cask::CdapOdbc::Argument::toStdString(SQLWCHAR* string, SQLSMALLINT length) {
-  std::wstring temp(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
-  return Encoding::toUtf8(temp);
-}
-
-void Cask::CdapOdbc::Argument::fromStdString(const std::string& input, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
-
+void Cask::CdapOdbc::Argument::fromStdString(const std::wstring & input, SQLWCHAR * outString, SQLSMALLINT bufferLength, SQLSMALLINT * stringLengthPtr) {
   // Determine max output string length
   size_t maxLength = static_cast<size_t>(bufferLength) - 1;
-  size_t size = (input.size() > maxLength) ? input.size() : maxLength;
-  
+  size_t size = (input.size() < maxLength) ? input.size() : maxLength;
+
   // Copy string to output buffer
-  if (outConnectionString != nullptr) {
-    auto it = stdext::make_checked_array_iterator<char*>(reinterpret_cast<char*>(outConnectionString), size);
+  if (outString != nullptr) {
+    auto it = stdext::make_checked_array_iterator<wchar_t*>(reinterpret_cast<wchar_t*>(outString), size);
     std::copy(input.begin(), input.begin() + size, it);
-    outConnectionString[size] = 0;
-  }
-
-  // Fill stringLengthPtr even if outConnectionString is nullptr.
-  if (stringLengthPtr != nullptr) {
-    *stringLengthPtr = static_cast<SQLSMALLINT>(size);
-  }
-}
-
-void Cask::CdapOdbc::Argument::fromStdString(const std::string& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
-  std::wstring convertedInput = Encoding::toUtf16(input);
-
-  // Determine max output string length
-  size_t maxLength = static_cast<size_t>(bufferLength) - 1;
-  size_t size = (convertedInput.size() > maxLength) ? convertedInput.size() : maxLength;
-
-  // Copy string to output buffer
-  if (outConnectionString != nullptr) {
-    auto it = stdext::make_checked_array_iterator<wchar_t*>(reinterpret_cast<wchar_t*>(outConnectionString), size);
-    std::copy(convertedInput.begin(), convertedInput.begin() + size, it);
-    outConnectionString[size] = 0;
+    outString[size] = 0;
   }
 
   // Fill stringLengthPtr even if outConnectionString is nullptr.

@@ -14,7 +14,18 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "ColumnDesc.h"
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+using namespace Cask::CdapOdbc;
+
+Cask::CdapOdbc::ColumnDesc::ColumnDesc()
+  : position(0) {
+}
+
+Cask::CdapOdbc::ColumnDesc::ColumnDesc(web::json::value value) {
+  this->name = value.at(L"name").as_string();
+  this->type = value.at(L"type").as_string();
+  this->position = value.at(L"position").as_integer();
+  this->comment = value.at(L"comment").as_string();
+}

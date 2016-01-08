@@ -9,5 +9,6 @@
     <ClCompile Include="LibraryTests.cpp" />
     <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
     <ClCompile Include="SQLDriverConnectDisconnectTests.cpp" />
+    <ClCompile Include="SQLTablesTests.cpp" />
   </ItemGroup>
 </Project>

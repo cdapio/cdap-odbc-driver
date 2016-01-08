@@ -14,7 +14,9 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "StillExecutingException.h"
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+Cask::CdapOdbc::StillExecutingException::StillExecutingException(const char* what)
+  : std::logic_error(what) {
+}

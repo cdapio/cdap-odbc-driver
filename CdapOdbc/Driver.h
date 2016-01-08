@@ -53,7 +53,7 @@ namespace Cask {
       /**
        * Creates a driver instance.
        */
-      Driver() = default;
+      Driver();
 
       /**
        * Destructor.
@@ -124,6 +124,11 @@ namespace Cask {
       * Destroys a descriptor freeing all allocated resources.
       */
       void freeDescriptor(SQLHDESC desc);
+
+      /**
+       * Setups supported functions.
+       */
+      void setupSupportedFunctions(SQLUSMALLINT* bitset);
     };
   }
 }

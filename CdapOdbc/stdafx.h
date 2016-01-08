@@ -24,13 +24,26 @@
 // Windows Header Files:
 #include <windows.h>
 
+// Conflicts with query op status
+#undef ERROR
+#undef max
+#undef min
+
 #include <sql.h>
 #include <sqlext.h>
+#include <odbcinst.h>
+
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+#endif // _DEBUG
 
 #include <cassert>
 
 #include <memory>
 #include <unordered_map>
+#include <map>
 #include <atomic>
 #include <mutex>
 #include <exception>
@@ -41,9 +54,13 @@
 #include <iterator>
 #include <sstream>
 #include <algorithm>
+#include <array>
+#include <limits>
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>
 #include <cpprest/http_client.h>
 #include <cpprest/http_headers.h>
 #include <cpprest/json.h>
+
+#include "debug.h"

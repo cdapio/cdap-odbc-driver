@@ -23,14 +23,15 @@ namespace Cask {
      * Represents connection parameters parsed from connection string.
      */
     class ConnectionParams {
-      std::string host;
+      std::wstring driver;
+      std::wstring host;
       int port;
-      std::string authToken;
-      std::string namespace_;
+      std::wstring authToken;
+      std::wstring namespace_;
       bool sslEnabled;
       bool verifySslCert;
 
-      void parse(const std::string& connectionString);
+      void parse(const std::wstring& connectionString);
 
       ConnectionParams(const ConnectionParams&) = delete;
       void operator=(const ConnectionParams&) = delete;
@@ -40,7 +41,7 @@ namespace Cask {
       /**
        * Creates an instance of connection params.
        */
-      ConnectionParams(const std::string& connectionString);
+      ConnectionParams(const std::wstring& connectionString);
 
       /**
        * Destructor.
@@ -48,9 +49,16 @@ namespace Cask {
       ~ConnectionParams() = default;
 
       /**
+      * Gets DRIVER connection parameter.
+      */
+      const std::wstring& getDriver() const {
+        return this->driver;
+      }
+
+      /**
        * Gets HOST connection parameter.
        */
-      const std::string& getHost() const {
+      const std::wstring& getHost() const {
         return this->host;
       }
 
@@ -64,14 +72,14 @@ namespace Cask {
       /**
        * Gets AUTH_TOKEN connection parameter.
        */
-      const std::string& getAuthToken() const {
+      const std::wstring& getAuthToken() const {
         return this->authToken;
       }
 
       /**
        * Gets NAMESPACE connection parameter.
        */
-      const std::string& getNamespace() const {
+      const std::wstring& getNamespace() const {
         return this->namespace_;
       }
 
@@ -92,7 +100,7 @@ namespace Cask {
       /**
        * Gets full version of connection string.
        */
-      std::string getFullConnectionString() const;
+      std::wstring getFullConnectionString() const;
     };
   }
 }
