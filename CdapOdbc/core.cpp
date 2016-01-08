@@ -441,8 +441,18 @@ SQLRETURN SQL_API SQLPrepareW(
   SQLHSTMT      StatementHandle,
   SQLWCHAR *     StatementText,
   SQLINTEGER    TextLength) {
-  TRACE(L"SQLPrepareW\n");
-  return SQL_ERROR;
+  TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLPrepareW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLPrepareW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLBindParameter(
@@ -713,8 +723,27 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
   SQLSMALLINT   NameLength3,
   SQLSMALLINT   Scope,
   SQLSMALLINT   Nullable) {
-  TRACE(L"SQLSpecialColumnsW\n");
-  return SQL_ERROR;
+  TRACE(
+    L"SQLSpecialColumnsW(StatementHandle = %X, IdentifierType = %d, CatalogName = %s, SchemaName = %s, TableName = %s, Scope = %d, Nullable = %d)\n", 
+    StatementHandle,
+    IdentifierType,
+    CatalogName,
+    SchemaName,
+    TableName,
+    Scope,
+    Nullable);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSpecialColumns();
+    TRACE(L"SQLSpecialColumnsW returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLSpecialColumnsW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLSpecialColumnsW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLFreeStmt(
@@ -1027,8 +1056,9 @@ SQLRETURN SQL_API SQLSetStmtAttrW(
   SQLINTEGER Attribute,
   SQLPOINTER Value,
   SQLINTEGER StringLength) {
-  TRACE(L"SQLSetStmtAttrW\n");
-  return SQL_ERROR;
+  TRACE(L"SQLSetStmtAttrW(StatementHandle = %X, Attribute = %d)\n", StatementHandle, Attribute);
+  TRACE(L"SQLSetStmtAttrW returns SQL_SUCCESS\n");
+  return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLStatisticsW(

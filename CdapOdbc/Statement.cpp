@@ -151,6 +151,7 @@ void Cask::CdapOdbc::Statement::throwStateError() {
 void Cask::CdapOdbc::Statement::openQuery() {
   switch (this->requestType) {
     case RequestType::SCHEMAS:
+    case RequestType::SPECIAL_COLUMNS:
       this->state = State::CLOSED;
       throw NoDataException("No more data in the query.");
     case RequestType::TABLES:
@@ -161,7 +162,6 @@ void Cask::CdapOdbc::Statement::openQuery() {
     case RequestType::COLUMNS:
       this->queryResult = this->connection->getExploreClient().getStreamFields(this->tableName);
       break;
-
     ////case RequestType::DATA:
     ////  auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
     ////  switch (status.getOperationStatus()) {
@@ -463,6 +463,15 @@ void Cask::CdapOdbc::Statement::getColumns(const std::wstring& tableName) {
 
   this->requestType = RequestType::COLUMNS;
   this->tableName = tableName;
+  this->state = State::OPEN;
+}
+
+void Cask::CdapOdbc::Statement::getSpecialColumns() {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  this->requestType = RequestType::SPECIAL_COLUMNS;
   this->state = State::OPEN;
 }
 

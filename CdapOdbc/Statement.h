@@ -43,6 +43,7 @@ namespace Cask {
         TABLES,
         TYPES,
         COLUMNS,
+        SPECIAL_COLUMNS,
         DATA
       };
 
@@ -150,6 +151,11 @@ namespace Cask {
        * Retrieves column information for a table.
        */
       void getColumns(const std::wstring& tableName);
+
+      /**
+       * Retrieves information about special columns for a table.
+       */
+      void getSpecialColumns();
 
       /**
        * Retrieves the next row for the current statement 
