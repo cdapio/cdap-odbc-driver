@@ -58,6 +58,13 @@ namespace Cask {
         return this->handle;
       }
 
+      /** 
+       * Gets an explore client instance.
+       */
+      ExploreClient& getExploreClient() const {
+        return *this->exploreClient;
+      }
+
       /**
        * Gets parent environment.
        */
@@ -77,7 +84,7 @@ namespace Cask {
        *   SSL_ENABLED - SSL enabled/disabled (default false)
        *   VERIFY_SSL_CERT - server certificate verification (default true)
        */
-      void open(const std::string& connectionString);
+      void open(const std::wstring& connectionString);
       
       /*
        * Closes a connection.

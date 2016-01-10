@@ -16,5 +16,26 @@
 
 #pragma once
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+namespace Cask {
+  namespace CdapOdbc {
+
+    /**
+     * Utility class for manipulating strings.
+     */
+    class String {
+      String() = delete;
+
+    public:
+
+      /**
+       * Splits a string to tokens separated by delimiter character.
+       */
+      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+
+      /**
+      * Removes whitespaces from the start and the end of a string.
+      */
+      static std::wstring trim(const std::wstring& str);
+    };
+  }
+}

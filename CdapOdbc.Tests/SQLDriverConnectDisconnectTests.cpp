@@ -64,10 +64,7 @@ namespace Cask {
          * to SQLDriverConnect fails with SQL_INVALID_HANDLE error.
          */
         TEST_METHOD(NullConnectionHandleOnConnectFails) {
-          SQLRETURN result = SQLDriverConnectA(nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(static_cast<SQLRETURN>(SQL_INVALID_HANDLE), result);
-
-          result = SQLDriverConnectW(nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
+          SQLRETURN result = SQLDriverConnectW(nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_INVALID_HANDLE), result);
         }
 
@@ -87,10 +84,7 @@ namespace Cask {
           auto connectionInfo = this->allocConnection();
           auto connectionHandle = std::get<1>(connectionInfo);
 
-          SQLRETURN result = SQLDriverConnectA(connectionHandle, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
-
-          result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
+          SQLRETURN result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, nullptr, 0, nullptr, 0);
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           this->freeConnection(connectionInfo);
@@ -103,10 +97,7 @@ namespace Cask {
           auto connectionInfo = this->allocConnection();
           auto connectionHandle = std::get<1>(connectionInfo);
 
-          SQLRETURN result = SQLDriverConnectA(connectionHandle, nullptr, reinterpret_cast<SQLCHAR*>(""), 0, nullptr, 0, nullptr, 0);
-          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
-
-          result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, L"", 0, nullptr, 0);
+          SQLRETURN result = SQLDriverConnectW(connectionHandle, nullptr, nullptr, 0, L"", 0, nullptr, 0);
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
 
           this->freeConnection(connectionInfo);
@@ -119,20 +110,8 @@ namespace Cask {
           auto connectionInfo = this->allocConnection();
           auto connectionHandle = std::get<1>(connectionInfo);
 
-          char invalidConnectionString[] = { "INVALID=True" };
-          SQLRETURN result = SQLDriverConnectA(
-            connectionHandle, 
-            nullptr, 
-            reinterpret_cast<SQLCHAR*>(invalidConnectionString), 
-            sizeof(invalidConnectionString), 
-            nullptr, 
-            0, 
-            nullptr, 
-            0);
-          Assert::AreEqual(static_cast<SQLRETURN>(SQL_ERROR), result);
-
           wchar_t invalidConnectionStringW[] = { L"INVALID=True" };
-          result = SQLDriverConnectW(
+          SQLRETURN result = SQLDriverConnectW(
             connectionHandle, 
             nullptr, 
             nullptr, 
@@ -153,22 +132,8 @@ namespace Cask {
           auto connectionInfo = this->allocConnection();
           auto connectionHandle = std::get<1>(connectionInfo);
 
-          auto connectionStringA = this->getBaseConnectionStringA();
-          SQLRETURN result = SQLDriverConnectA(
-            connectionHandle,
-            nullptr,
-            reinterpret_cast<SQLCHAR*>(const_cast<char*>(connectionStringA.c_str())),
-            static_cast<SQLSMALLINT>(connectionStringA.size()),
-            nullptr,
-            0,
-            nullptr,
-            0);
-          Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
-
-          SQLDisconnect(connectionHandle);
-
           auto connectionStringW = this->getBaseConnectionStringW();
-          result = SQLDriverConnectW(
+          SQLRETURN result = SQLDriverConnectW(
             connectionHandle,
             nullptr,
             const_cast<wchar_t*>(connectionStringW.c_str()),

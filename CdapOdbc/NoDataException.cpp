@@ -14,7 +14,9 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "NoDataException.h"
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+Cask::CdapOdbc::NoDataException::NoDataException(const char* what)
+  : std::logic_error(what) {
+}

@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include "ColumnBinding.h"
+#include "ExploreClient.h"
+#include "ColumnMapper.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Connection;
@@ -24,8 +28,44 @@ namespace Cask {
     * Represents a SQL statement which can be executed to return some data.
     */
     class Statement {
+  
+      enum class State {
+        INITIAL,
+        OPEN,
+        FETCH,
+        CLOSED,
+      };
+
+      enum class RequestType {
+        UNKNOWN,
+        CATALOGS,
+        SCHEMAS,
+        TABLES,
+        TYPES,
+        COLUMNS,
+        DATA
+      };
+
+      std::vector<ColumnBinding> columnBindings;
+      QueryHandle queryHandle;
+      QueryResult queryResult;
+      State state;
       Connection* connection;
       SQLHSTMT handle;
+      int fetchSize;
+      int currentRowIndex;
+      bool moreData;
+      std::unique_ptr<ColumnMapper> mapper;
+      RequestType requestType;
+      std::wstring tableName;
+
+      void throwStateError();
+      void openQuery();
+      bool loadData();
+      bool getNextResults();
+      void fetchRow();
+      void setupMetadataMapper();
+      void setupSimpleMapper();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -55,6 +95,82 @@ namespace Cask {
       Connection* getConnection() const {
         return this->connection;
       }
+
+      /**
+       * Gets a fetch size.
+       */
+      int getFetchSize() const {
+        return this->fetchSize;
+      }
+
+      /**
+       * Sets a fetch size.
+       */
+      void setFetchSize(int value) {
+        this->fetchSize = value;
+      }
+
+      /**
+       * Adds a column binding information to a statement.
+       */
+      void addColumnBinding(const ColumnBinding& binding);
+
+      /**
+       * Removes a column binding information from a statement.
+       */
+      void removeColumnBinding(SQLUSMALLINT columnNumber);
+
+      /**
+       * Retrieves catalogs from a database.
+       */
+      void getCatalogs();
+
+      /**
+       * Retrieves schemas from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
+       */
+      void getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern);
+
+      /**
+       * Retrieves tables from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
+       */
+      void getTables(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
+
+      /**
+       * Retrieves data type information.
+       */
+      void getDataTypes();
+
+      /**
+       * Retrieves column information for a table.
+       */
+      void getColumns(const std::wstring& tableName);
+
+      /**
+       * Retrieves the next row for the current statement 
+       * and updates column bindings.
+       */
+      void fetch();
+
+      /**
+       * Resets statement to initial state.
+       */
+      void reset();
+
+      /**
+       * Unbinds all column bindings.
+       */
+      void unbindColumns();
+
+      /**
+       * Resets parameters.
+       */
+      void resetParameters();
     };
   }
 }

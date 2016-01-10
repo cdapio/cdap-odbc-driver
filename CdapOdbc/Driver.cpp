@@ -24,6 +24,12 @@
 
 using namespace Cask::CdapOdbc;
 
+namespace {
+  void setFunction(SQLUSMALLINT* bitset, SQLUSMALLINT functionId) {
+    bitset[(functionId) >> 4] |= (1 << ((functionId) & 0xF));
+  }
+}
+
 std::unique_ptr<Driver> Cask::CdapOdbc::Driver::instance(std::make_unique<Driver>());
 std::atomic_int Cask::CdapOdbc::Driver::lastHandleIndex = 100;
 
@@ -85,6 +91,9 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
   }
 }
 
+Cask::CdapOdbc::Driver::Driver() {
+}
+
 Driver& Cask::CdapOdbc::Driver::getInstance() {
   return *instance;
 }
@@ -109,7 +118,7 @@ Statement& Cask::CdapOdbc::Driver::getStatement(SQLHSTMT stmt) {
   throw InvalidHandleException("stmt", stmt);
 }
 
-Descriptor & Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
+Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   auto it = this->descriptors.find(desc);
   if (it != this->descriptors.end()) {
@@ -187,4 +196,68 @@ void Cask::CdapOdbc::Driver::freeDescriptor(SQLHDESC desc) {
   if (this->descriptors.erase(desc) == 0) {
     throw InvalidHandleException("desc", desc);
   }
+}
+
+void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
+  if (bitset == nullptr) {
+    throw std::invalid_argument("bitset");
+  }
+
+  auto it = stdext::make_checked_array_iterator(bitset, SQL_API_ODBC3_ALL_FUNCTIONS_SIZE);
+  std::fill(it, it + SQL_API_ODBC3_ALL_FUNCTIONS_SIZE, 0);
+
+  setFunction(bitset, SQL_API_SQLALLOCHANDLE);
+  setFunction(bitset, SQL_API_SQLBINDCOL);
+  setFunction(bitset, SQL_API_SQLBINDPARAMETER);
+  setFunction(bitset, SQL_API_SQLBULKOPERATIONS);
+  setFunction(bitset, SQL_API_SQLCANCEL);
+  setFunction(bitset, SQL_API_SQLCLOSECURSOR);
+  setFunction(bitset, SQL_API_SQLCOLATTRIBUTE);
+  setFunction(bitset, SQL_API_SQLCOLUMNS);
+  setFunction(bitset, SQL_API_SQLCONNECT);
+  setFunction(bitset, SQL_API_SQLCOPYDESC);
+  setFunction(bitset, SQL_API_SQLDESCRIBECOL);
+  setFunction(bitset, SQL_API_SQLDISCONNECT);
+  setFunction(bitset, SQL_API_SQLDRIVERCONNECT);
+  setFunction(bitset, SQL_API_SQLDRIVERS);
+  setFunction(bitset, SQL_API_SQLENDTRAN);
+  setFunction(bitset, SQL_API_SQLEXECDIRECT);
+  setFunction(bitset, SQL_API_SQLEXECUTE);
+  setFunction(bitset, SQL_API_SQLEXTENDEDFETCH);
+  setFunction(bitset, SQL_API_SQLFETCH);
+  setFunction(bitset, SQL_API_SQLFETCHSCROLL);
+  setFunction(bitset, SQL_API_SQLFREEHANDLE);
+  setFunction(bitset, SQL_API_SQLFREESTMT);
+  setFunction(bitset, SQL_API_SQLGETCONNECTATTR);
+  setFunction(bitset, SQL_API_SQLGETCURSORNAME);
+  setFunction(bitset, SQL_API_SQLGETDATA);
+  setFunction(bitset, SQL_API_SQLGETDESCFIELD);
+  setFunction(bitset, SQL_API_SQLGETDESCREC);
+  setFunction(bitset, SQL_API_SQLGETDIAGFIELD);
+  setFunction(bitset, SQL_API_SQLGETDIAGREC);
+  setFunction(bitset, SQL_API_SQLGETFUNCTIONS);
+  setFunction(bitset, SQL_API_SQLGETINFO);
+  setFunction(bitset, SQL_API_SQLGETSTMTATTR);
+  setFunction(bitset, SQL_API_SQLGETTYPEINFO);
+  setFunction(bitset, SQL_API_SQLMORERESULTS);
+  setFunction(bitset, SQL_API_SQLNATIVESQL);
+  setFunction(bitset, SQL_API_SQLNUMPARAMS);
+  setFunction(bitset, SQL_API_SQLNUMRESULTCOLS);
+  setFunction(bitset, SQL_API_SQLPARAMDATA);
+  setFunction(bitset, SQL_API_SQLPREPARE);
+  setFunction(bitset, SQL_API_SQLPROCEDURECOLUMNS);
+  setFunction(bitset, SQL_API_SQLPROCEDURES);
+  setFunction(bitset, SQL_API_SQLPRIMARYKEYS);
+  setFunction(bitset, SQL_API_SQLPUTDATA);
+  setFunction(bitset, SQL_API_SQLROWCOUNT);
+  setFunction(bitset, SQL_API_SQLSETCONNECTATTR);
+  setFunction(bitset, SQL_API_SQLSETCURSORNAME);
+  setFunction(bitset, SQL_API_SQLSETDESCFIELD);
+  setFunction(bitset, SQL_API_SQLSETDESCREC);
+  setFunction(bitset, SQL_API_SQLSETENVATTR);
+  setFunction(bitset, SQL_API_SQLSETPOS);
+  setFunction(bitset, SQL_API_SQLSETSTMTATTR);
+  setFunction(bitset, SQL_API_SQLSPECIALCOLUMNS);
+  setFunction(bitset, SQL_API_SQLSTATISTICS);
+  setFunction(bitset, SQL_API_SQLTABLES);
 }

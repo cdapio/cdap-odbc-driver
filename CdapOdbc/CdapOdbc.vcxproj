@@ -91,7 +91,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -105,8 +104,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,21 +146,34 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Argument.h" />
+    <ClInclude Include="ColumnBinding.h" />
+    <ClInclude Include="ColumnDesc.h" />
+    <ClInclude Include="ColumnMapper.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="Descriptor.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
+    <ClInclude Include="MetadataColumnMapper.h" />
+    <ClInclude Include="NoDataException.h" />
+    <ClInclude Include="QueryResult.h" />
+    <ClInclude Include="QueryStatus.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StillExecutingException.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="ColumnBinding.cpp" />
+    <ClCompile Include="ColumnDesc.cpp" />
+    <ClCompile Include="ColumnMapper.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="core.cpp" />
@@ -185,6 +197,10 @@
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
+    <ClCompile Include="MetadataColumnMapper.cpp" />
+    <ClCompile Include="NoDataException.cpp" />
+    <ClCompile Include="QueryResult.cpp" />
+    <ClCompile Include="QueryStatus.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -192,6 +208,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StillExecutingException.cpp" />
+    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">

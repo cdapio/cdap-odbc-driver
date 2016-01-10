@@ -18,30 +18,38 @@
 
 namespace Cask {
   namespace CdapOdbc {
-    /**
-     * Reports errors that arise because SQLHANDLE argument value has not been accepted.
-     */
-    class InvalidHandleException : public std::invalid_argument {
-      SQLHANDLE handle;
 
+    /**
+     * Represents a query result.
+     */
+    class QueryResult {
+      web::json::value rows;
+    
     public:
 
       /**
-       * Creates an instance.
+       * Creates an instance of QueryResult.
        */
-      InvalidHandleException(const char *what_arg, SQLHANDLE handle);
-      
-      /**
-       * Descructor.
-       */
-      ~InvalidHandleException() = default;
-
+      QueryResult() = default;
 
       /**
-      * Gets a handle which value has not been accepted.
+      * Creates an instance of QueryResult from JSON.
       */
-      SQLHANDLE getHandle() const {
-        return this->handle;
+      QueryResult(const web::json::value& value);
+
+      /**
+       * Gets a query data.
+       */
+      const web::json::array& getRows() {
+        return this->rows.as_array();
+      }
+
+      size_t getSize() const {
+        if (this->rows.is_array()) {
+          return this->rows.as_array().size();
+        } else {
+          return 0;
+        }
       }
     };
   }

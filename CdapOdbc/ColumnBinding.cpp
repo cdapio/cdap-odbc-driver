@@ -14,7 +14,15 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "ColumnBinding.h"
 
-#define _WIN32_WINNT 0x0601
-#include <SDKDDKVer.h>
+using namespace Cask::CdapOdbc;
+
+Cask::CdapOdbc::ColumnBinding::ColumnBinding() 
+  : columnNumber(0)
+  , targetType(0)
+  , targetValuePtr(nullptr)
+  , bufferLength(0)
+  , strLenOrInd(nullptr) {
+}
