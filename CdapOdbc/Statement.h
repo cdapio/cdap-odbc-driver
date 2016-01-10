@@ -17,8 +17,9 @@
 #pragma once
 
 #include "ColumnBinding.h"
+#include "Command.h"
+
 #include "ExploreClient.h"
-#include "ColumnMapper.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -36,37 +37,14 @@ namespace Cask {
         CLOSED,
       };
 
-      enum class RequestType {
-        UNKNOWN,
-        CATALOGS,
-        SCHEMAS,
-        TABLES,
-        TYPES,
-        COLUMNS,
-        SPECIAL_COLUMNS,
-        DATA
-      };
-
-      std::vector<ColumnBinding> columnBindings;
-      QueryHandle queryHandle;
-      QueryResult queryResult;
       State state;
       Connection* connection;
       SQLHSTMT handle;
-      int fetchSize;
-      int currentRowIndex;
-      bool moreData;
-      std::unique_ptr<ColumnMapper> mapper;
-      RequestType requestType;
-      std::wstring tableName;
+      std::vector<ColumnBinding> columnBindings;
+      std::unique_ptr<Command> command;
+      std::unique_ptr<DataReader> dataReader;
 
       void throwStateError();
-      void openQuery();
-      bool loadData();
-      bool getNextResults();
-      void fetchRow();
-      void setupMetadataMapper();
-      void setupSimpleMapper();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -98,20 +76,6 @@ namespace Cask {
       }
 
       /**
-       * Gets a fetch size.
-       */
-      int getFetchSize() const {
-        return this->fetchSize;
-      }
-
-      /**
-       * Sets a fetch size.
-       */
-      void setFetchSize(int value) {
-        this->fetchSize = value;
-      }
-
-      /**
        * Adds a column binding information to a statement.
        */
       void addColumnBinding(const ColumnBinding& binding);
@@ -120,11 +84,6 @@ namespace Cask {
        * Removes a column binding information from a statement.
        */
       void removeColumnBinding(SQLUSMALLINT columnNumber);
-
-      /**
-       * Retrieves catalogs from a database.
-       */
-      void getCatalogs();
 
       /**
        * Retrieves schemas from a database.

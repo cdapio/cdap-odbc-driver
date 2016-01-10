@@ -16,6 +16,15 @@
     <Filter Include="Library">
       <UniqueIdentifier>{bfa9e0b2-0ea5-4bc5-bcfe-433249ecdef8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Statements">
+      <UniqueIdentifier>{dc1858ad-49f0-4883-8768-0504563b636c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\Commands">
+      <UniqueIdentifier>{2eea4c72-2c03-4efb-9998-7cd272d3c3ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\DataReaders">
+      <UniqueIdentifier>{a20badfa-83aa-406b-a68f-1af3300b1479}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Driver.h">
@@ -81,11 +90,47 @@
     <ClInclude Include="debug.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnMapper.h">
-      <Filter>Driver</Filter>
+    <ClInclude Include="DataReader.h">
+      <Filter>Statements</Filter>
     </ClInclude>
-    <ClInclude Include="MetadataColumnMapper.h">
-      <Filter>Driver</Filter>
+    <ClInclude Include="Command.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="SchemasCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="TablesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="TypesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="SchemasDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TablesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TypesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -149,11 +194,47 @@
     <ClCompile Include="core.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnMapper.cpp">
-      <Filter>Driver</Filter>
+    <ClCompile Include="DataReader.cpp">
+      <Filter>Statements</Filter>
     </ClCompile>
-    <ClCompile Include="MetadataColumnMapper.cpp">
-      <Filter>Driver</Filter>
+    <ClCompile Include="Command.cpp">
+      <Filter>Statements</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="SchemasCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="TablesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="TypesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="SchemasDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="TablesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="TypesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecialColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecialColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

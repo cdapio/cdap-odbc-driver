@@ -16,20 +16,27 @@
 
 #pragma once
 
-#include "ColumnMapper.h"
+#include "Command.h"
 
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Represents metadata mappings of columns from Explore to ODBC datasets.
+     * Gets a list of special columns from a database.
      */
-    class MetadataColumnMapper : public ColumnMapper {
+    class SpecialColumnsCommand : public Command {
 
-    protected:
+    public:
 
-      virtual const ColumnDesc* getDesc(const ColumnBinding& binding) const override;
+      /**
+       * Creates a command instance.
+       */
+      SpecialColumnsCommand(Connection* connection);
 
+      /**
+       * Executes a command and builds a data reader.
+       */
+      virtual std::unique_ptr<DataReader> executeReader() override;
     };
   }
 }
