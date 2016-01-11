@@ -18,8 +18,9 @@
 #include "QueryCommand.h"
 #include "QueryDataReader.h"
 
-Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection)
-  : Command(connection) {
+Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
+  : Command(connection)
+  , query(query) {
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::executeReader() {

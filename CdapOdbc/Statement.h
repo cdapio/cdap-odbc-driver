@@ -32,6 +32,7 @@ namespace Cask {
   
       enum class State {
         INITIAL,
+        PREPARE,
         OPEN,
         FETCH,
         CLOSED,
@@ -45,6 +46,7 @@ namespace Cask {
       std::unique_ptr<DataReader> dataReader;
 
       void throwStateError();
+      void openQuery();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -136,6 +138,16 @@ namespace Cask {
        * Resets parameters.
        */
       void resetParameters();
+
+      /**
+       * Prepares SQL query statement for execution.
+       */
+      void prepare(const std::wstring& query);
+
+      /**
+       * Executes SQL query.
+       */
+      void execute();
     };
   }
 }

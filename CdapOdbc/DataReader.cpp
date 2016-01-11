@@ -25,7 +25,7 @@ void Cask::CdapOdbc::DataReader::fetchNull(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::DataReader::fetchString(const wchar_t* str, const ColumnBinding& binding) {
-  assert(binding.getTargetType() == SQL_C_CHAR);
+  assert(binding.getTargetType() == SQL_CHAR || binding.getTargetType() == SQL_DEFAULT);
   if (str) {
     std::string ansiStr = Encoding::toUtf8(str);
     size_t maxLength = static_cast<size_t>(binding.getBufferLength()) - 1;
@@ -57,11 +57,11 @@ void Cask::CdapOdbc::DataReader::fetchString(const wchar_t* str, const ColumnBin
 }
 
 void Cask::CdapOdbc::DataReader::fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding) {
-  assert(binding.getTargetType() == SQL_C_SSHORT);
+  assert(binding.getTargetType() == SQL_C_SSHORT || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLSMALLINT*>(binding.getTargetValuePtr())) = value;
 }
 
 void Cask::CdapOdbc::DataReader::fetchInt(SQLINTEGER value, const ColumnBinding& binding) {
-  assert(binding.getTargetType() == SQL_C_SLONG);
+  assert(binding.getTargetType() == SQL_C_SLONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLINTEGER*>(binding.getTargetValuePtr())) = value;
 }

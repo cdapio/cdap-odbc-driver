@@ -444,8 +444,15 @@ SQLRETURN SQL_API SQLPrepareW(
   TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
-    TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
+    auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+    if (sql) {
+      statement.prepare(*sql);
+      TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    }
+
+    TRACE(L"SQLPrepareW returns SQL_ERROR\n");
+    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLPrepareW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
@@ -472,8 +479,19 @@ SQLRETURN SQL_API SQLBindParameter(
 
 SQLRETURN SQL_API SQLExecute(
   SQLHSTMT     StatementHandle) {
-  TRACE(L"SQLExecute\n");
-  return SQL_ERROR;
+  TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.execute();
+    TRACE(L"SQLExecute returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLExecute returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLExecute returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLExecDirectW(

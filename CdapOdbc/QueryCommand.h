@@ -26,12 +26,14 @@ namespace Cask {
      */
     class QueryCommand : public Command {
 
+      std::wstring query;
+
     public:
 
       /**
        * Creates a command instance.
        */
-      QueryCommand(Connection* connection);
+      QueryCommand(Connection* connection, const std::wstring& query);
 
       /**
        * Executes a command and builds a data reader.

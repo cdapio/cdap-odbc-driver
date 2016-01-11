@@ -26,9 +26,19 @@
 #include "TypesCommand.h"
 #include "ColumnsCommand.h"
 #include "SpecialColumnsCommand.h"
+#include "QueryCommand.h"
 
 void Cask::CdapOdbc::Statement::throwStateError() {
   throw std::logic_error("Wrong statement state.");
+}
+
+void Cask::CdapOdbc::Statement::openQuery() {
+  if (this->state != State::PREPARE) {
+    this->throwStateError();
+  }
+  
+  this->dataReader = this->command->executeReader();
+  this->state = State::OPEN;
 }
 
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
@@ -40,7 +50,9 @@ Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
-  if (this->state != State::INITIAL && this->state != State::OPEN) {
+  if (this->state != State::INITIAL && 
+      this->state != State::PREPARE && 
+      this->state != State::OPEN) {
     this->throwStateError();
   }
 
@@ -58,7 +70,9 @@ void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
-  if (this->state != State::INITIAL && this->state != State::OPEN) {
+  if (this->state != State::INITIAL &&
+    this->state != State::PREPARE &&
+    this->state != State::OPEN) {
     this->throwStateError();
   }
 
@@ -79,7 +93,9 @@ void Cask::CdapOdbc::Statement::getSchemas(const std::wstring* catalog, const st
   }
 
   this->command = std::make_unique<SchemasCommand>(this->connection);
-  this->state = State::OPEN;
+  this->state = State::PREPARE;
+
+  this->openQuery();
 }
 
 void Cask::CdapOdbc::Statement::getTables(
@@ -92,7 +108,9 @@ void Cask::CdapOdbc::Statement::getTables(
   }
 
   this->command = std::make_unique<TablesCommand>(this->connection);
-  this->state = State::OPEN;
+  this->state = State::PREPARE;
+
+  this->openQuery();
 }
 
 void Cask::CdapOdbc::Statement::getDataTypes() {
@@ -101,7 +119,9 @@ void Cask::CdapOdbc::Statement::getDataTypes() {
   }
 
   this->command = std::make_unique<TypesCommand>(this->connection);
-  this->state = State::OPEN;
+  this->state = State::PREPARE;
+
+  this->openQuery();
 }
 
 void Cask::CdapOdbc::Statement::getColumns(const std::wstring& tableName) {
@@ -110,7 +130,9 @@ void Cask::CdapOdbc::Statement::getColumns(const std::wstring& tableName) {
   }
 
   this->command = std::make_unique<ColumnsCommand>(this->connection, tableName);
-  this->state = State::OPEN;
+  this->state = State::PREPARE;
+
+  this->openQuery();
 }
 
 void Cask::CdapOdbc::Statement::getSpecialColumns() {
@@ -119,7 +141,9 @@ void Cask::CdapOdbc::Statement::getSpecialColumns() {
   }
 
   this->command = std::make_unique<SpecialColumnsCommand>(this->connection);
-  this->state = State::OPEN;
+  this->state = State::PREPARE;
+
+  this->openQuery();
 }
 
 void Cask::CdapOdbc::Statement::fetch() {
@@ -127,20 +151,14 @@ void Cask::CdapOdbc::Statement::fetch() {
     this->throwStateError();
   }
 
-  if (this->state == State::OPEN) {
-    this->dataReader = this->command->executeReader();
-    this->state = State::FETCH;
-  }
-
-  if (this->state == State::FETCH) {
-    if (this->dataReader->read()) {
-      for (auto& binding : this->columnBindings) {
-        this->dataReader->getColumnValue(binding);
-      }
-    } else {
-      this->state = State::CLOSED;
-      throw NoDataException("No more data in the query.");
+  this->state = State::FETCH;
+  if (this->dataReader->read()) {
+    for (auto& binding : this->columnBindings) {
+      this->dataReader->getColumnValue(binding);
     }
+  } else {
+    this->state = State::CLOSED;
+    throw NoDataException("No more data in the query.");
   }
 }
 
@@ -153,7 +171,9 @@ void Cask::CdapOdbc::Statement::reset() {
 }
 
 void Cask::CdapOdbc::Statement::unbindColumns() {
-  if (this->state != State::INITIAL && this->state != State::OPEN) {
+  if (this->state != State::INITIAL &&
+    this->state != State::PREPARE &&
+    this->state != State::OPEN) {
     this->throwStateError();
   }
 
@@ -164,4 +184,17 @@ void Cask::CdapOdbc::Statement::resetParameters() {
   if (this->state != State::INITIAL) {
     this->throwStateError();
   }
+}
+
+void Cask::CdapOdbc::Statement::prepare(const std::wstring& query) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  this->command = std::make_unique<QueryCommand>(this->connection, query);
+  this->state = State::PREPARE;
+}
+
+void Cask::CdapOdbc::Statement::execute() {
+  this->openQuery();
 }
