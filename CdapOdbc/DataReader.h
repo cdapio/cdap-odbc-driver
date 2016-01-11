@@ -58,6 +58,11 @@ namespace Cask {
        * Gets the value of the specified column.
        */
       virtual void getColumnValue(const ColumnBinding& binding) = 0;
+
+      /**
+      * Gets number of columns in a result set.
+      */
+      virtual short getColumnCount() const = 0;
     };
   }
 }

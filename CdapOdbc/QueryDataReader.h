@@ -20,13 +20,14 @@
 
 namespace Cask {
   namespace CdapOdbc {
+    class QueryCommand;
 
     /**
      * Reads a forward-only stream of rows.
      */
     class QueryDataReader : public DataReader {
 
-      ////QueryHandle queryHandle;
+      QueryCommand* queryCommand;
       ////QueryResult queryResult;
       ////int fetchSize;
       ////int currentRowIndex;
@@ -36,11 +37,19 @@ namespace Cask {
 
     public:
 
+      /**
+       * Creates an instance of QueryDataReader.
+       */
+      QueryDataReader(QueryCommand* command);
+
       // Inherited via DataReader
       virtual bool read() override;
 
       // Inherited via DataReader
-      virtual void getColumnValue(const ColumnBinding & binding) override;
+      virtual void getColumnValue(const ColumnBinding& binding) override;
+
+      // Inherited via DataReader
+      virtual short getColumnCount() const override;
     };
   }
 }

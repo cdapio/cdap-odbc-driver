@@ -519,8 +519,24 @@ SQLRETURN SQL_API SQLParamData(
 SQLRETURN SQL_API SQLNumResultCols(
   SQLHSTMT        StatementHandle,
   SQLSMALLINT *   ColumnCountPtr) {
-  TRACE(L"SQLNumResultCols\n");
-  return SQL_ERROR;
+  TRACE(L"SQLNumResultCols(StatementHandle = %X)\n", StatementHandle);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    if (!ColumnCountPtr) {
+      TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+      return SQL_ERROR;
+    }
+
+    *ColumnCountPtr = statement.getColumnCount();
+    TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLNumResultCols returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLDescribeColW(

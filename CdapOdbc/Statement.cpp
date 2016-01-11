@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "Statement.h"
 #include "Connection.h"
-#include "StillExecutingException.h"
 #include "NoDataException.h"
 #include "String.h"
 #include "Encoding.h"
@@ -28,7 +27,7 @@
 #include "SpecialColumnsCommand.h"
 #include "QueryCommand.h"
 
-void Cask::CdapOdbc::Statement::throwStateError() {
+void Cask::CdapOdbc::Statement::throwStateError() const {
   throw std::logic_error("Wrong statement state.");
 }
 
@@ -197,4 +196,12 @@ void Cask::CdapOdbc::Statement::prepare(const std::wstring& query) {
 
 void Cask::CdapOdbc::Statement::execute() {
   this->openQuery();
+}
+
+SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
+  if (this->state != State::OPEN) {
+    this->throwStateError();
+  }
+
+  return this->dataReader->getColumnCount();
 }

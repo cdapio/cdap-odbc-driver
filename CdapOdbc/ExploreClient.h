@@ -106,9 +106,14 @@ namespace Cask {
       QueryResult getStreams();
 
       /**
-       * Retrieves a list 
+       * Retrieves a list.
        */
       QueryResult getStreamFields(const std::wstring& streamName);
+
+      /**
+      * Executes SQL statement.
+      */
+      QueryHandle execute(const std::wstring& statement);
     };
   }
 }

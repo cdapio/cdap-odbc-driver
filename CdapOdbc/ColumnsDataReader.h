@@ -43,6 +43,9 @@ namespace Cask {
 
       // Inherited via DataReader
       virtual void getColumnValue(const ColumnBinding & binding) override;
+
+      // Inherited via DataReader
+      virtual short getColumnCount() const override;
     };
   }
 }

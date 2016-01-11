@@ -67,3 +67,7 @@ void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& bindin
       break;
   }
 }
+
+short Cask::CdapOdbc::TypesDataReader::getColumnCount() const {
+  return 19;
+}

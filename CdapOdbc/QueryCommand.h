@@ -17,6 +17,7 @@
 #pragma once
 
 #include "Command.h"
+#include "ExploreClient.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -27,6 +28,9 @@ namespace Cask {
     class QueryCommand : public Command {
 
       std::wstring query;
+      QueryHandle queryHandle;
+      bool hasData;
+      std::vector<ColumnDesc> querySchema;
 
     public:
 
@@ -34,6 +38,13 @@ namespace Cask {
        * Creates a command instance.
        */
       QueryCommand(Connection* connection, const std::wstring& query);
+
+      /**
+       * Gets column count.
+       */
+      size_t getColumnCount() const {
+        return this->querySchema.size();
+      }
 
       /**
        * Executes a command and builds a data reader.

@@ -16,7 +16,9 @@
 
 #include "stdafx.h"
 #include "QueryCommand.h"
+#include "Connection.h"
 #include "QueryDataReader.h"
+#include "StillExecutingException.h"
 
 Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
   : Command(connection)
@@ -24,32 +26,31 @@ Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::ws
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::executeReader() {
+  if (this->queryHandle.size() == 0) {
+    this->queryHandle = this->getConnection()->getExploreClient().execute(this->query);
+  }
 
-  ////case RequestType::DATA:
-  ////  auto status = this->connection->getExploreClient().getQueryStatus(this->queryHandle);
-  ////  switch (status.getOperationStatus()) {
-  ////    case OperationStatus::FINISHED:
-  ////      if (status.hasResults()) {
-  ////        this->moreData = true;
-  ////        auto querySchema = this->connection->getExploreClient().getQuerySchema(this->queryHandle);
-  ////        this->mapper->setColumnBindings(this->columnBindings);
-  ////        this->mapper->setColumnDescs(querySchema);
-  ////      }
+  auto status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);
+  switch (status.getOperationStatus()) {
+    case OperationStatus::FINISHED:
+      if (status.hasResults()) {
+        this->hasData = true;
+        this->querySchema = this->getConnection()->getExploreClient().getQuerySchema(this->queryHandle);
+      }
 
-  ////      break;
-  ////    case OperationStatus::INITIALIZED:
-  ////    case OperationStatus::PENDING:
-  ////    case OperationStatus::RUNNING:
-  ////      throw StillExecutingException("The query is still executing.");
-  ////    case OperationStatus::UNKNOWN:
-  ////    case OperationStatus::ERROR:
-  ////      throw std::exception("An error occured during query execution.");
-  ////    case OperationStatus::CANCELED:
-  ////      throw std::exception("Query canceled.");
-  ////    case OperationStatus::CLOSED:
-  ////      throw std::exception("Query closed.");
-  ////  }
-  ////  break;
+      break;
+    case OperationStatus::INITIALIZED:
+    case OperationStatus::PENDING:
+    case OperationStatus::RUNNING:
+      throw StillExecutingException("The query is still executing.");
+    case OperationStatus::UNKNOWN:
+    case OperationStatus::ERROR:
+      throw std::exception("An error occured during query execution.");
+    case OperationStatus::CANCELED:
+      throw std::exception("Query canceled.");
+    case OperationStatus::CLOSED:
+      throw std::exception("Query closed.");
+  }
 
-  return std::make_unique<QueryDataReader>();
+  return std::make_unique<QueryDataReader>(this);
 }

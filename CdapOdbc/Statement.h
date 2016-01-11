@@ -45,7 +45,7 @@ namespace Cask {
       std::unique_ptr<Command> command;
       std::unique_ptr<DataReader> dataReader;
 
-      void throwStateError();
+      void throwStateError() const;
       void openQuery();
 
       Statement(const Statement&) = delete;
@@ -148,6 +148,11 @@ namespace Cask {
        * Executes SQL query.
        */
       void execute();
+
+      /**
+       * Returns number of columns for a statement. 
+       */
+      SQLSMALLINT getColumnCount() const;
     };
   }
 }

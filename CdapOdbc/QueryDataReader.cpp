@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "QueryDataReader.h"
+#include "QueryCommand.h"
 
 ////namespace {
 ////  const std::wstring* convertPattern(const std::wstring* pattern) {
@@ -42,6 +43,9 @@ bool Cask::CdapOdbc::QueryDataReader::loadData() {
   return false;
 }
 
+Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command) {
+}
+
 bool Cask::CdapOdbc::QueryDataReader::read() {
   ////bool result = false;
   ////bool dataLoaded = (this->queryResult.getSize() > 0);
@@ -62,4 +66,8 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
 }
 
 void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& binding) {
+}
+
+short Cask::CdapOdbc::QueryDataReader::getColumnCount() const {
+  return static_cast<short>(this->queryCommand->getColumnCount());
 }
