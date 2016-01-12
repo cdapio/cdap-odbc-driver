@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "TablesDataReader.h"
+#include "String.h"
 
 Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& queryResult)
   : queryResult(queryResult)
@@ -36,7 +37,7 @@ void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& bindi
       this->fetchNull(binding);
       break;
     case 3: // TABLE_NAME 
-      name = this->queryResult.getRows().at(this->currentRowIndex).at(L"name").as_string();
+      name = String::makeTableName(this->queryResult.getRows().at(this->currentRowIndex).at(L"name").as_string());
       this->fetchString(name.c_str(), binding);
       break;
     case 4: // TABLE_TYPE 

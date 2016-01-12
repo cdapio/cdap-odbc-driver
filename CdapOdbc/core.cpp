@@ -671,9 +671,9 @@ SQLRETURN SQL_API SQLColumnsW(
     ColumnName);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
-    auto tableName = Argument::toStdString(TableName, NameLength3);
-    if (tableName) {
-      statement.getColumns(*tableName);
+    auto streamName = Argument::toStdString(TableName, NameLength3);
+    if (streamName) {
+      statement.getColumns(*streamName);
       TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     }
@@ -722,7 +722,7 @@ SQLRETURN SQL_API SQLTablesW(
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     auto catalogName = Argument::toStdString(CatalogName, NameLength1);
     auto schemaName = Argument::toStdString(SchemaName, NameLength2);
-    auto tableName = Argument::toStdString(TableName, NameLength3);
+    auto streamName = Argument::toStdString(TableName, NameLength3);
     auto tableTypes = Argument::toStdString(TableType, NameLength4);
 
     if (schemaName && *schemaName == L"%") {
@@ -730,7 +730,7 @@ SQLRETURN SQL_API SQLTablesW(
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } else if (tableTypes) {
-      statement.getTables(catalogName.get(), schemaName.get(), tableName.get(), tableTypes.get());
+      statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
       TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     }

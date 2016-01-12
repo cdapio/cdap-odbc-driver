@@ -123,12 +123,12 @@ void Cask::CdapOdbc::Statement::getDataTypes() {
   this->openQuery();
 }
 
-void Cask::CdapOdbc::Statement::getColumns(const std::wstring& tableName) {
+void Cask::CdapOdbc::Statement::getColumns(const std::wstring& streamName) {
   if (this->state != State::INITIAL) {
     this->throwStateError();
   }
 
-  this->command = std::make_unique<ColumnsCommand>(this->connection, tableName);
+  this->command = std::make_unique<ColumnsCommand>(this->connection, streamName);
   this->state = State::PREPARE;
 
   this->openQuery();

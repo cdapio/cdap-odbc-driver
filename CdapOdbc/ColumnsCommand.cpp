@@ -18,6 +18,7 @@
 #include "ColumnsCommand.h"
 #include "Connection.h"
 #include "ColumnsDataReader.h"
+#include "String.h"
 
 Cask::CdapOdbc::ColumnsCommand::ColumnsCommand(Connection* connection, const std::wstring& tableName)
   : Command(connection)
@@ -25,6 +26,7 @@ Cask::CdapOdbc::ColumnsCommand::ColumnsCommand(Connection* connection, const std
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::ColumnsCommand::executeReader() {
-  auto queryResult = this->getConnection()->getExploreClient().getStreamFields(this->tableName);
+  auto streamName = String::makeStreamName(this->tableName);
+  auto queryResult = this->getConnection()->getExploreClient().getStreamFields(streamName);
   return std::make_unique<ColumnsDataReader>(this->tableName, queryResult);
 }

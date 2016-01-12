@@ -111,7 +111,7 @@ namespace Cask {
       /**
        * Retrieves column information for a table.
        */
-      void getColumns(const std::wstring& tableName);
+      void getColumns(const std::wstring& streamName);
 
       /**
        * Retrieves information about special columns for a table.

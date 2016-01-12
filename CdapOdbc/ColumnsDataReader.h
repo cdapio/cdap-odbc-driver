@@ -34,7 +34,7 @@ namespace Cask {
     public:
 
       /**
-       * Creates an instance of TablesDataReader.
+       * Creates an instance of ColumnsDataReader.
        */
       ColumnsDataReader(const std::wstring& tableName, const QueryResult& queryResult);
 

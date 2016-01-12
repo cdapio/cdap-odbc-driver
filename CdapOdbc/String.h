@@ -33,9 +33,19 @@ namespace Cask {
       static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
 
       /**
-      * Removes whitespaces from the start and the end of a string.
-      */
+       * Removes whitespaces from the start and the end of a string.
+       */
       static std::wstring trim(const std::wstring& str);
+
+      /**
+       * Makes stream name from table name.
+       */
+      static std::wstring makeStreamName(const std::wstring& streamName);
+
+      /**
+       * Makes table name from stream name.
+       */
+      static std::wstring makeTableName(const std::wstring& streamName);
     };
   }
 }
