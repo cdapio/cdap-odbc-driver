@@ -40,6 +40,13 @@ namespace Cask {
       QueryCommand(Connection* connection, const std::wstring& query);
 
       /**
+       * Gets if query has some data.
+       */
+      bool getHasData() const {
+        return this->hasData;
+      }
+
+      /**
        * Gets column count.
        */
       size_t getColumnCount() const {
@@ -50,6 +57,11 @@ namespace Cask {
        * Executes a command and builds a data reader.
        */
       virtual std::unique_ptr<DataReader> executeReader() override;
+
+      /**
+       * Loads next N rows.
+       */
+      QueryResult loadRows(int rows);
     };
   }
 }

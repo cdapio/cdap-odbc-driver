@@ -44,9 +44,9 @@ namespace Cask {
         return this->rows.as_array();
       }
 
-      size_t getSize() const {
+      int getSize() const {
         if (this->rows.is_array()) {
-          return this->rows.as_array().size();
+          return static_cast<int>(this->rows.as_array().size());
         } else {
           return 0;
         }

@@ -31,38 +31,42 @@
 ////}
 
 bool Cask::CdapOdbc::QueryDataReader::loadData() {
-  //if (this->moreData) {
-  //  this->queryResult = this->connection->getExploreClient().getQueryResult(this->queryHandle, this->fetchSize);
-  //  this->moreData = (this->queryResult.getSize() == this->fetchSize);
-  //  this->currentRowIndex = 0;
-  //  // True if there are some records 
-  //  return (this->queryResult.getSize() > 0);
-  //} else {
-  //  return false;
-  //}
-  return false;
+  if (this->moreData) {
+    this->queryResult = this->queryCommand->loadRows(FETCH_SIZE);
+    ++this->fetchCount;
+
+    // If number of rows is equal to fetch size
+    // assume there are more rows
+    this->moreData = (this->queryResult.getSize() == FETCH_SIZE);
+    this->currentRowIndex = -1;
+    return (this->queryResult.getSize() > 0);
+  } else {
+    return false;
+  }
 }
 
-Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command) {
+Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
+  : queryCommand(command)
+  , fetchCount(0)
+  , currentRowIndex(-1)
+  , moreData(true) {
 }
 
 bool Cask::CdapOdbc::QueryDataReader::read() {
-  ////bool result = false;
-  ////bool dataLoaded = (this->queryResult.getSize() > 0);
-  ////if (dataLoaded) {
-  ////  ++this->currentRowIndex;
-  ////  if (this->currentRowIndex == this->queryResult.getSize()) {
-  ////    // Need more data
-  ////    result = this->loadData();
-  ////  } else {
-  ////    result = true;
-  ////  }
-  ////} else {
-  ////  // Get 1st row - no data yet
-  ////  result = this->loadData();
-  ////}
-
-  return false;
+  if (this->queryCommand->getHasData()) {
+    if (this->fetchCount == 0) {
+      return this->loadData();
+    } else {
+      ++this->currentRowIndex;
+      if (this->currentRowIndex = this->queryResult.getSize()) {
+        return this->loadData();
+      } else {
+        return true;
+      }
+    }
+  } else {
+    return false;
+  }
 }
 
 void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& binding) {

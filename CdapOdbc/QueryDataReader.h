@@ -17,6 +17,7 @@
 #pragma once
 
 #include "DataReader.h"
+#include "QueryResult.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -27,11 +28,13 @@ namespace Cask {
      */
     class QueryDataReader : public DataReader {
 
+      static const int FETCH_SIZE = 100;
+
       QueryCommand* queryCommand;
-      ////QueryResult queryResult;
-      ////int fetchSize;
-      ////int currentRowIndex;
-      ////bool moreData;
+      QueryResult queryResult;
+      int fetchCount;
+      int currentRowIndex;
+      bool moreData;
    
       bool loadData();
 
