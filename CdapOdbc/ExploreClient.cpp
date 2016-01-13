@@ -167,6 +167,6 @@ QueryResult Cask::CdapOdbc::ExploreClient::getStreamFields(const std::wstring& s
 QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
   web::json::value query;
   query[L"query"] = toJson(&statement);
-  auto value = this->doPost(L"namespaces/%s/data/explore/queries", query);
+  auto value = this->doPost(L"namespaces/default/data/explore/queries", query);
   return value.at(L"handle").as_string();
 }

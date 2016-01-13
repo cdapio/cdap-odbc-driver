@@ -549,8 +549,22 @@ SQLRETURN SQL_API SQLDescribeColW(
   SQLULEN *      ColumnSizePtr,
   SQLSMALLINT *  DecimalDigitsPtr,
   SQLSMALLINT *  NullablePtr) {
-  TRACE(L"SQLDescribeColW\n");
-  return SQL_ERROR;
+  TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d, ColumnName = %s)\n", StatementHandle, ColumnNumber, ColumnName);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+
+
+
+
+    TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLNumResultCols returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLColAttributeW(

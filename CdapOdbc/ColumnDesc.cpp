@@ -27,5 +27,7 @@ Cask::CdapOdbc::ColumnDesc::ColumnDesc(web::json::value value) {
   this->name = value.at(L"name").as_string();
   this->type = value.at(L"type").as_string();
   this->position = value.at(L"position").as_integer();
-  this->comment = value.at(L"comment").as_string();
+  if (value.has_field(L"comment")) {
+    this->comment = value.at(L"comment").as_string();
+  }
 }
