@@ -17,6 +17,17 @@
 #include "stdafx.h"
 #include "DataType.h"
 
-Cask::CdapOdbc::DataType::DataType(const std::wstring& name)
-  : name(name) {
+Cask::CdapOdbc::DataType::DataType(
+  const std::wstring& name, 
+  SQLSMALLINT sqlType, 
+  SQLULEN size /* = 0U */, 
+  SQLLEN displaySize /* = 0 */, 
+  SQLSMALLINT decimalDigits /* = 0 */, 
+  SQLSMALLINT nullable /* = SQL_NULLABLE */)
+  : name(name)
+  , size(size)
+  , displaySize(displaySize)
+  , sqlType(sqlType)
+  , decimalDigits(decimalDigits)
+  , nullable(nullable) {
 }

@@ -16,7 +16,11 @@
 
 #include "stdafx.h"
 #include "ColumnInfo.h"
+#include "ColumnDesc.h"
+#include "DataType.h"
+#include "Driver.h"
 
-Cask::CdapOdbc::ColumnInfo::ColumnInfo(const std::wstring& name)
-  : name(name) {
+Cask::CdapOdbc::ColumnInfo::ColumnInfo(const ColumnDesc& columnDesc)
+  : name(columnDesc.getName())
+  , dataType(Driver::getInstance().getDataType(columnDesc.getType())) {
 }

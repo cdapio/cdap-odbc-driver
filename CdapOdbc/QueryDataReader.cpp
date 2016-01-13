@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "QueryDataReader.h"
 #include "QueryCommand.h"
+#include "Driver.h"
 
 ////namespace {
 ////  const std::wstring* convertPattern(const std::wstring* pattern) {
@@ -38,7 +39,7 @@ bool Cask::CdapOdbc::QueryDataReader::loadData() {
     // If number of rows is equal to fetch size
     // assume there are more rows
     this->moreData = (this->queryResult.getSize() == FETCH_SIZE);
-    this->currentRowIndex = -1;
+    this->currentRowIndex = 0;
     return (this->queryResult.getSize() > 0);
   } else {
     return false;
@@ -50,6 +51,7 @@ Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
   , fetchCount(0)
   , currentRowIndex(-1)
   , moreData(true) {
+  this->schema = this->queryCommand->loadSchema();
 }
 
 bool Cask::CdapOdbc::QueryDataReader::read() {
@@ -70,12 +72,35 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
 }
 
 void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& binding) {
+  auto& row = this->queryResult.getRows().at(this->currentRowIndex);
+  auto& value = row.at(L"columns").as_array().at(binding.getColumnNumber() - 1);
+  
+  if (value.is_null()) {
+    this->fetchNull(binding);
+  } else {
+    auto& columnDesc = this->schema[binding.getColumnNumber() - 1];
+    auto& dataType = Driver::getInstance().getDataType(columnDesc.getType());
+    switch (dataType.getSqlType()) {
+      case SQL_C_CHAR:
+        this->fetchString(value.as_string().c_str(), binding);
+        break;
+      case SQL_INTEGER:
+        this->fetchInt(value.as_integer(), binding);
+        break;
+      case SQL_DOUBLE:
+        this->fetchDouble(value.as_double(), binding);
+        break;
+      default:
+        throw std::exception("Unknown column data type.");
+    }
+  }
 }
 
 short Cask::CdapOdbc::QueryDataReader::getColumnCount() const {
-  return static_cast<short>(this->queryCommand->getColumnCount());
+  return static_cast<short>(this->schema.size());
 }
 
 std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::QueryDataReader::getColumnInfo(short columnNumber) const {
-  return std::unique_ptr<ColumnInfo>();
+  auto& columnDesc = this->schema[columnNumber - 1];
+  return std::make_unique<ColumnInfo>(columnDesc);
 }

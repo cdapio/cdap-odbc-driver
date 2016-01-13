@@ -30,7 +30,6 @@ namespace Cask {
       std::wstring query;
       QueryHandle queryHandle;
       bool hasData;
-      std::vector<ColumnDesc> querySchema;
 
     public:
 
@@ -47,13 +46,6 @@ namespace Cask {
       }
 
       /**
-       * Gets column count.
-       */
-      size_t getColumnCount() const {
-        return this->querySchema.size();
-      }
-
-      /**
        * Executes a command and builds a data reader.
        */
       virtual std::unique_ptr<DataReader> executeReader() override;
@@ -62,6 +54,11 @@ namespace Cask {
        * Loads next N rows.
        */
       QueryResult loadRows(int rows);
+
+      /**
+       * Loads query schema.
+       */
+      std::vector<ColumnDesc> loadSchema();
     };
   }
 }

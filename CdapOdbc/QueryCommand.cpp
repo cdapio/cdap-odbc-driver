@@ -34,7 +34,6 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
   switch (status.getOperationStatus()) {
     case OperationStatus::FINISHED:
       this->hasData = status.hasResults();
-      this->querySchema = this->getConnection()->getExploreClient().getQuerySchema(this->queryHandle);
       break;
     case OperationStatus::INITIALIZED:
     case OperationStatus::PENDING:
@@ -53,5 +52,9 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
 }
 
 Cask::CdapOdbc::QueryResult Cask::CdapOdbc::QueryCommand::loadRows(int rows) {
-  return this->getConnection()->getExploreClient().getQueryResult(this->query, rows);
+  return this->getConnection()->getExploreClient().getQueryResult(this->queryHandle, rows);
+}
+
+std::vector<Cask::CdapOdbc::ColumnDesc> Cask::CdapOdbc::QueryCommand::loadSchema() {
+  return this->getConnection()->getExploreClient().getQuerySchema(this->queryHandle);
 }

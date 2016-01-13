@@ -26,6 +26,7 @@ namespace Cask {
       std::wstring name;
       std::wstring createParams;
       SQLULEN size;
+      SQLLEN displaySize;
       SQLSMALLINT sqlType;
       SQLSMALLINT decimalDigits;
       SQLSMALLINT nullable;
@@ -47,13 +48,56 @@ namespace Cask {
       /**
        * Creates an instance of DataType.
        */
-      DataType(const std::wstring& name);
+      DataType(
+        const std::wstring& name, 
+        SQLSMALLINT sqlType, 
+        SQLULEN size = 0U,
+        SQLLEN displaySize = 0,
+        SQLSMALLINT decimalDigits = 0, 
+        SQLSMALLINT nullable = SQL_NULLABLE);
 
       /**
        * Gets type name.
        */
       const std::wstring& getName() const {
         return this->name;
+      }
+
+      /**
+       * Gets the size (in characters) of the column.
+       * If the column size cannot be determined, returns 0.
+       */
+      SQLULEN getSize() const {
+        return this->size;
+      }
+
+      /**
+       * Gets the SQL data type of the column.
+       */
+      SQLSMALLINT getSqlType() const {
+        return this->sqlType;
+      }
+
+      /**
+       * Gets the number of decimal digits of the column. If the number of decimal digits
+       * cannot be determined or is not applicable, the driver returns 0.
+       */
+      SQLSMALLINT getDecimalDigits() const {
+        return this->decimalDigits;
+      }
+
+      /**
+       * Gets a value that indicates whether the column allows NULL values.
+       */
+      SQLSMALLINT getNullable() const {
+        return this->nullable;
+      }
+
+      /**
+       * Gets maximum number of characters required to display data from the column.
+       */
+      SQLLEN getDisplaySize() const {
+        return this->displaySize;
       }
     };
   }

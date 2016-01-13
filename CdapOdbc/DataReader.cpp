@@ -61,6 +61,11 @@ void Cask::CdapOdbc::DataReader::fetchSmallint(SQLSMALLINT value, const ColumnBi
   *(reinterpret_cast<SQLSMALLINT*>(binding.getTargetValuePtr())) = value;
 }
 
+void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBinding& binding) {
+  assert(binding.getTargetType() == SQL_DOUBLE || binding.getTargetType() == SQL_DEFAULT);
+  *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
+}
+
 void Cask::CdapOdbc::DataReader::fetchInt(SQLINTEGER value, const ColumnBinding& binding) {
   assert(binding.getTargetType() == SQL_C_SLONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLINTEGER*>(binding.getTargetValuePtr())) = value;

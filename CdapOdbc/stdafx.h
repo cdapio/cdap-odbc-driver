@@ -55,6 +55,7 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <cwctype>
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>

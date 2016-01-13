@@ -18,6 +18,7 @@
 
 #include "DataReader.h"
 #include "QueryResult.h"
+#include "ColumnDesc.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -31,6 +32,7 @@ namespace Cask {
       static const int FETCH_SIZE = 100;
 
       QueryCommand* queryCommand;
+      std::vector<ColumnDesc> schema;
       QueryResult queryResult;
       int fetchCount;
       int currentRowIndex;

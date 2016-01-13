@@ -18,17 +18,16 @@
 
 namespace Cask {
   namespace CdapOdbc {
+    class ColumnDesc;
+    class DataType;
 
     /**
      * Holds information aabout data type.
      */
     class ColumnInfo {
       std::wstring name;
+      const DataType& dataType;
       //std::wstring createParams;
-      //SQLULEN size;
-      //SQLSMALLINT sqlType;
-      //SQLSMALLINT decimalDigits;
-      //SQLSMALLINT nullable;
       //SQLSMALLINT searchable;
       //SQLSMALLINT fixedPrecScale;
       ////case 4: // LITERAL_PREFIX 
@@ -45,15 +44,22 @@ namespace Cask {
     public:
 
       /**
-       * Creates an instance of ColumnInfo.
-       */
-      ColumnInfo(const std::wstring& name);
+      * Creates an instance of ColumnInfo.
+      */
+      ColumnInfo(const ColumnDesc& columnDesc);
 
       /**
        * Gets type name.
        */
       const std::wstring& getName() const {
         return this->name;
+      }
+
+      /**
+       * Gets data type of the column. 
+       */
+      const DataType& getDataType() const {
+        return this->dataType;
       }
     };
   }

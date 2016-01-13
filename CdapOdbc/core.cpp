@@ -549,17 +549,36 @@ SQLRETURN SQL_API SQLDescribeColW(
   SQLULEN *      ColumnSizePtr,
   SQLSMALLINT *  DecimalDigitsPtr,
   SQLSMALLINT *  NullablePtr) {
-  TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d, ColumnName = %s)\n", StatementHandle, ColumnNumber, ColumnName);
+  TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d)\n", StatementHandle, ColumnNumber);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     auto columnInfo = statement.getColumnInfo(ColumnNumber);
-    TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
+    
+    Argument::fromStdString(columnInfo->getName(), ColumnName, BufferLength, NameLengthPtr);
+
+    if (DataTypePtr) {
+      *DataTypePtr = columnInfo->getDataType().getSqlType();
+    }
+
+    if (ColumnSizePtr) {
+      *ColumnSizePtr = columnInfo->getDataType().getSize();
+    }
+
+    if (DecimalDigitsPtr) {
+      *DecimalDigitsPtr = columnInfo->getDataType().getDecimalDigits();
+    }
+
+    if (NullablePtr) {
+      *NullablePtr = columnInfo->getDataType().getNullable();
+    }
+
+    TRACE(L"SQLDescribeColW returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
-    TRACE(L"SQLNumResultCols returns SQL_INVALID_HANDLE\n");
+    TRACE(L"SQLDescribeColW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
-    TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+    TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
@@ -572,8 +591,34 @@ SQLRETURN SQL_API SQLColAttributeW(
   SQLSMALLINT     BufferLength,
   SQLSMALLINT *   StringLengthPtr,
   SQLLEN *        NumericAttributePtr) {
-  TRACE(L"SQLColAttributeW\n");
-  return SQL_ERROR;
+  TRACE(
+    L"SQLColAttributeW(StatementHandle = %X, ColumnNumber = %d, FieldIdentifier = %d)\n", 
+    StatementHandle, 
+    ColumnNumber, 
+    FieldIdentifier);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    auto& columnInfo = statement.getColumnInfo(ColumnNumber);
+
+    switch (FieldIdentifier) {
+      case SQL_COLUMN_DISPLAY_SIZE:
+        if (NumericAttributePtr) {
+          *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+        }
+
+        TRACE(L"SQLColAttributeW returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+    }
+    
+    TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLColAttributeW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception) {
+    TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLBindCol(
