@@ -91,7 +91,12 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
   }
 }
 
+void Cask::CdapOdbc::Driver::initializeDataTypes() {
+  this->dataTypes.insert({ L"string", DataType(L"string") });
+}
+
 Cask::CdapOdbc::Driver::Driver() {
+  this->initializeDataTypes();
 }
 
 Driver& Cask::CdapOdbc::Driver::getInstance() {

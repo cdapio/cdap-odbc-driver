@@ -148,6 +148,7 @@
     <ClInclude Include="Argument.h" />
     <ClInclude Include="ColumnBinding.h" />
     <ClInclude Include="ColumnDesc.h" />
+    <ClInclude Include="ColumnInfo.h" />
     <ClInclude Include="ColumnsCommand.h" />
     <ClInclude Include="ColumnsDataReader.h" />
     <ClInclude Include="Command.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataReader.h" />
+    <ClInclude Include="DataType.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="Descriptor.h" />
     <ClInclude Include="Driver.h" />
@@ -185,6 +187,7 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="ColumnBinding.cpp" />
     <ClCompile Include="ColumnDesc.cpp" />
+    <ClCompile Include="ColumnInfo.cpp" />
     <ClCompile Include="ColumnsCommand.cpp" />
     <ClCompile Include="ColumnsDataReader.cpp" />
     <ClCompile Include="Command.cpp" />
@@ -192,6 +195,7 @@
     <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="DataReader.cpp" />
+    <ClCompile Include="DataType.cpp" />
     <ClCompile Include="Descriptor.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

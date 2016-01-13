@@ -15,19 +15,8 @@
 */
 
 #include "stdafx.h"
-#include "SpecialColumnsDataReader.h"
+#include "ColumnInfo.h"
 
-bool Cask::CdapOdbc::SpecialColumnsDataReader::read() {
-  return false;
-}
-
-void Cask::CdapOdbc::SpecialColumnsDataReader::getColumnValue(const ColumnBinding& binding) {
-}
-
-short Cask::CdapOdbc::SpecialColumnsDataReader::getColumnCount() const {
-  return 8;
-}
-
-std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::SpecialColumnsDataReader::getColumnInfo(short columnNumber) const {
-  return std::unique_ptr<ColumnInfo>();
+Cask::CdapOdbc::ColumnInfo::ColumnInfo(const std::wstring& name)
+  : name(name) {
 }

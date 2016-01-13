@@ -27,3 +27,7 @@ void Cask::CdapOdbc::SchemasDataReader::getColumnValue(const ColumnBinding& bind
 short Cask::CdapOdbc::SchemasDataReader::getColumnCount() const {
   return 5;
 }
+
+std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::SchemasDataReader::getColumnInfo(short columnNumber) const {
+  return std::unique_ptr<ColumnInfo>();
+}

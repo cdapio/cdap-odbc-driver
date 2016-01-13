@@ -132,6 +132,12 @@
     <ClInclude Include="QueryDataReader.h">
       <Filter>Statements\DataReaders</Filter>
     </ClInclude>
+    <ClInclude Include="DataType.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -235,6 +241,12 @@
     </ClCompile>
     <ClCompile Include="QueryDataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="DataType.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnInfo.cpp">
+      <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

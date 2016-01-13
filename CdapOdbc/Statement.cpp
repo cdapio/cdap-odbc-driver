@@ -205,3 +205,7 @@ SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
 
   return this->dataReader->getColumnCount();
 }
+
+std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::Statement::getColumnInfo(short columnNumber) const {
+  return this->dataReader->getColumnInfo(columnNumber);
+}

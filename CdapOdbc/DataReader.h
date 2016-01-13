@@ -17,6 +17,7 @@
 #pragma once
 
 #include "ColumnBinding.h"
+#include "ColumnInfo.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -60,9 +61,14 @@ namespace Cask {
       virtual void getColumnValue(const ColumnBinding& binding) = 0;
 
       /**
-      * Gets number of columns in a result set.
-      */
+       * Gets number of columns in a result set.
+       */
       virtual short getColumnCount() const = 0;
+
+      /**
+       * Gets column information.
+       */
+      virtual std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const = 0;
     };
   }
 }

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "DataType.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
@@ -31,12 +33,14 @@ namespace Cask {
       static std::unique_ptr<Driver> instance;
       static std::atomic_int lastHandleIndex;
 
-      std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
-      std::unordered_map<SQLHDBC, std::unique_ptr<Connection>> connections;
-      std::unordered_map<SQLHSTMT, std::unique_ptr<Statement>> statements;
-      std::unordered_map<SQLHDESC, std::unique_ptr<Descriptor>> descriptors;
+      std::map<SQLHENV, std::unique_ptr<Environment>> environments;
+      std::map<SQLHDBC, std::unique_ptr<Connection>> connections;
+      std::map<SQLHSTMT, std::unique_ptr<Statement>> statements;
+      std::map<SQLHDESC, std::unique_ptr<Descriptor>> descriptors;
 
       std::mutex mutex;
+
+      std::map<std::wstring, DataType> dataTypes;
 
       static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);
@@ -44,6 +48,7 @@ namespace Cask {
       void freeConnections(const Environment& env);
       void freeStatements(const Connection& dbc);
       void freeDescriptors(const Connection& dbc);
+      void initializeDataTypes();
 
       Driver(const Driver&) = delete;
       void operator=(const Driver&) = delete;
@@ -84,6 +89,13 @@ namespace Cask {
       * Gets a descriptor by handle.
       */
       Descriptor& getDescriptor(SQLHDESC desc);
+
+      /**
+      * Gets a data type by name.
+      */
+      const DataType& getDataType(const std::wstring& name) const {
+        return this->dataTypes.at(name);
+      }
 
       /**
       * Allocates a new environment and returns its handle.

@@ -18,8 +18,7 @@
 
 #include "ColumnBinding.h"
 #include "Command.h"
-
-#include "ExploreClient.h"
+#include "ColumnInfo.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -153,6 +152,11 @@ namespace Cask {
        * Returns number of columns for a statement. 
        */
       SQLSMALLINT getColumnCount() const;
+
+      /**
+       * Gets a column info.
+       */
+      std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const;
     };
   }
 }

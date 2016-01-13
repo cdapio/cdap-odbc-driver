@@ -42,7 +42,6 @@
 #include <cassert>
 
 #include <memory>
-#include <unordered_map>
 #include <map>
 #include <atomic>
 #include <mutex>

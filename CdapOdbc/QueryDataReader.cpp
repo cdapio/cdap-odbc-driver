@@ -75,3 +75,7 @@ void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& bindin
 short Cask::CdapOdbc::QueryDataReader::getColumnCount() const {
   return static_cast<short>(this->queryCommand->getColumnCount());
 }
+
+std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::QueryDataReader::getColumnInfo(short columnNumber) const {
+  return std::unique_ptr<ColumnInfo>();
+}

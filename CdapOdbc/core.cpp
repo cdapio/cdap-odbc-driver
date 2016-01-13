@@ -552,10 +552,7 @@ SQLRETURN SQL_API SQLDescribeColW(
   TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d, ColumnName = %s)\n", StatementHandle, ColumnNumber, ColumnName);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
-
-
-
-
+    auto columnInfo = statement.getColumnInfo(ColumnNumber);
     TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {

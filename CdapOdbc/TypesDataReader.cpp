@@ -71,3 +71,7 @@ void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& bindin
 short Cask::CdapOdbc::TypesDataReader::getColumnCount() const {
   return 19;
 }
+
+std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::TypesDataReader::getColumnInfo(short columnNumber) const {
+  return std::unique_ptr<ColumnInfo>();
+}
