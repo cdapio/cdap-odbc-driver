@@ -488,6 +488,12 @@ SQLRETURN SQL_API SQLExecute(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLExecute returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
+  } catch (StillExecutingException&) {
+    TRACE(L"SQLExecute returns SQL_STILL_EXECUTING\n");
+    return SQL_STILL_EXECUTING;
+  } catch (NoDataException&) {
+    TRACE(L"SQLExecute returns SQL_NO_DATA\n");
+    return SQL_NO_DATA;
   } catch (std::exception) {
     TRACE(L"SQLExecute returns SQL_ERROR\n");
     return SQL_ERROR;
