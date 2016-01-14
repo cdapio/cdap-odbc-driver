@@ -16,36 +16,43 @@
 
 #pragma once
 
+#include "DataReader.h"
+
 namespace Cask {
   namespace CdapOdbc {
+    class Connection;
 
     /**
-     * Utility class for manipulating strings.
+     * Represents a command to a database.
      */
-    class String {
-      String() = delete;
+    class Command {
+      Connection* connection;
+
+      Command(const Command&) = delete;
+      void operator=(const Command&) = delete;
+
+    protected:
+
+      Connection* getConnection() const {
+        return this->connection;
+      }
 
     public:
 
       /**
-       * Splits a string to tokens separated by delimiter character.
+       * Creates a command instance.
        */
-      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+      Command(Connection* connection);
 
       /**
-       * Removes whitespaces from the start and the end of a string.
+       * Destructor.
        */
-      static std::wstring trim(const std::wstring& str);
+      virtual ~Command() = default;
 
       /**
-       * Makes stream name from table name.
+       * Executes a command and builds a data reader.
        */
-      static std::wstring makeStreamName(const std::wstring& streamName);
-
-      /**
-       * Makes table name from stream name.
-       */
-      static std::wstring makeTableName(const std::wstring& streamName);
+      virtual std::unique_ptr<DataReader> executeReader() = 0;
     };
   }
 }

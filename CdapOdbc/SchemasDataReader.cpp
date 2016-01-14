@@ -15,20 +15,19 @@
 */
 
 #include "stdafx.h"
-#include "ColumnDesc.h"
+#include "SchemasDataReader.h"
 
-using namespace Cask::CdapOdbc;
-
-Cask::CdapOdbc::ColumnDesc::ColumnDesc()
-  : position(0) {
+bool Cask::CdapOdbc::SchemasDataReader::read() {
+  return false;
 }
 
-Cask::CdapOdbc::ColumnDesc::ColumnDesc(web::json::value value) {
-  this->name = value.at(L"name").as_string();
-  this->type = value.at(L"type").as_string();
-  std::transform(this->type.begin(), this->type.end(), this->type.begin(), std::towlower);
-  this->position = value.at(L"position").as_integer();
-  if (value.has_field(L"comment")) {
-    this->comment = value.at(L"comment").as_string();
-  }
+void Cask::CdapOdbc::SchemasDataReader::getColumnValue(const ColumnBinding& binding) {
+}
+
+short Cask::CdapOdbc::SchemasDataReader::getColumnCount() const {
+  return 5;
+}
+
+std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::SchemasDataReader::getColumnInfo(short columnNumber) const {
+  return std::unique_ptr<ColumnInfo>();
 }

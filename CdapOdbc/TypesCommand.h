@@ -16,36 +16,27 @@
 
 #pragma once
 
+#include "Command.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Utility class for manipulating strings.
+     * Gets a list of data types from a database.
      */
-    class String {
-      String() = delete;
+    class TypesCommand : public Command {
 
     public:
 
       /**
-       * Splits a string to tokens separated by delimiter character.
+       * Creates a command instance.
        */
-      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+      TypesCommand(Connection* connection);
 
       /**
-       * Removes whitespaces from the start and the end of a string.
+       * Executes a command and builds a data reader.
        */
-      static std::wstring trim(const std::wstring& str);
-
-      /**
-       * Makes stream name from table name.
-       */
-      static std::wstring makeStreamName(const std::wstring& streamName);
-
-      /**
-       * Makes table name from stream name.
-       */
-      static std::wstring makeTableName(const std::wstring& streamName);
+      virtual std::unique_ptr<DataReader> executeReader() override;
     };
   }
 }

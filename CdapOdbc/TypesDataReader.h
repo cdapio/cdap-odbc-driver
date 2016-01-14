@@ -16,36 +16,36 @@
 
 #pragma once
 
+#include "DataReader.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Utility class for manipulating strings.
+     * Reads a forward-only stream of rows.
      */
-    class String {
-      String() = delete;
+    class TypesDataReader : public DataReader {
+
+      int currentRowIndex;
 
     public:
 
       /**
-       * Splits a string to tokens separated by delimiter character.
+       * Creates an instance of TablesDataReader.
        */
-      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+      TypesDataReader();
 
-      /**
-       * Removes whitespaces from the start and the end of a string.
-       */
-      static std::wstring trim(const std::wstring& str);
+      // Inherited via DataReader
+      virtual bool read() override;
 
-      /**
-       * Makes stream name from table name.
-       */
-      static std::wstring makeStreamName(const std::wstring& streamName);
+      // Inherited via DataReader
+      virtual void getColumnValue(const ColumnBinding & binding) override;
 
-      /**
-       * Makes table name from stream name.
-       */
-      static std::wstring makeTableName(const std::wstring& streamName);
+      // Inherited via DataReader
+      virtual short getColumnCount() const override;
+
+      // Inherited via DataReader
+      virtual std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const override;
     };
   }
 }

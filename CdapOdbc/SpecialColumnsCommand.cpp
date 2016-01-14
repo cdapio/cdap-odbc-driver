@@ -15,20 +15,13 @@
 */
 
 #include "stdafx.h"
-#include "ColumnDesc.h"
+#include "SpecialColumnsCommand.h"
+#include "SpecialColumnsDataReader.h"
 
-using namespace Cask::CdapOdbc;
-
-Cask::CdapOdbc::ColumnDesc::ColumnDesc()
-  : position(0) {
+Cask::CdapOdbc::SpecialColumnsCommand::SpecialColumnsCommand(Connection* connection)
+  : Command(connection) {
 }
 
-Cask::CdapOdbc::ColumnDesc::ColumnDesc(web::json::value value) {
-  this->name = value.at(L"name").as_string();
-  this->type = value.at(L"type").as_string();
-  std::transform(this->type.begin(), this->type.end(), this->type.begin(), std::towlower);
-  this->position = value.at(L"position").as_integer();
-  if (value.has_field(L"comment")) {
-    this->comment = value.at(L"comment").as_string();
-  }
+std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::SpecialColumnsCommand::executeReader() {
+  return std::make_unique<SpecialColumnsDataReader>();
 }

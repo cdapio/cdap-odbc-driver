@@ -91,7 +91,14 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
   }
 }
 
+void Cask::CdapOdbc::Driver::initializeDataTypes() {
+  this->dataTypes.insert({ L"string", DataType(L"string", SQL_C_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
+  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11) });
+  this->dataTypes.insert({ L"double", DataType(L"double", SQL_DOUBLE, 0, 24) });
+}
+
 Cask::CdapOdbc::Driver::Driver() {
+  this->initializeDataTypes();
 }
 
 Driver& Cask::CdapOdbc::Driver::getInstance() {

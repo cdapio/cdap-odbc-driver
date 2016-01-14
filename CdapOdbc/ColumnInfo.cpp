@@ -15,20 +15,12 @@
 */
 
 #include "stdafx.h"
+#include "ColumnInfo.h"
 #include "ColumnDesc.h"
+#include "DataType.h"
+#include "Driver.h"
 
-using namespace Cask::CdapOdbc;
-
-Cask::CdapOdbc::ColumnDesc::ColumnDesc()
-  : position(0) {
-}
-
-Cask::CdapOdbc::ColumnDesc::ColumnDesc(web::json::value value) {
-  this->name = value.at(L"name").as_string();
-  this->type = value.at(L"type").as_string();
-  std::transform(this->type.begin(), this->type.end(), this->type.begin(), std::towlower);
-  this->position = value.at(L"position").as_integer();
-  if (value.has_field(L"comment")) {
-    this->comment = value.at(L"comment").as_string();
-  }
+Cask::CdapOdbc::ColumnInfo::ColumnInfo(const ColumnDesc& columnDesc)
+  : name(columnDesc.getName())
+  , dataType(Driver::getInstance().getDataType(columnDesc.getType())) {
 }

@@ -42,7 +42,6 @@
 #include <cassert>
 
 #include <memory>
-#include <unordered_map>
 #include <map>
 #include <atomic>
 #include <mutex>
@@ -56,6 +55,7 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <cwctype>
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>

@@ -16,41 +16,29 @@
 
 #pragma once
 
+#include "DataReader.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Represents a query result.
+     * Reads a forward-only stream of rows.
      */
-    class QueryResult {
-      web::json::value rows;
-    
+    class SpecialColumnsDataReader : public DataReader {
+   
     public:
 
-      /**
-       * Creates an instance of QueryResult.
-       */
-      QueryResult() = default;
+      // Inherited via DataReader
+      virtual bool read() override;
 
-      /**
-      * Creates an instance of QueryResult from JSON.
-      */
-      QueryResult(const web::json::value& value);
+      // Inherited via DataReader
+      virtual void getColumnValue(const ColumnBinding & binding) override;
 
-      /**
-       * Gets a query data.
-       */
-      const web::json::array& getRows() {
-        return this->rows.as_array();
-      }
+      // Inherited via DataReader
+      virtual short getColumnCount() const override;
 
-      int getSize() const {
-        if (this->rows.is_array()) {
-          return static_cast<int>(this->rows.as_array().size());
-        } else {
-          return 0;
-        }
-      }
+      // Inherited via DataReader
+      virtual std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const override;
     };
   }
 }

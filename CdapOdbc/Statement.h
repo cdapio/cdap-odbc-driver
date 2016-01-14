@@ -17,8 +17,8 @@
 #pragma once
 
 #include "ColumnBinding.h"
-#include "ExploreClient.h"
-#include "ColumnMapper.h"
+#include "Command.h"
+#include "ColumnInfo.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -31,41 +31,21 @@ namespace Cask {
   
       enum class State {
         INITIAL,
+        PREPARE,
         OPEN,
         FETCH,
         CLOSED,
       };
 
-      enum class RequestType {
-        UNKNOWN,
-        CATALOGS,
-        SCHEMAS,
-        TABLES,
-        TYPES,
-        COLUMNS,
-        DATA
-      };
-
-      std::vector<ColumnBinding> columnBindings;
-      QueryHandle queryHandle;
-      QueryResult queryResult;
       State state;
       Connection* connection;
       SQLHSTMT handle;
-      int fetchSize;
-      int currentRowIndex;
-      bool moreData;
-      std::unique_ptr<ColumnMapper> mapper;
-      RequestType requestType;
-      std::wstring tableName;
+      std::vector<ColumnBinding> columnBindings;
+      std::unique_ptr<Command> command;
+      std::unique_ptr<DataReader> dataReader;
 
-      void throwStateError();
+      void throwStateError() const;
       void openQuery();
-      bool loadData();
-      bool getNextResults();
-      void fetchRow();
-      void setupMetadataMapper();
-      void setupSimpleMapper();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -97,20 +77,6 @@ namespace Cask {
       }
 
       /**
-       * Gets a fetch size.
-       */
-      int getFetchSize() const {
-        return this->fetchSize;
-      }
-
-      /**
-       * Sets a fetch size.
-       */
-      void setFetchSize(int value) {
-        this->fetchSize = value;
-      }
-
-      /**
        * Adds a column binding information to a statement.
        */
       void addColumnBinding(const ColumnBinding& binding);
@@ -119,11 +85,6 @@ namespace Cask {
        * Removes a column binding information from a statement.
        */
       void removeColumnBinding(SQLUSMALLINT columnNumber);
-
-      /**
-       * Retrieves catalogs from a database.
-       */
-      void getCatalogs();
 
       /**
        * Retrieves schemas from a database.
@@ -149,7 +110,12 @@ namespace Cask {
       /**
        * Retrieves column information for a table.
        */
-      void getColumns(const std::wstring& tableName);
+      void getColumns(const std::wstring& streamName);
+
+      /**
+       * Retrieves information about special columns for a table.
+       */
+      void getSpecialColumns();
 
       /**
        * Retrieves the next row for the current statement 
@@ -171,6 +137,26 @@ namespace Cask {
        * Resets parameters.
        */
       void resetParameters();
+
+      /**
+       * Prepares SQL query statement for execution.
+       */
+      void prepare(const std::wstring& query);
+
+      /**
+       * Executes SQL query.
+       */
+      void execute();
+
+      /**
+       * Returns number of columns for a statement. 
+       */
+      SQLSMALLINT getColumnCount() const;
+
+      /**
+       * Gets a column info.
+       */
+      std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const;
     };
   }
 }

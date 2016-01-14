@@ -16,36 +16,49 @@
 
 #pragma once
 
+#include "Command.h"
+#include "ExploreClient.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
     /**
-     * Utility class for manipulating strings.
+     * Gets a SQL query data from a database.
      */
-    class String {
-      String() = delete;
+    class QueryCommand : public Command {
+
+      std::wstring query;
+      QueryHandle queryHandle;
+      bool hasData;
 
     public:
 
       /**
-       * Splits a string to tokens separated by delimiter character.
+       * Creates a command instance.
        */
-      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+      QueryCommand(Connection* connection, const std::wstring& query);
 
       /**
-       * Removes whitespaces from the start and the end of a string.
+       * Gets if query has some data.
        */
-      static std::wstring trim(const std::wstring& str);
+      bool getHasData() const {
+        return this->hasData;
+      }
 
       /**
-       * Makes stream name from table name.
+       * Executes a command and builds a data reader.
        */
-      static std::wstring makeStreamName(const std::wstring& streamName);
+      virtual std::unique_ptr<DataReader> executeReader() override;
 
       /**
-       * Makes table name from stream name.
+       * Loads next N rows.
        */
-      static std::wstring makeTableName(const std::wstring& streamName);
+      QueryResult loadRows(int rows);
+
+      /**
+       * Loads query schema.
+       */
+      std::vector<ColumnDesc> loadSchema();
     };
   }
 }
