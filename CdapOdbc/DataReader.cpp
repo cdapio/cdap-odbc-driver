@@ -66,6 +66,23 @@ void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBindin
   *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
 }
 
+void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
+  std::wstring strValue;
+  switch (binding.getTargetType()) {
+    case SQL_C_CHAR:
+      if (value.is_string()) {
+        strValue = value.as_string();
+      } else if (value.is_integer()) {
+        strValue = std::to_wstring(value.as_integer());
+      } else if (value.is_double()) {
+        strValue = std::to_wstring(value.as_double());
+      }
+
+      this->fetchString(strValue.c_str(), binding);
+      break;
+  }
+}
+
 void Cask::CdapOdbc::DataReader::fetchInt(SQLINTEGER value, const ColumnBinding& binding) {
   assert(binding.getTargetType() == SQL_C_SLONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLINTEGER*>(binding.getTargetValuePtr())) = value;

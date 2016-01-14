@@ -49,9 +49,7 @@ Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
-  if (this->state != State::INITIAL && 
-      this->state != State::PREPARE && 
-      this->state != State::OPEN) {
+  if (this->state == State::CLOSED) {
     this->throwStateError();
   }
 
@@ -69,9 +67,7 @@ void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
-  if (this->state != State::INITIAL &&
-    this->state != State::PREPARE &&
-    this->state != State::OPEN) {
+  if (this->state == State::CLOSED) {
     this->throwStateError();
   }
 

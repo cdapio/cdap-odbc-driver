@@ -60,7 +60,7 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
       return this->loadData();
     } else {
       ++this->currentRowIndex;
-      if (this->currentRowIndex = this->queryResult.getSize()) {
+      if (this->currentRowIndex == this->queryResult.getSize()) {
         return this->loadData();
       } else {
         return true;
@@ -78,21 +78,7 @@ void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& bindin
   if (value.is_null()) {
     this->fetchNull(binding);
   } else {
-    auto& columnDesc = this->schema[binding.getColumnNumber() - 1];
-    auto& dataType = Driver::getInstance().getDataType(columnDesc.getType());
-    switch (dataType.getSqlType()) {
-      case SQL_C_CHAR:
-        this->fetchString(value.as_string().c_str(), binding);
-        break;
-      case SQL_INTEGER:
-        this->fetchInt(value.as_integer(), binding);
-        break;
-      case SQL_DOUBLE:
-        this->fetchDouble(value.as_double(), binding);
-        break;
-      default:
-        throw std::exception("Unknown column data type.");
-    }
+    this->fetchValue(value, binding);
   }
 }
 
