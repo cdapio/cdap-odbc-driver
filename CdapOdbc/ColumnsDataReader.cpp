@@ -124,11 +124,11 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
       this->fetchNull(binding);
       break;
     case 3: // TABLE_NAME 
-      this->fetchString(this->tableName.c_str(), binding);
+      this->fetchVarchar(this->tableName.c_str(), binding);
       break;
     case 4: // COLUMN_NAME 
       name = record.at(L"name").as_string();
-      this->fetchString(name.c_str(), binding);
+      this->fetchVarchar(name.c_str(), binding);
       break;
     case 5: // DATA_TYPE
     case 14: // SQL_DATA_TYPE 
@@ -136,7 +136,7 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
       break;
     case 6: // TYPE_NAME 
       typeName = getTypeName(record.at(L"type"));
-      this->fetchString(typeName.c_str(), binding);
+      this->fetchVarchar(typeName.c_str(), binding);
       break;
     case 7: // COLUMN_SIZE 
       this->fetchInt(getColumnSize(record.at(L"type")), binding);
@@ -160,7 +160,7 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
       this->fetchInt(this->currentRowIndex + 1, binding);
       break;
     case 18: // IS_NULLABLE 
-      this->fetchString((getIsNull(record.at(L"type")) == SQL_NO_NULLS) ? L"NO" : L"YES", binding);
+      this->fetchVarchar((getIsNull(record.at(L"type")) == SQL_NO_NULLS) ? L"NO" : L"YES", binding);
       break;
   }
 }

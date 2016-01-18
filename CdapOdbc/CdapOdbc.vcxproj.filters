@@ -140,9 +140,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
     <ClCompile Include="Driver.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
@@ -248,11 +245,14 @@
     <ClCompile Include="ColumnInfo.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CdapOdbc.def">
-      <Filter>Driver</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="CdapOdbc.def">
+      <Filter>Library</Filter>
+    </None>
   </ItemGroup>
 </Project>
