@@ -28,9 +28,9 @@
 using namespace Cask::CdapOdbc;
 
 SQLRETURN SQL_API SQLAllocHandle(
-  SQLSMALLINT   HandleType,
-  SQLHANDLE     InputHandle,
-  SQLHANDLE *   OutputHandlePtr) {
+  SQLSMALLINT HandleType,
+  SQLHANDLE InputHandle,
+  _Out_ SQLHANDLE* OutputHandlePtr) {
   TRACE(L"SQLAllocHandle(HandleType = %d, InputHandle = %X)\n", HandleType, InputHandle);
   try {
     // OutputHandlePtr must be a valid pointer
@@ -334,45 +334,52 @@ SQLRETURN SQL_API SQLGetFunctions(
   SQLHDBC           ConnectionHandle,
   SQLUSMALLINT      FunctionId,
   SQLUSMALLINT *    SupportedPtr) {
-  TRACE(L"SQLGetFunctions\n");
+  TRACE(L"SQLGetFunctions(ConnectionHandle = %X, FunctionId = %d)\n", ConnectionHandle, FunctionId);
   try {
-    Driver::getInstance().getConnection(ConnectionHandle);
-    if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
-      Driver::getInstance().setupSupportedFunctions(SupportedPtr);
-      return SQL_SUCCESS;
-    } else if (FunctionId >= 0 && FunctionId < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE) {
-      switch (FunctionId) {
-        case SQL_API_SQLALLOCHANDLE:
-        case SQL_API_SQLBINDCOL:
-        case SQL_API_SQLCANCEL:
-        case SQL_API_SQLGETFUNCTIONS:
-        case SQL_API_SQLGETINFO:
-        case SQL_API_SQLDISCONNECT:
-        case SQL_API_SQLPREPARE:
-        case SQL_API_SQLEXECDIRECT:
-        case SQL_API_SQLEXECUTE:
-        case SQL_API_SQLFETCH:
-        case SQL_API_SQLFREEHANDLE:
-        case SQL_API_SQLFREESTMT:
-        case SQL_API_SQLCOLUMNS:
-        case SQL_API_SQLTABLES:
-        case SQL_API_SQLBINDPARAMETER:
-        case SQL_API_SQLNUMPARAMS:
-        case SQL_API_SQLDRIVERCONNECT:
-        case SQL_API_SQLMORERESULTS:
-          *SupportedPtr = SQL_TRUE;
-          break;
-        default:
-          *SupportedPtr = SQL_FALSE;
-      }
+    if (SupportedPtr) {
+      Driver::getInstance().getConnection(ConnectionHandle);
+      if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
+        Driver::getInstance().setupSupportedFunctions(SupportedPtr);
+        TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      } else if (FunctionId >= 0 && FunctionId < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE) {
+        switch (FunctionId) {
+          case SQL_API_SQLALLOCHANDLE:
+          case SQL_API_SQLBINDCOL:
+          case SQL_API_SQLCANCEL:
+          case SQL_API_SQLGETFUNCTIONS:
+          case SQL_API_SQLGETINFO:
+          case SQL_API_SQLDISCONNECT:
+          case SQL_API_SQLPREPARE:
+          case SQL_API_SQLEXECDIRECT:
+          case SQL_API_SQLEXECUTE:
+          case SQL_API_SQLFETCH:
+          case SQL_API_SQLFREEHANDLE:
+          case SQL_API_SQLFREESTMT:
+          case SQL_API_SQLCOLUMNS:
+          case SQL_API_SQLTABLES:
+          case SQL_API_SQLBINDPARAMETER:
+          case SQL_API_SQLNUMPARAMS:
+          case SQL_API_SQLDRIVERCONNECT:
+          case SQL_API_SQLMORERESULTS:
+            *SupportedPtr = SQL_TRUE;
+            break;
+          default:
+            *SupportedPtr = SQL_FALSE;
+        }
 
-      return SQL_SUCCESS;
+        TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      }
     }
 
+    TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
+    TRACE(L"SQLGetFunctions returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
   } catch (std::exception) {
+    TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
     return SQL_ERROR;
   }
 }
@@ -504,8 +511,31 @@ SQLRETURN SQL_API SQLExecDirectW(
   SQLHSTMT     StatementHandle,
   SQLWCHAR *   StatementText,
   SQLINTEGER   TextLength) {
-  TRACE(L"SQLExecDirectW\n");
-  return SQL_ERROR;
+  TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+    if (query) {
+      statement.executeDirect(*query);
+      TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    }
+
+    TRACE(L"SQLExecDirectW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLExecDirectW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (StillExecutingException&) {
+    TRACE(L"SQLExecDirectW returns SQL_STILL_EXECUTING\n");
+    return SQL_STILL_EXECUTING;
+  } catch (NoDataException&) {
+    TRACE(L"SQLExecDirectW returns SQL_NO_DATA\n");
+    return SQL_NO_DATA;
+  } catch (std::exception) {
+    TRACE(L"SQLExecDirectW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLNumParams(

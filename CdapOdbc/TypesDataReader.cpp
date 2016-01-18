@@ -29,7 +29,7 @@ bool Cask::CdapOdbc::TypesDataReader::read() {
 void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& binding) {
   switch (binding.getColumnNumber()) {
     case 1: // TYPE_NAME
-      this->fetchString(L"string", binding);
+      this->fetchVarchar(L"string", binding);
       break;
     case 2: // DATA_TYPE 
     case 16: // SQL_DATA_TYPE   
@@ -51,7 +51,7 @@ void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& bindin
       this->fetchNull(binding);
       break;
     case 6: // CREATE_PARAMS 
-      this->fetchString(L"length", binding);
+      this->fetchVarchar(L"length", binding);
       break;
     case 7: // NULLABLE  
       this->fetchSmallint(SQL_NULLABLE, binding);

@@ -101,6 +101,10 @@ Cask::CdapOdbc::Driver::Driver() {
   this->initializeDataTypes();
 }
 
+Cask::CdapOdbc::Driver::~Driver() {
+  TRACE(L"Destructing Driver object...\n");
+}
+
 Driver& Cask::CdapOdbc::Driver::getInstance() {
   return *instance;
 }

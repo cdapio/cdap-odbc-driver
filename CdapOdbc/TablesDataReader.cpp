@@ -38,10 +38,10 @@ void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& bindi
       break;
     case 3: // TABLE_NAME 
       name = String::makeTableName(this->queryResult.getRows().at(this->currentRowIndex).at(L"name").as_string());
-      this->fetchString(name.c_str(), binding);
+      this->fetchVarchar(name.c_str(), binding);
       break;
     case 4: // TABLE_TYPE 
-      this->fetchString(L"TABLE", binding);
+      this->fetchVarchar(L"TABLE", binding);
       break;
   }
 }

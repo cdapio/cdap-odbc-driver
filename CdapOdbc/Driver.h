@@ -63,7 +63,7 @@ namespace Cask {
       /**
        * Destructor.
        */
-      ~Driver() = default;
+      ~Driver();
 
       /**
        * Gets a driver instance.

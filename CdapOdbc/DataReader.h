@@ -34,7 +34,8 @@ namespace Cask {
     protected:
 
       void fetchNull(const ColumnBinding& binding);
-      void fetchString(const wchar_t* str, const ColumnBinding& binding);
+      void fetchVarchar(const wchar_t* str, const ColumnBinding& binding);
+      void fetchWVarchar(const wchar_t* str, const ColumnBinding& binding);
       void fetchInt(SQLINTEGER value, const ColumnBinding& binding);
       void fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding);
       void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding);

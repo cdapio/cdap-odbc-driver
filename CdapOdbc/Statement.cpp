@@ -194,6 +194,21 @@ void Cask::CdapOdbc::Statement::execute() {
   this->openQuery();
 }
 
+void Cask::CdapOdbc::Statement::executeDirect(const std::wstring& query) {
+  if (this->state != State::INITIAL && this->state != State::PREPARE) {
+    this->throwStateError();
+  }
+
+  if (this->state == State::INITIAL) {
+    this->command = std::make_unique<QueryCommand>(this->connection, query);
+    this->state = State::PREPARE;
+  }
+  
+  if (this->state == State::PREPARE) {
+    this->openQuery();
+  }
+}
+
 SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
   if (this->state != State::OPEN) {
     this->throwStateError();

@@ -149,6 +149,11 @@ namespace Cask {
       void execute();
 
       /**
+       * Directly executes SQL query (without prepare first).
+       */
+      void executeDirect(const std::wstring& query);
+
+      /**
        * Returns number of columns for a statement. 
        */
       SQLSMALLINT getColumnCount() const;
