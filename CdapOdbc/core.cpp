@@ -712,8 +712,8 @@ SQLRETURN SQL_API SQLFetch(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLFetch returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception&) {
-    TRACE(L"SQLFetch returns SQL_ERROR\n");
+  } catch (std::exception& ex) {
+    TRACE(L"SQLFetch returns SQL_ERROR (%s)\n");
     return SQL_ERROR;
   }
 }

@@ -26,12 +26,20 @@ namespace {
       typeName = value.as_array().at(0).as_string();
     }
 
-    if (typeName == L"string") {
-      return SQL_VARCHAR;
-    } else if (typeName == L"int") {
-      return SQL_INTEGER;
+    if (typeName == L"boolean") {
+      return SQL_BIT;
+    } else if (typeName == L"bytes") {
+      return SQL_BINARY;
     } else if (typeName == L"double") {
       return SQL_DOUBLE;
+    } else if (typeName == L"float") {
+      return SQL_REAL;
+    } else if (typeName == L"int") {
+      return SQL_INTEGER;
+    } else if (typeName == L"long") {
+      return SQL_BIGINT;
+    } else if (typeName == L"string") {
+      return SQL_CHAR;
     } else {
       return SQL_UNKNOWN_TYPE;
     }
@@ -50,12 +58,9 @@ namespace {
 
   SQLINTEGER getColumnSize(const web::json::value& value) {
     switch (getDataType(value)) {
-      case SQL_VARCHAR:
+      case SQL_CHAR:
+      case SQL_BINARY:
         return std::numeric_limits<std::int32_t>::max();
-      case SQL_INTEGER:
-        return std::numeric_limits<std::int32_t>::digits;
-      case SQL_DOUBLE:
-        return std::numeric_limits<double>::digits;
       default:
         return 0;
     }
@@ -63,12 +68,19 @@ namespace {
 
   SQLINTEGER getBufferLength(const web::json::value& value) {
     switch (getDataType(value)) {
-      case SQL_VARCHAR:
+      case SQL_BIT:
+        return sizeof(char);
+      case SQL_BINARY:
+      case SQL_CHAR:
         return std::numeric_limits<std::int32_t>::max();
-      case SQL_INTEGER:
-        return sizeof(std::int32_t);
       case SQL_DOUBLE:
         return sizeof(double);
+      case SQL_REAL:
+        return sizeof(float);
+      case SQL_INTEGER:
+        return sizeof(std::int32_t);
+      case SQL_BIGINT:
+        return sizeof(std::int64_t);
       default:
         return 0;
     }

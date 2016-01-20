@@ -92,9 +92,13 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
 }
 
 void Cask::CdapOdbc::Driver::initializeDataTypes() {
-  this->dataTypes.insert({ L"string", DataType(L"string", SQL_C_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
-  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11) });
+  this->dataTypes.insert({ L"boolean", DataType(L"boolean", SQL_BIT, 0, 1) });
+  this->dataTypes.insert({ L"binary", DataType(L"binary", SQL_BINARY, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
   this->dataTypes.insert({ L"double", DataType(L"double", SQL_DOUBLE, 0, 24) });
+  this->dataTypes.insert({ L"float", DataType(L"float", SQL_REAL, 0, 7) });
+  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11) });
+  this->dataTypes.insert({ L"bigint", DataType(L"bigint", SQL_BIGINT, 0, 19) });
+  this->dataTypes.insert({ L"string", DataType(L"string", SQL_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
 }
 
 Cask::CdapOdbc::Driver::Driver() {

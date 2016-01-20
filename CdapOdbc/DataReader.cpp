@@ -18,6 +18,33 @@
 #include "DataReader.h"
 #include "Encoding.h"
 
+namespace {
+  std::wstring to_wstring(const web::json::value& value) {
+    if (value.is_string()) {
+      return value.as_string();
+    } else if (value.is_integer()) {
+      return std::to_wstring(value.as_integer());
+    } else if (value.is_double()) {
+      return std::to_wstring(value.as_double());
+    } else if (value.is_number()) {
+      return std::to_wstring(value.as_number().to_double());
+    } else if (value.is_boolean()) {
+      return std::to_wstring(value.as_bool() ? 1 : 0);
+    } else if (value.is_array()) {
+      std::wstring result;
+      for (auto& item : value.as_array()) {
+        if (item.is_number()) {
+          result.push_back(static_cast<wchar_t>(item.as_number().to_uint32()));
+        }
+      }
+
+      return result;
+    } else {
+      return std::wstring();
+    }
+  }
+}
+
 void Cask::CdapOdbc::DataReader::fetchNull(const ColumnBinding& binding) {
   if (binding.getStrLenOrInd()) {
     *binding.getStrLenOrInd() = SQL_NULL_DATA;
@@ -103,25 +130,11 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   SQLDOUBLE dblValue = NAN;
   switch (binding.getTargetType()) {
     case SQL_CHAR:
-      if (value.is_string()) {
-        strValue = value.as_string();
-      } else if (value.is_integer()) {
-        strValue = std::to_wstring(value.as_integer());
-      } else if (value.is_double()) {
-        strValue = std::to_wstring(value.as_double());
-      }
-
+      strValue = to_wstring(value);
       this->fetchVarchar(strValue.c_str(), binding);
       break;
     case SQL_WCHAR:
-      if (value.is_string()) {
-        strValue = value.as_string();
-      } else if (value.is_integer()) {
-        strValue = std::to_wstring(value.as_integer());
-      } else if (value.is_double()) {
-        strValue = std::to_wstring(value.as_double());
-      }
-
+      strValue = to_wstring(value);
       this->fetchWVarchar(strValue.c_str(), binding);
       break;
     case SQL_DOUBLE:
@@ -133,6 +146,8 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         dblValue = value.as_double();
       } else if (value.is_number()) {
         dblValue = value.as_number().to_double();
+      } else if (value.is_boolean()) {
+        dblValue = value.as_bool() ? 1.0 : 0.0;
       }
 
       this->fetchDouble(dblValue, binding);

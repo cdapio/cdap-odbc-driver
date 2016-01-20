@@ -19,18 +19,6 @@
 #include "QueryCommand.h"
 #include "Driver.h"
 
-////namespace {
-////  const std::wstring* convertPattern(const std::wstring* pattern) {
-////    // '%' means all in ODBC and NULL means all in Explore
-////    // Convert '%' to NULL
-////    if (pattern && *pattern == L"%") {
-////      return nullptr;
-////    } else {
-////      return pattern;
-////    }
-////  }
-////}
-
 bool Cask::CdapOdbc::QueryDataReader::loadData() {
   if (this->moreData) {
     this->queryResult = this->queryCommand->loadRows(FETCH_SIZE);
