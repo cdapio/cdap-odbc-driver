@@ -32,6 +32,7 @@ namespace Cask {
      */
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
+      std::wstring namespace_;
 
       web::json::value doRequest(web::http::http_request& request);
       web::json::value doRequest(web::http::method mhd, const utility::string_t& path);
@@ -49,7 +50,7 @@ namespace Cask {
       /**
        * Creates an instance of explore client.
        */
-      ExploreClient(const web::http::uri& baseUri);
+      ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_);
       
       /**
        * Destructor.

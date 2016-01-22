@@ -45,7 +45,7 @@ void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
   assert(!this->isOpen);
   this->params = std::make_unique<ConnectionParams>(connectionString);
   auto baseUri = this->resolveUri();
-  this->exploreClient = std::make_unique<ExploreClient>(baseUri);
+  this->exploreClient = std::make_unique<ExploreClient>(baseUri, this->params->getNamespace());
   if (this->exploreClient->isAvailable()) {
     this->isOpen = true;
   } else {

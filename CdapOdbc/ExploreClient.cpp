@@ -79,7 +79,8 @@ web::json::value Cask::CdapOdbc::ExploreClient::doDelete(const utility::string_t
   return this->doRequest(web::http::methods::DEL, path);
 }
 
-Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
+Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_)
+  : namespace_(namespace_) {
   this->httpClient = std::make_unique<web::http::client::http_client>(baseUri);
 }
 
@@ -155,18 +156,18 @@ QueryHandle Cask::CdapOdbc::ExploreClient::getTables(const std::wstring* catalog
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getStreams() {
-  auto value = this->doGet(L"namespaces/default/streams");
+  auto value = this->doGet(L"namespaces/" + this->namespace_ + L"/streams");
   return QueryResult(value);
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getStreamFields(const std::wstring& streamName) {
-  auto value = this->doGet(L"namespaces/default/streams/" + streamName).at(L"format").at(L"schema").at(L"fields");
+  auto value = this->doGet(L"namespaces/" + this->namespace_ + L"/streams/" + streamName).at(L"format").at(L"schema").at(L"fields");
   return QueryResult(value);
 }
 
 QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
   web::json::value query;
   query[L"query"] = toJson(&statement);
-  auto value = this->doPost(L"namespaces/default/data/explore/queries", query);
+  auto value = this->doPost(L"namespaces/" + this->namespace_ + L"/data/explore/queries", query);
   return value.at(L"handle").as_string();
 }
