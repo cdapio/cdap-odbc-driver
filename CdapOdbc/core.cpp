@@ -24,6 +24,7 @@
 #include "Connection.h"
 #include "Argument.h"
 #include "Statement.h"
+#include "ConnectionDialog.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -134,20 +135,30 @@ SQLRETURN SQL_API SQLDriverConnectW(
 
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::unique_ptr<std::wstring> connectionString;
+    std::wstring newConnectionString;
+    std::unique_ptr<ConnectionDialog> dialog;
+
     switch (DriverCompletion) {
       case SQL_DRIVER_PROMPT:
         // DRIVER
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        *connectionString += L"HOST=localhost;PORT=10000";
-        connection.open(*connectionString);
-        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
-        TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
-        return SQL_SUCCESS;
+        dialog = std::make_unique<ConnectionDialog>(WindowHandle);
+        dialog->setParams(ConnectionParams(*connectionString));
+        if (dialog->show()) {
+          newConnectionString = dialog->getParams().getFullConnectionString();
+          connection.open(newConnectionString);
+          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
+          return SQL_SUCCESS;
+        }
+
+        TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+        return SQL_ERROR;
       case SQL_DRIVER_COMPLETE:
       case SQL_DRIVER_COMPLETE_REQUIRED:
         // DSN
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        connection.open(L"HOST=localhost;PORT=10000");
+        connection.open(*connectionString);
         Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
         return SQL_SUCCESS;
@@ -712,7 +723,7 @@ SQLRETURN SQL_API SQLFetch(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLFetch returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception& ex) {
+  } catch (std::exception&) {
     TRACE(L"SQLFetch returns SQL_ERROR (%s)\n");
     return SQL_ERROR;
   }

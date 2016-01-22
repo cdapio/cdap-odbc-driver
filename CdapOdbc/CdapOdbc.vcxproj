@@ -153,6 +153,7 @@
     <ClInclude Include="ColumnsDataReader.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="ConnectionDialog.h" />
     <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataReader.h" />
@@ -164,11 +165,13 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
+    <ClInclude Include="Library.h" />
     <ClInclude Include="NoDataException.h" />
     <ClInclude Include="QueryCommand.h" />
     <ClInclude Include="QueryDataReader.h" />
     <ClInclude Include="QueryResult.h" />
     <ClInclude Include="QueryStatus.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SchemasDataReader.h" />
     <ClInclude Include="SchemasCommand.h" />
     <ClInclude Include="SpecialColumnsCommand.h" />
@@ -192,30 +195,18 @@
     <ClCompile Include="ColumnsDataReader.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="ConnectionDialog.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="DataReader.cpp" />
     <ClCompile Include="DataType.cpp" />
     <ClCompile Include="Descriptor.cpp" />
-    <ClCompile Include="dllmain.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
+    <ClCompile Include="Library.cpp" />
     <ClCompile Include="NoDataException.cpp" />
     <ClCompile Include="QueryCommand.cpp" />
     <ClCompile Include="QueryDataReader.cpp" />
@@ -244,6 +235,9 @@
       <DeploymentContent>false</DeploymentContent>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
