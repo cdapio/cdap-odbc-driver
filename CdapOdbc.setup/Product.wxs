@@ -47,13 +47,13 @@
   
   <Fragment>
     <DirectoryRef Id="APPFOLDER">
-      <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="87D3BCC2-A2D3-48E8-810A-A7083DBFBC7D">
+      <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
         <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
       </Component>  
-      <Component Id="CppRestDll"  Win64 ="$(var.Win64)" Guid="3EF5F736-F4EA-4741-B9B0-90FEE7D70472">
+      <Component Id="CppRestDll"  Win64 ="$(var.Win64)" Guid="*">
         <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" />
       </Component>  
-      <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="94015BDA-1A3D-441F-8CBB-2CA74907C3A3">
+      <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
         <RegistryKey Root="HKLM"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
           <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed" />
@@ -71,7 +71,7 @@
           <RegistryValue Type="string" Name="CpTimeout" Value="120"/>
         </RegistryKey>
       </Component>
-      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="1E7F1643-DC23-43B9-A8AD-0B7235DBAA04">   
+      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Data Sources">        
           <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
@@ -84,7 +84,7 @@
       
     </DirectoryRef>
     <DirectoryRef Id="ApplicationProgramsFolder">
-      <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="A6FCE084-FE32-47F3-9CAB-B37821333DDA">
+      <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">
         <Shortcut Id="UninstallDriver"
                   Name="Uninstal CDAP ODBC Driver"
                   Description="Uninstal CDAP ODBC Driver"
