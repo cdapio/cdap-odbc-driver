@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define InstallName = "CDAP ODBC Driver" ?>
+<?define CdapOdbcDll = "CdapOdbc.dll" ?>
+<?define CppRestDll = "cpprest140d_2_7.dll" ?>
+
+<?if $(var.Platform) = x64 ?>
+  <?define ProductName = "$(var.InstallName) (x64)" ?>
+  <?define ProgramsPath = "ProgramFiles64Folder" ?>
+  <?define Win64 = "yes" ?>
+<?else ?>
+  <?define ProductName = "$(var.InstallName) (x86)" ?>
+  <?define ProgramsPath = "ProgramFilesFolder" ?>
+  <?define Win64 = "yes" ?>
+<?endif ?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.0" Manufacturer="Cask" UpgradeCode="3523fbf5-f35b-433e-9878-6adf90f0e61a">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="$(var.ProgramsPath)">
+        <Directory Id="VENDORFOLDER" Name="Cask" >
+				  <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
+        </Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+  
+  <Fragment>
+    <DirectoryRef Id="APPFOLDER">
+      <Component Id="CdapOdbcDll" >
+        <File Id="$(var.CdapOdbcDll)" Source="$(var.SolutionDir)$(var.Platform)\$(var.Configuration)\$(var.CdapOdbcDll)" />
+      </Component>  
+      <Component Id="CppRestDll" >
+        <File Id="$(var.CppRestDll)" Source="$(var.SolutionDir)$(var.Platform)\$(var.Configuration)\$(var.CppRestDll)" />
+      </Component>  
+    <Component Id="RgistryEntriesHKLM">
+      <RegistryKey Root="HKLM"
+                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
+        <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed"/>
+      </RegistryKey>
+      <RegistryKey Root="HKLM"
+                   Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC">
+        <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
+        <RegistryValue Type="string" Name="Driver" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
+        <RegistryValue Type="string" Name="Setup" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
+        <RegistryValue Type="string" Name="SQLLevel" Value="0"/>
+        <RegistryValue Type="string" Name="FileUsage" Value="0"/>
+        <RegistryValue Type="string" Name="DriverODBCVer" Value="03.80"/>
+        <RegistryValue Type="string" Name="ConnectFunctions" Value="NYN"/>
+        <RegistryValue Type="string" Name="APILevel" Value="0"/> 
+        <RegistryValue Type="string" Name="CpTimeout" Value="120"/>
+      </RegistryKey>
+    </Component>
+    <Component Id="RgistryEntriesHKCU">   
+      <RegistryKey Root="HKCU"
+                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Data Sources">        
+        <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
+      </RegistryKey>
+      <RegistryKey Root="HKCU"
+                   Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP Datasets">        
+        <RegistryValue Type="string" Name="Driver" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
+      </RegistryKey>
+    </Component>
+  
+    </DirectoryRef>
+  </Fragment>
+    
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
+      <ComponentRef Id="CdapOdbcDll" />
+      <ComponentRef Id="CppRestDll" />
+      <ComponentRef Id="RgistryEntriesHKLM" />
+      <ComponentRef Id="RgistryEntriesHKCU" />
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<!-- <Component Id="ProductComponent"> -->
+				<!-- TODO: Insert files, registry keys, and other resources here. -->
+			<!-- </Component> -->
+		</ComponentGroup>
+	</Fragment>
+</Wix>
