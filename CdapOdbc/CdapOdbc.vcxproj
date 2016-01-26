@@ -167,6 +167,7 @@
     <ClInclude Include="InvalidHandleException.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="NoDataException.h" />
+    <ClInclude Include="NoSchemaColumnsDataReader.h" />
     <ClInclude Include="QueryCommand.h" />
     <ClInclude Include="QueryDataReader.h" />
     <ClInclude Include="QueryResult.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="InvalidHandleException.cpp" />
     <ClCompile Include="Library.cpp" />
     <ClCompile Include="NoDataException.cpp" />
+    <ClCompile Include="NoSchemaColumnsDataReader.cpp" />
     <ClCompile Include="QueryCommand.cpp" />
     <ClCompile Include="QueryDataReader.cpp" />
     <ClCompile Include="QueryResult.cpp" />

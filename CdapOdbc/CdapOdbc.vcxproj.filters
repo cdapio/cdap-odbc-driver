@@ -150,6 +150,9 @@
     <ClInclude Include="Library.h">
       <Filter>Library</Filter>
     </ClInclude>
+    <ClInclude Include="NoSchemaColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -262,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="Library.cpp">
       <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="NoSchemaColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

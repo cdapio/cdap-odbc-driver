@@ -99,6 +99,7 @@ void Cask::CdapOdbc::Driver::initializeDataTypes() {
   this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11) });
   this->dataTypes.insert({ L"bigint", DataType(L"bigint", SQL_BIGINT, 0, 19) });
   this->dataTypes.insert({ L"string", DataType(L"string", SQL_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
+  this->dataTypes.insert({ L"map<string,string>", DataType(L"string", SQL_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
 }
 
 Cask::CdapOdbc::Driver::Driver() {
