@@ -44,15 +44,15 @@
       </Directory>
 		</Directory>
 	</Fragment>
-  
+
   <Fragment>
     <DirectoryRef Id="APPFOLDER">
       <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
         <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
-      </Component>  
+      </Component>
       <Component Id="CppRestDll"  Win64 ="$(var.Win64)" Guid="*">
         <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" />
-      </Component>  
+      </Component>
       <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
         <RegistryKey Root="HKLM"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
@@ -61,8 +61,8 @@
         <RegistryKey Root="HKLM"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC">
           <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
-          <RegistryValue Type="string" Name="Driver" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
-          <RegistryValue Type="string" Name="Setup" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
+          <RegistryValue Type="string" Name="Setup" Value="[!$(var.CdapOdbcDll)]"/>
           <RegistryValue Type="string" Name="SQLLevel" Value="0"/>
           <RegistryValue Type="string" Name="FileUsage" Value="0"/>
           <RegistryValue Type="string" Name="DriverODBCVer" Value="03.80"/>
@@ -73,15 +73,15 @@
       </Component>
       <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
         <RegistryKey Root="HKCU"
-                  Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Data Sources">        
+                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
           <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
         </RegistryKey>
         <RegistryKey Root="HKCU"
-                  Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP Datasets">        
-          <RegistryValue Type="string" Name="Driver" Value="[APPFOLDER]$(var.CdapOdbcDll)"/>
+                  Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
         </RegistryKey>
       </Component>  
-      
+
     </DirectoryRef>
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">
@@ -92,7 +92,7 @@
                   Arguments="/x [ProductCode]" />
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
         <RegistryValue Root="HKCU"
-                  Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers"
+                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Drivers"
                   Type="integer"
                   Name="installed"
                   Value="1"
@@ -100,7 +100,6 @@
       </Component>
     </DirectoryRef>
   </Fragment>
-  
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
