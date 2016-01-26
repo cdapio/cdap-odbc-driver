@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?define targetArch = x64 ?>
 <?define InstallName = "CDAP ODBC Driver" ?>
 <?define CdapOdbcDll = "CdapOdbc.dll" ?>
-<?define CppRestDll = "cpprest140d_2_7.dll" ?>
-
-<?if $(var.Platform) = x64 ?>
+<?if $(var.CdapOdbc.Configuration) = Debug ?>
+  <?define CppRestDll = "cpprest140d_2_7.dll" ?>
+<?else ?>
+  <?define CppRestDll = "cpprest140_2_7.dll" ?>
+<?endif ?>
+<?define Win64 = "yes" ?>
+<!-- TODO Fix x86 build for CdapOdbc
+<?if $(var.targetArch) = x64 ?>
   <?define ProductName = "$(var.InstallName) (x64)" ?>
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
   <?define Win64 = "yes" ?>
 <?else ?>
   <?define ProductName = "$(var.InstallName) (x86)" ?>
   <?define ProgramsPath = "ProgramFilesFolder" ?>
-  <?define Win64 = "yes" ?>
-<?endif ?>
+  <?define Win64 = "no" ?>
+<?endif ?>-->
+<?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.0" Manufacturer="Cask" UpgradeCode="3523fbf5-f35b-433e-9878-6adf90f0e61a">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="x64"  />
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes"/>
 
@@ -25,7 +35,7 @@
 
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="$(var.ProgramsPath)">
+			<Directory Id="ProgramFiles64Folder">
         <Directory Id="VENDORFOLDER" Name="Cask" >
 				  <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
         </Directory>
@@ -35,16 +45,16 @@
   
   <Fragment>
     <DirectoryRef Id="APPFOLDER">
-      <Component Id="CdapOdbcDll" >
-        <File Id="$(var.CdapOdbcDll)" Source="$(var.SolutionDir)$(var.Platform)\$(var.Configuration)\$(var.CdapOdbcDll)" />
+      <Component Id="CdapOdbcDll"  Win64 ="yes">
+        <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" ProcessorArchitecture="x64"/>
       </Component>  
-      <Component Id="CppRestDll" >
-        <File Id="$(var.CppRestDll)" Source="$(var.SolutionDir)$(var.Platform)\$(var.Configuration)\$(var.CppRestDll)" />
+      <Component Id="CppRestDll"  Win64 ="yes">
+        <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" ProcessorArchitecture="x64" />
       </Component>  
-    <Component Id="RgistryEntriesHKLM">
+    <Component Id="RgistryEntriesHKLM"  Win64 ="yes">
       <RegistryKey Root="HKLM"
                    Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
-        <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed"/>
+        <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed" />
       </RegistryKey>
       <RegistryKey Root="HKLM"
                    Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC">
@@ -59,7 +69,7 @@
         <RegistryValue Type="string" Name="CpTimeout" Value="120"/>
       </RegistryKey>
     </Component>
-    <Component Id="RgistryEntriesHKCU">   
+    <Component Id="RgistryEntriesHKCU"  Win64 ="yes">   
       <RegistryKey Root="HKCU"
                    Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Data Sources">        
         <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
@@ -72,7 +82,7 @@
   
     </DirectoryRef>
   </Fragment>
-    
+  
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
@@ -80,10 +90,6 @@
       <ComponentRef Id="CppRestDll" />
       <ComponentRef Id="RgistryEntriesHKLM" />
       <ComponentRef Id="RgistryEntriesHKCU" />
-			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-			<!-- <Component Id="ProductComponent"> -->
-				<!-- TODO: Insert files, registry keys, and other resources here. -->
-			<!-- </Component> -->
 		</ComponentGroup>
 	</Fragment>
 </Wix>
