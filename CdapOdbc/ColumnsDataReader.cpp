@@ -121,8 +121,6 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
   auto& record = this->queryResult.getRows().at(this->currentRowIndex);
   std::wstring name;
   std::wstring typeName;
-  std::wstring no = L"NO";
-  std::wstring yes = L"YES";
   SQLSMALLINT radix = 0;
 
   switch (binding.getColumnNumber()) {

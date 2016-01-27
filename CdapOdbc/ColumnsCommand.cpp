@@ -18,6 +18,7 @@
 #include "ColumnsCommand.h"
 #include "Connection.h"
 #include "ColumnsDataReader.h"
+#include "NoSchemaColumnsDataReader.h"
 #include "String.h"
 
 Cask::CdapOdbc::ColumnsCommand::ColumnsCommand(Connection* connection, const std::wstring& tableName)
@@ -28,5 +29,10 @@ Cask::CdapOdbc::ColumnsCommand::ColumnsCommand(Connection* connection, const std
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::ColumnsCommand::executeReader() {
   auto streamName = String::makeStreamName(this->tableName);
   auto queryResult = this->getConnection()->getExploreClient().getStreamFields(streamName);
-  return std::make_unique<ColumnsDataReader>(this->tableName, queryResult);
+  bool noSchema = (queryResult.getSize() == 1) && (queryResult.getRows().at(0).at(L"name").as_string() == L"body");
+  if (noSchema) {
+    return std::make_unique<NoSchemaColumnsDataReader>(this->tableName, queryResult);
+  } else {
+    return std::make_unique<ColumnsDataReader>(this->tableName, queryResult);
+  }
 }
