@@ -56,10 +56,10 @@
       <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
         <RegistryKey Root="HKLM"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
-          <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed" />
+          <RegistryValue Type="string" Name="Cask CDAP ODBC Driver" Value="Installed" />
         </RegistryKey>
         <RegistryKey Root="HKLM"
-                  Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC">
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\Cask CDAP ODBC Driver">
           <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
           <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
           <RegistryValue Type="string" Name="Setup" Value="[!$(var.CdapOdbcDll)]"/>
@@ -74,7 +74,7 @@
       <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
-          <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
+          <RegistryValue Type="string" Name="CDAP Datasets" Value="Cask CDAP ODBC Driver"/>
         </RegistryKey>
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
