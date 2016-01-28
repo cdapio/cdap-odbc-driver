@@ -19,7 +19,7 @@
 <?endif ?>
 <?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.0" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
+	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.1" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
 		<Package InstallerVersion="200"
              Compressed="yes"
              InstallScope="perMachine"
