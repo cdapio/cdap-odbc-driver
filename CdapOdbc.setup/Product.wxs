@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define targetArch =  $(var.CdapOdbc.Platform)  ?>
+<?define InstallName = "CDAP ODBC Driver" ?>
+<?define CdapOdbcDll = "CdapOdbc.dll" ?>
+<?if $(var.CdapOdbc.Configuration) = Debug ?>
+  <?define CppRestDll = "cpprest140d_2_7.dll" ?>
+<?else ?>
+  <?define CppRestDll = "cpprest140_2_7.dll" ?>
+<?endif ?>
+<?if $(var.targetArch) = x64 ?>
+  <?define ProductName = "$(var.InstallName) (x64)" ?>
+  <?define ProgramsPath = "ProgramFiles64Folder" ?>
+  <?define Win64 = "yes" ?>
+<?else ?>
+  <?define targetArch = x86 ?>
+  <?define ProductName = "$(var.InstallName) (x86)" ?>
+  <?define ProgramsPath = "ProgramFilesFolder" ?>
+  <?define Win64 = "no" ?>
+<?endif ?>
+<?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.0" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
+		<Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="x64"  />
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="$(var.ProgramsPath)">
+        <Directory Id="VENDORFOLDER" Name="Cask" >
+				  <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
+        </Directory>
+			</Directory>
+      <Directory Id="ProgramMenuFolder">
+         <Directory Id="ApplicationProgramsFolder" Name="CDAP ODBC Driver"/>
+      </Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="APPFOLDER">
+      <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
+        <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
+      </Component>
+      <Component Id="CppRestDll"  Win64 ="$(var.Win64)" Guid="*">
+        <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" />
+      </Component>
+      <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
+        <RegistryKey Root="HKLM"
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
+          <RegistryValue Type="string" Name="CDAP ODBC" Value="Installed" />
+        </RegistryKey>
+        <RegistryKey Root="HKLM"
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\CDAP ODBC">
+          <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
+          <RegistryValue Type="string" Name="Setup" Value="[!$(var.CdapOdbcDll)]"/>
+          <RegistryValue Type="string" Name="SQLLevel" Value="0"/>
+          <RegistryValue Type="string" Name="FileUsage" Value="0"/>
+          <RegistryValue Type="string" Name="DriverODBCVer" Value="03.80"/>
+          <RegistryValue Type="string" Name="ConnectFunctions" Value="NYN"/>
+          <RegistryValue Type="string" Name="APILevel" Value="0"/> 
+          <RegistryValue Type="string" Name="CpTimeout" Value="120"/>
+        </RegistryKey>
+      </Component>
+      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
+        <RegistryKey Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
+          <RegistryValue Type="string" Name="CDAP Datasets" Value="CDAP ODBC"/>
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
+        </RegistryKey>
+      </Component>  
+
+    </DirectoryRef>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">
+        <Shortcut Id="UninstallDriver"
+                  Name="Uninstal CDAP ODBC Driver"
+                  Description="Uninstal CDAP ODBC Driver"
+                  Target="[System64Folder]msiexec.exe"
+                  Arguments="/x [ProductCode]" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Drivers"
+                  Type="integer"
+                  Name="installed"
+                  Value="1"
+                  KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
+      <ComponentRef Id="CdapOdbcDll" />
+      <ComponentRef Id="CppRestDll" />
+      <ComponentRef Id="RgistryEntriesHKLM" />
+      <ComponentRef Id="RgistryEntriesHKCU" />
+      <ComponentRef Id="UninstallShortcut" />
+		</ComponentGroup>
+	</Fragment>
+</Wix>

@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdapOdbc.Tests", "CdapOdbc.
 		{8F9A79B2-A66C-42E6-B9CE-E2F1B75C82B6} = {8F9A79B2-A66C-42E6-B9CE-E2F1B75C82B6}
 	EndProjectSection
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CdapOdbc.setup", "CdapOdbc.setup\CdapOdbc.setup.wixproj", "{232AF8B4-F2C9-4673-9D88-6B327251F7F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +36,12 @@ Global
 		{35F99D77-FA1E-40DA-98BC-9506868ED18E}.Release|x64.Build.0 = Release|x64
 		{35F99D77-FA1E-40DA-98BC-9506868ED18E}.Release|x86.ActiveCfg = Release|Win32
 		{35F99D77-FA1E-40DA-98BC-9506868ED18E}.Release|x86.Build.0 = Release|Win32
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Debug|x64.ActiveCfg = Debug|x86
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Debug|x86.ActiveCfg = Debug|x86
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Debug|x86.Build.0 = Debug|x86
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Release|x64.ActiveCfg = Release|x86
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Release|x86.ActiveCfg = Release|x86
+		{232AF8B4-F2C9-4673-9D88-6B327251F7F8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
