@@ -19,7 +19,7 @@
 <?endif ?>
 <?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="CDAP ODBC Driver" Language="1033" Version="1.0.0.1" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
+	<Product Id="*" Name="Cask CDAP ODBC Driver" Language="1033" Version="1.0.0.1" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
 		<Package InstallerVersion="200"
              Compressed="yes"
              InstallScope="perMachine"
@@ -56,10 +56,10 @@
       <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
         <RegistryKey Root="HKLM"
                   Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
-          <RegistryValue Type="string" Name="Cask CDAP ODBC Driver" Value="Installed" />
+          <RegistryValue Type="string" Name="[ProductName]" Value="Installed" />
         </RegistryKey>
         <RegistryKey Root="HKLM"
-                  Key="SOFTWARE\ODBC\ODBCINST.INI\Cask CDAP ODBC Driver">
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\[ProductName]">
           <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
           <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
           <RegistryValue Type="string" Name="Setup" Value="[!$(var.CdapOdbcDll)]"/>
@@ -74,7 +74,7 @@
       <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
-          <RegistryValue Type="string" Name="CDAP Datasets" Value="Cask CDAP ODBC Driver"/>
+          <RegistryValue Type="string" Name="CDAP Datasets" Value="[ProductName]"/>
         </RegistryKey>
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
@@ -86,13 +86,13 @@
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">
         <Shortcut Id="UninstallDriver"
-                  Name="Uninstal CDAP ODBC Driver"
-                  Description="Uninstal CDAP ODBC Driver"
+                  Name="Uninstal [ProductName]"
+                  Description="Uninstal [ProductName]"
                   Target="[System64Folder]msiexec.exe"
                   Arguments="/x [ProductCode]" />
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
         <RegistryValue Root="HKCU"
-                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Drivers"
+                  Key="SOFTWARE\ODBC\ODBC.INI\[ProductName]"
                   Type="integer"
                   Name="installed"
                   Value="1"
