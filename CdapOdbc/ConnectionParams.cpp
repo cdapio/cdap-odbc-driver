@@ -71,6 +71,8 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
 
     if (equals(key, L"driver")) {
       this->driver = String::trim(values[1]);
+    } else if (equals(key, L"dsn")) {
+      this->dsn = String::trim(values[1]);
     } else if (equals(key, L"host")) {
       this->host = String::trim(values[1]);
     } else if (equals(key, L"port")) {

@@ -21,6 +21,10 @@
 #include "Statement.h"
 #include "Descriptor.h"
 #include "InvalidHandleException.h"
+#include "DataSourceDialog.h"
+#include "Argument.h"
+
+#define ODBC_INI L"ODBC.INI"
 
 using namespace Cask::CdapOdbc;
 
@@ -276,4 +280,32 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   setFunction(bitset, SQL_API_SQLSPECIALCOLUMNS);
   setFunction(bitset, SQL_API_SQLSTATISTICS);
   setFunction(bitset, SQL_API_SQLTABLES);
+}
+
+void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
+  if (dialog->show()) {
+    if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+      throw std::logic_error("Cannot write DSN.");
+    }
+  }
+}
+
+void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  auto params = ConnectionParams(attrs);
+  auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
+  dialog->setName(params.getDsn());
+  if (dialog->show()) {
+    if (params.getDsn() != dialog->getName()) {
+      ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
+      if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+        throw std::logic_error("Cannot write DSN.");
+      }
+    }
+  }
+}
+
+void Cask::CdapOdbc::Driver::deleteDataSource(const std::wstring& driver, const std::wstring& attrs) {
+  auto params = ConnectionParams(attrs);
+  ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
 }

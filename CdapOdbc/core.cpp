@@ -25,6 +25,7 @@
 #include "Argument.h"
 #include "Statement.h"
 #include "ConnectionDialog.h"
+#include "Encoding.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -158,8 +159,21 @@ SQLRETURN SQL_API SQLDriverConnectW(
       case SQL_DRIVER_COMPLETE_REQUIRED:
         // DSN
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        connection.open(*connectionString);
-        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        if (connectionString->find(L"DSN") != std::wstring::npos) {
+          dialog = std::make_unique<ConnectionDialog>(WindowHandle);
+          dialog->setParams(ConnectionParams(*connectionString));
+          if (!dialog->show()) {
+            TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+            return SQL_ERROR;
+          }
+          
+          newConnectionString = dialog->getParams().getFullConnectionString();
+        } else {
+          newConnectionString = *connectionString;
+        }
+        
+        connection.open(newConnectionString);
+        Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
         return SQL_SUCCESS;
       case SQL_DRIVER_NOPROMPT:
@@ -1217,7 +1231,48 @@ BOOL INSTAPI ConfigDSN(
   WORD     fRequest,
   LPCSTR   lpszDriver,
   LPCSTR   lpszAttributes) {
-  TRACE(L"ConfigDSN(hwndParent = %X, fRequest = %d, lpszDriver = %s)\n", hwndParent, fRequest, lpszDriver);
+  TRACE(L"ConfigDSN(hwndParent = %X, fRequest = %d)\n", hwndParent, fRequest);
+  try {
+    auto driver = Encoding::toUtf16(lpszDriver);
+    auto attrs = Encoding::toUtf16(lpszAttributes);
+    TRACE(L"ConfigDSN - lpszDriver = %s, lpszAttributes = %s\n", driver.c_str(), attrs.c_str());
+    switch (fRequest) {
+      case ODBC_ADD_DSN:
+        Driver::getInstance().addDataSource(hwndParent, driver, attrs);
+        TRACE(L"ConfigDSN returns TRUE\n");
+        return TRUE;
+      case ODBC_CONFIG_DSN:
+        Driver::getInstance().modifyDataSource(hwndParent, driver, attrs);
+        TRACE(L"ConfigDSN returns TRUE\n");
+        return TRUE;
+      case ODBC_REMOVE_DSN:
+        Driver::getInstance().deleteDataSource(driver, attrs);
+        TRACE(L"ConfigDSN returns TRUE\n");
+        return TRUE;
+    }
+
+    TRACE(L"ConfigDSN returns FALSE\n");
+    return FALSE;
+  } catch (std::exception&) {
+    TRACE(L"ConfigDSN returns FALSE\n");
+    return FALSE;
+  }
+}
+
+BOOL INSTAPI ConfigDriver(
+  HWND    hwndParent,
+  WORD    fRequest,
+  LPCSTR  lpszDriver,
+  LPCSTR  lpszArgs,
+  LPSTR   lpszMsg,
+  WORD    cbMsgMax,
+  WORD *  pcbMsgOut) {
+  TRACE(
+    L"ConfigDriver(hwndParent = %X, fRequest = %d, lpszDriver = %s, lpszArgs = %s)\n", 
+    hwndParent, 
+    fRequest, 
+    lpszDriver,
+    lpszArgs);
   TRACE(L"ConfigDSN returns TRUE\n");
   return TRUE;
 }

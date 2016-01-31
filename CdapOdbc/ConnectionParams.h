@@ -24,6 +24,7 @@ namespace Cask {
      */
     class ConnectionParams {
       std::wstring driver;
+      std::wstring dsn;
       std::wstring host;
       int port;
       std::wstring authToken;
@@ -78,6 +79,13 @@ namespace Cask {
       }
 
       /**
+       * Gets DSN connection parameter.
+       */
+      const std::wstring& getDsn() const {
+        return this->dsn;
+      }
+
+      /**
        * Gets HOST connection parameter.
        */
       const std::wstring& getHost() const {
@@ -129,6 +137,13 @@ namespace Cask {
        */
       void setDriver(const std::wstring& value) {
         this->driver = value;
+      }
+
+      /**
+       * Sets DSN connection parameter.
+       */
+      void setDsn(const std::wstring& value) {
+        this->dsn = value;
       }
 
       /**

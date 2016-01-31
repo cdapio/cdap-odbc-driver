@@ -141,6 +141,21 @@ namespace Cask {
        * Setups supported functions.
        */
       void setupSupportedFunctions(SQLUSMALLINT* bitset);
+
+      /**
+       * Adds new DSN.
+       */
+      void addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs);
+
+      /**
+       * Modifies DSN.
+       */
+      void modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs);
+    
+      /**
+       * Removes DSN.
+       */
+      void deleteDataSource(const std::wstring& driver, const std::wstring& attrs);
     };
   }
 }
