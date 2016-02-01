@@ -39,7 +39,7 @@ namespace {
     } else if (typeName == L"long") {
       return SQL_BIGINT;
     } else if (typeName == L"string") {
-      return SQL_CHAR;
+      return SQL_VARCHAR;
     } else {
       return SQL_UNKNOWN_TYPE;
     }
