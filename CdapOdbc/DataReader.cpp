@@ -22,12 +22,17 @@ namespace {
   std::wstring to_wstring(const web::json::value& value) {
     if (value.is_string()) {
       return value.as_string();
-    } else if (value.is_integer()) {
-      return std::to_wstring(value.as_integer());
+    } else if (value.is_number()) {
+      const auto& number = value.as_number();
+      if (number.is_int64()) {
+        return std::to_wstring(number.to_int64());
+      } else if (number.is_int32()) {
+        return std::to_wstring(number.to_int32());
+      } else {
+        return std::to_wstring(number.to_double());
+      }
     } else if (value.is_double()) {
       return std::to_wstring(value.as_double());
-    } else if (value.is_number()) {
-      return std::to_wstring(value.as_number().to_double());
     } else if (value.is_boolean()) {
       return std::to_wstring(value.as_bool() ? 1 : 0);
     } else if (value.is_array()) {
