@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 <?define targetArch =  $(var.CdapOdbc.Platform)  ?>
 <?define InstallName = "CDAP ODBC Driver" ?>
 <?define CdapOdbcDll = "CdapOdbc.dll" ?>
@@ -18,22 +19,30 @@
   <?define Win64 = "no" ?>
 <?endif ?>
 <?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<?define redistMSMPath = "C:\Program Files (x86)\Common Files\Merge Modules\" ?>
+<?define nonRedistPath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist\x64\Microsoft.VC140.DebugCRT\" ?>
+
 	<Product Id="*" Name="Cask CDAP ODBC Driver" Language="1033" Version="1.0.0.1" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
-		<Package InstallerVersion="200"
+		<Package InstallerVersion="301"
              Compressed="yes"
              InstallScope="perMachine"
              Platform="x64"  />
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes"/>
-
+    <Feature Id="VCRedist" Title="Visual C++ Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="VCRedist"/>
+    </Feature>
 		<Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
+      <?if  $(var.CdapOdbc.Configuration) = Debug ?>
+        <!-- This option should be enabled only for debugging -->
+        <ComponentRef Id="VC140DCRT" />
+      <?endif?>
 		</Feature>
 	</Product>
 
 	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
+    <Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="$(var.ProgramsPath)">
         <Directory Id="VENDORFOLDER" Name="Cask" >
 				  <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
@@ -43,10 +52,23 @@
          <Directory Id="ApplicationProgramsFolder" Name="CDAP ODBC Driver"/>
       </Directory>
 		</Directory>
+    
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)Microsoft_VC140_CRT_x64.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
 	</Fragment>
 
   <Fragment>
     <DirectoryRef Id="APPFOLDER">
+      <?if  $(var.CdapOdbc.Configuration) = Debug ?>
+      <!-- This option should be enabled only for debugging -->
+      <Component Id="VC140DCRT" Win64="$(var.Win64)" Guid="{4F9DF96A-C0F4-4C85-A509-19529962CFE6}">
+        <File Id="concrt140.dll" Source="$(var.nonRedistPath)concrt140d.dll" />
+        <File Id="msvcp140.dll" Source="$(var.nonRedistPath)msvcp140d.dll" />
+        <File Id="vccorlib140.dll" Source="$(var.nonRedistPath)vccorlib140d.dll" />
+        <File Id="vcruntime140.dll" Source="$(var.nonRedistPath)vcruntime140d.dll" />
+      </Component>
+      <?endif ?>
       <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
         <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
       </Component>
