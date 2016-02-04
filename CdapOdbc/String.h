@@ -46,6 +46,11 @@ namespace Cask {
        * Makes table name from stream name.
        */
       static std::wstring makeTableName(const std::wstring& streamName);
+
+      /**
+       * Converts double to string with specified precision.
+       */
+      static std::wstring fromDouble(double value, int precision);
     };
   }
 }

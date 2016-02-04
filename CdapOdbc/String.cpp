@@ -50,3 +50,9 @@ std::wstring Cask::CdapOdbc::String::makeStreamName(const std::wstring& streamNa
 std::wstring Cask::CdapOdbc::String::makeTableName(const std::wstring& streamName) {
   return L"stream_" + streamName;
 }
+
+std::wstring Cask::CdapOdbc::String::fromDouble(double value, int precision) {
+  std::wstringstream s;
+  s << std::setprecision(precision) << value;
+  return s.str();
+}
