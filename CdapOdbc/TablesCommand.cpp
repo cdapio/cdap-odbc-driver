@@ -24,6 +24,7 @@ Cask::CdapOdbc::TablesCommand::TablesCommand(Connection* connection)
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::TablesCommand::executeReader() {
-  auto queryResult = this->getConnection()->getExploreClient().getStreams();
-  return std::make_unique<TablesDataReader>(queryResult);
+  auto streams = this->getConnection()->getExploreClient().getStreams();
+  auto datasets = this->getConnection()->getExploreClient().getDatasets();
+  return std::make_unique<TablesDataReader>(streams, datasets);
 }

@@ -23,11 +23,11 @@ namespace {
 
   std::wstring doubleToWString(double value, const Cask::CdapOdbc::ColumnBinding& binding) {
     int maxLen = static_cast<int>(binding.getBufferLength()) - 1;
-    auto result = Cask::CdapOdbc::String::fromDouble(value, maxLen - 1);
-    if (result.size() > maxLen) {
-      maxLen -= (static_cast<int>(result.size()) - maxLen);
-      result = Cask::CdapOdbc::String::fromDouble(value, maxLen - 1);
-    }
+    auto result = Cask::CdapOdbc::String::fromDouble(value, maxLen);
+    //if (result.size() > maxLen) {
+    //  maxLen -= (static_cast<int>(result.size()) - maxLen);
+    //  result = Cask::CdapOdbc::String::fromDouble(value, maxLen - 1);
+    //}
 
     return result;
   }
