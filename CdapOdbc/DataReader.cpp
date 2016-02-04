@@ -17,9 +17,22 @@
 #include "stdafx.h"
 #include "DataReader.h"
 #include "Encoding.h"
+#include "String.h"
 
 namespace {
-  std::wstring to_wstring(const web::json::value& value) {
+
+  std::wstring doubleToWString(double value, const Cask::CdapOdbc::ColumnBinding& binding) {
+    int maxLen = static_cast<int>(binding.getBufferLength()) - 1;
+    auto result = Cask::CdapOdbc::String::fromDouble(value, maxLen - 1);
+    if (result.size() > maxLen) {
+      maxLen -= (static_cast<int>(result.size()) - maxLen);
+      result = Cask::CdapOdbc::String::fromDouble(value, maxLen - 1);
+    }
+
+    return result;
+  }
+
+  std::wstring toWString(const web::json::value& value, const Cask::CdapOdbc::ColumnBinding& binding) {
     if (value.is_string()) {
       return value.as_string();
     } else if (value.is_number()) {
@@ -29,10 +42,10 @@ namespace {
       } else if (number.is_int32()) {
         return std::to_wstring(number.to_int32());
       } else {
-        return std::to_wstring(number.to_double());
+        return doubleToWString(number.to_double(), binding);
       }
     } else if (value.is_double()) {
-      return std::to_wstring(value.as_double());
+      return doubleToWString(value.as_double(), binding);
     } else if (value.is_boolean()) {
       return std::to_wstring(value.as_bool() ? 1 : 0);
     } else if (value.is_array()) {
@@ -135,11 +148,11 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   SQLDOUBLE dblValue = NAN;
   switch (binding.getTargetType()) {
     case SQL_CHAR:
-      strValue = to_wstring(value);
+      strValue = toWString(value, binding);
       this->fetchVarchar(strValue.c_str(), binding);
       break;
     case SQL_WCHAR:
-      strValue = to_wstring(value);
+      strValue = toWString(value, binding);
       this->fetchWVarchar(strValue.c_str(), binding);
       break;
     case SQL_DOUBLE:

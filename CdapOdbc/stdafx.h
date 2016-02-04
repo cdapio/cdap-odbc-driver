@@ -62,6 +62,7 @@
 #include <array>
 #include <limits>
 #include <cwctype>
+#include <iomanip>
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>
