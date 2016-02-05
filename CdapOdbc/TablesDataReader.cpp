@@ -18,6 +18,18 @@
 #include "TablesDataReader.h"
 #include "String.h"
 
+void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
+  std::vector<web::json::value> newRows;
+  auto& rows = this->datasets.getRows();
+  for (auto& row : rows) {
+    if (row.at(L"properties").has_field(L"schema")) {
+      newRows.push_back(row);
+    }
+  }
+ 
+  this->datasets = QueryResult(web::json::value::array(newRows));
+}
+
 std::wstring Cask::CdapOdbc::TablesDataReader::getTableName() {
   if (this->currentRowIndex < this->streams.getSize()) {
     // get stream name
@@ -33,6 +45,7 @@ Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& streams, c
   : streams(streams)
   , datasets(datasets)
   , currentRowIndex(-1) {
+  this->filterDatasets();
 }
 
 bool Cask::CdapOdbc::TablesDataReader::read() {

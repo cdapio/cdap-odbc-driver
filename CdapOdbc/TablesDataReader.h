@@ -31,6 +31,7 @@ namespace Cask {
       QueryResult datasets;
       int currentRowIndex;
 
+      void filterDatasets();
       std::wstring getTableName();
 
     public:
