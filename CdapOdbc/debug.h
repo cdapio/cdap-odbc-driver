@@ -29,5 +29,5 @@ void inline debugFPrint(const wchar_t* fmtString, ...) {
 
 #define TRACE(msg, ...) debugFPrint(msg, __VA_ARGS__)
 #else
-#define TRACE(msg)
+#define TRACE(msg, ...)
 #endif
