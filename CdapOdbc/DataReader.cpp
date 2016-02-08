@@ -105,7 +105,7 @@ void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnB
   assert(binding.getTargetType() == SQL_WCHAR || binding.getTargetType() == SQL_DEFAULT);
   if (str) {
     std::wstring uniStr = str;
-    size_t maxLength = static_cast<size_t>(binding.getBufferLength()) - 1;
+    size_t maxLength = (static_cast<size_t>(binding.getBufferLength()) / sizeof(wchar_t)) - 1;
     size_t size = (uniStr.size() < maxLength) ? uniStr.size() : maxLength;
     if (binding.getTargetValuePtr()) {
       wchar_t* outString = static_cast<wchar_t*>(binding.getTargetValuePtr());
@@ -116,7 +116,7 @@ void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnB
 
     if (binding.getStrLenOrInd()) {
       if (size <= maxLength) {
-        *binding.getStrLenOrInd() = size;
+        *binding.getStrLenOrInd() = size * sizeof(wchar_t);
       } else {
         *binding.getStrLenOrInd() = SQL_NO_TOTAL;
       }
