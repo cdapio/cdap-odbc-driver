@@ -18,14 +18,39 @@
 #include "TablesDataReader.h"
 #include "String.h"
 
-Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& queryResult)
-  : queryResult(queryResult)
+void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
+  std::vector<web::json::value> newRows;
+  auto& rows = this->datasets.getRows();
+  for (auto& row : rows) {
+    if (row.at(L"properties").has_field(L"schema")) {
+      newRows.push_back(row);
+    }
+  }
+ 
+  this->datasets = QueryResult(web::json::value::array(newRows));
+}
+
+std::wstring Cask::CdapOdbc::TablesDataReader::getTableName() {
+  if (this->currentRowIndex < this->streams.getSize()) {
+    // get stream name
+    return L"stream_" + this->streams.getRows().at(this->currentRowIndex).at(L"name").as_string();
+  } else {
+    // get dataset name
+    int rowIndex = this->currentRowIndex - this->streams.getSize();
+    return L"dataset_" + this->datasets.getRows().at(rowIndex).at(L"name").as_string();
+  }
+}
+
+Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& streams, const QueryResult& datasets)
+  : streams(streams)
+  , datasets(datasets)
   , currentRowIndex(-1) {
+  this->filterDatasets();
 }
 
 bool Cask::CdapOdbc::TablesDataReader::read() {
   ++this->currentRowIndex;
-  return this->currentRowIndex < queryResult.getSize();
+  return this->currentRowIndex < (streams.getSize() + datasets.getSize());
 }
 
 void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& binding) {
@@ -37,7 +62,7 @@ void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& bindi
       this->fetchNull(binding);
       break;
     case 3: // TABLE_NAME 
-      name = String::makeTableName(this->queryResult.getRows().at(this->currentRowIndex).at(L"name").as_string());
+      name = this->getTableName();
       this->fetchVarchar(name.c_str(), binding);
       break;
     case 4: // TABLE_TYPE 

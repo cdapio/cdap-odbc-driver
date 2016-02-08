@@ -107,9 +107,19 @@ namespace Cask {
       QueryResult getStreams();
 
       /**
-       * Retrieves a list.
+       * Retrieves a list of datasets.
+       */
+      QueryResult getDatasets();
+
+      /**
+       * Retrieves a list of stream fields.
        */
       QueryResult getStreamFields(const std::wstring& streamName);
+
+      /**
+       * Retrieves a list of dataset fields.
+       */
+      QueryResult getDatasetFields(const std::wstring& datasetName);
 
       /**
       * Executes SQL statement.
