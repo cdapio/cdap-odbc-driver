@@ -27,21 +27,25 @@ namespace Cask {
      */
     class TablesDataReader : public DataReader {
    
-      QueryResult queryResult;
+      QueryResult streams;
+      QueryResult datasets;
       int currentRowIndex;
+
+      void filterDatasets();
+      std::wstring getTableName();
 
     public:
 
       /**
        * Creates an instance of TablesDataReader.
        */
-      TablesDataReader(const QueryResult& queryResult);
+      TablesDataReader(const QueryResult& streams, const QueryResult& datasets);
 
       // Inherited via DataReader
       virtual bool read() override;
 
       // Inherited via DataReader
-      virtual void getColumnValue(const ColumnBinding & binding) override;
+      virtual void getColumnValue(const ColumnBinding& binding) override;
 
       // Inherited via DataReader
       virtual short getColumnCount() const override;

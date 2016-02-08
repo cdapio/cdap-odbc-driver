@@ -43,16 +43,8 @@ std::wstring Cask::CdapOdbc::String::trim(const std::wstring & str) {
   return result;
 }
 
-std::wstring Cask::CdapOdbc::String::makeStreamName(const std::wstring& streamName) {
-  return streamName.substr(7);
-}
-
-std::wstring Cask::CdapOdbc::String::makeTableName(const std::wstring& streamName) {
-  return L"stream_" + streamName;
-}
-
-std::wstring Cask::CdapOdbc::String::fromDouble(double value, int precision) {
+std::wstring Cask::CdapOdbc::String::fromDouble(double value, int width) {
   std::wstringstream s;
-  s << std::setprecision(precision) << value;
+  s << std::setw(width) << value;
   return s.str();
 }
