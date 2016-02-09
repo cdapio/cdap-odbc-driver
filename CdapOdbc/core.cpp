@@ -18,6 +18,7 @@
 #include "core.h"
 #include "InvalidHandleException.h"
 #include "StillExecutingException.h"
+#include "CancelException.h"
 #include "NoDataException.h"
 #include "Driver.h"
 #include "Environment.h"
@@ -1232,6 +1233,21 @@ BOOL INSTAPI ConfigDSN(
   LPCSTR   lpszDriver,
   LPCSTR   lpszAttributes) {
   TRACE(L"ConfigDSN(hwndParent = %X, fRequest = %d)\n", hwndParent, fRequest);
+
+  if (hwndParent == INVALID_HANDLE_VALUE) {
+    SQLPostInstallerErrorW(ODBC_ERROR_INVALID_HWND, L"The hwndParent argument was invalid.");
+    TRACE(L"ConfigDSN returns FALSE\n");
+    return FALSE;
+  }
+
+  if (!(fRequest == ODBC_ADD_DSN || fRequest == ODBC_CONFIG_DSN || fRequest == ODBC_REMOVE_DSN)) {
+    SQLPostInstallerErrorW(
+      ODBC_ERROR_INVALID_REQUEST_TYPE, 
+      L"The fRequest argument was not one of the following: ODBC_ADD_DSN, ODBC_CONFIG_DSN, ODBC_REMOVE_DSN.");
+    TRACE(L"ConfigDSN returns FALSE\n");
+    return FALSE;
+  }
+
   try {
     auto driver = Encoding::toUtf16(lpszDriver);
     auto attrs = Encoding::toUtf16(lpszAttributes);
@@ -1253,7 +1269,14 @@ BOOL INSTAPI ConfigDSN(
 
     TRACE(L"ConfigDSN returns FALSE\n");
     return FALSE;
-  } catch (std::exception&) {
+  } catch (CancelException cex) {
+    std::wstring msg = Encoding::toUtf16(cex.what());
+    SQLPostInstallerErrorW(ODBC_ERROR_USER_CANCELED, msg.c_str());
+    TRACE(L"ConfigDSN returns FALSE\n");
+    return FALSE;
+  } catch (std::exception& ex) {
+    std::wstring msg = Encoding::toUtf16(ex.what());
+    SQLPostInstallerErrorW(ODBC_ERROR_GENERAL_ERR, msg.c_str());
     TRACE(L"ConfigDSN returns FALSE\n");
     return FALSE;
   }

@@ -21,6 +21,7 @@
 #include "Statement.h"
 #include "Descriptor.h"
 #include "InvalidHandleException.h"
+#include "CancelException.h"
 #include "DataSourceDialog.h"
 #include "Argument.h"
 
@@ -284,10 +285,16 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
 
 void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
-  if (dialog->show()) {
-    if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
-      throw std::logic_error("Cannot write DSN.");
-    }
+  if (!dialog->show()) {
+    throw CancelException();
+  }
+
+  if (dialog->getName().size() == 0) {
+    throw std::logic_error("Data source name cannot be empty.");
+  }
+
+  if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+    throw std::logic_error("Cannot write data source.");
   }
 }
 
@@ -296,11 +303,17 @@ void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstr
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
   dialog->setName(params.getDsn());
   if (dialog->show()) {
-    if (params.getDsn() != dialog->getName()) {
-      ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
-      if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
-        throw std::logic_error("Cannot write DSN.");
-      }
+    throw CancelException();
+  }
+
+  if (dialog->getName().size() == 0) {
+    throw std::logic_error("Data source name cannot be empty.");
+  }
+
+  if (params.getDsn() != dialog->getName()) {
+    ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
+    if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+      throw std::logic_error("Cannot write data source.");
     }
   }
 }
