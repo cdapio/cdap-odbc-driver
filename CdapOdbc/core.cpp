@@ -145,16 +145,16 @@ SQLRETURN SQL_API SQLDriverConnectW(
         connectionString = Argument::toStdString(InConnectionString, StringLength1);
         dialog = std::make_unique<ConnectionDialog>(WindowHandle);
         dialog->setParams(ConnectionParams(*connectionString));
-        if (dialog->show()) {
-          newConnectionString = dialog->getParams().getFullConnectionString();
-          connection.open(newConnectionString);
-          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
-          TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
-          return SQL_SUCCESS;
+        if (!dialog->show()) {
+          TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
+          return SQL_NO_DATA;
         }
 
-        TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-        return SQL_ERROR;
+        newConnectionString = dialog->getParams().getFullConnectionString();
+        connection.open(newConnectionString);
+        Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+        TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
+        return SQL_SUCCESS;
       case SQL_DRIVER_COMPLETE:
       case SQL_DRIVER_COMPLETE_REQUIRED:
         // DSN
@@ -163,8 +163,8 @@ SQLRETURN SQL_API SQLDriverConnectW(
           dialog = std::make_unique<ConnectionDialog>(WindowHandle);
           dialog->setParams(ConnectionParams(*connectionString));
           if (!dialog->show()) {
-            TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-            return SQL_ERROR;
+            TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
+            return SQL_NO_DATA;
           }
           
           newConnectionString = dialog->getParams().getFullConnectionString();
