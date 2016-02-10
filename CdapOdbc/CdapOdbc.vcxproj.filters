@@ -159,6 +159,9 @@
     <ClInclude Include="CancelException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="BadRequestException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -279,6 +282,9 @@
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="CancelException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="BadRequestException.cpp">
       <Filter>Exceptions</Filter>
     </ClCompile>
   </ItemGroup>

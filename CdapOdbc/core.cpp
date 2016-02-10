@@ -527,7 +527,7 @@ SQLRETURN SQL_API SQLExecute(
   } catch (NoDataException&) {
     TRACE(L"SQLExecute returns SQL_NO_DATA\n");
     return SQL_NO_DATA;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLExecute returns SQL_ERROR\n");
     return SQL_ERROR;
   }
