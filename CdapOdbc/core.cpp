@@ -170,9 +170,9 @@ SQLRETURN SQL_API SQLDriverConnectW(
           dialog = std::make_unique<ConnectionDialog>(WindowHandle);
           dialog->setParams(ConnectionParams(*connectionString));
           if (!dialog->show()) {
-            TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-            connection.getSqlStatus().addMsg(L"HY000", L"General error: Invalid file dsn");
-            return SQL_ERROR;
+            TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
+            // Not an error
+            return SQL_NO_DATA;
           }
 
           newConnectionString = dialog->getParams().getFullConnectionString();
