@@ -20,6 +20,7 @@
 #include "StillExecutingException.h"
 #include "CancelException.h"
 #include "NoDataException.h"
+#include "CommunicationLinkFailure.h"
 #include "Driver.h"
 #include "Environment.h"
 #include "Connection.h"
@@ -27,6 +28,7 @@
 #include "Statement.h"
 #include "ConnectionDialog.h"
 #include "Encoding.h"
+#include "SQLStatus.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -140,6 +142,9 @@ SQLRETURN SQL_API SQLDriverConnectW(
     std::wstring newConnectionString;
     std::unique_ptr<ConnectionDialog> dialog;
 
+    // Clear Connection SQL Status
+    connection.getSqlStatus().clear();
+
     switch (DriverCompletion) {
       case SQL_DRIVER_PROMPT:
         // DRIVER
@@ -148,6 +153,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
         dialog->setParams(ConnectionParams(*connectionString));
         if (!dialog->show()) {
           TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
+          // Not an error
           return SQL_NO_DATA;
         }
 
@@ -164,15 +170,16 @@ SQLRETURN SQL_API SQLDriverConnectW(
           dialog = std::make_unique<ConnectionDialog>(WindowHandle);
           dialog->setParams(ConnectionParams(*connectionString));
           if (!dialog->show()) {
-            TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
-            return SQL_NO_DATA;
+            TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+            connection.getSqlStatus().addMsg(L"HY000", L"General error: Invalid file dsn");
+            return SQL_ERROR;
           }
-          
+
           newConnectionString = dialog->getParams().getFullConnectionString();
         } else {
           newConnectionString = *connectionString;
         }
-        
+
         connection.open(newConnectionString);
         Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
         TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
@@ -187,12 +194,20 @@ SQLRETURN SQL_API SQLDriverConnectW(
     }
 
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+    connection.getSqlStatus().addMsg(L"HYC00", L"Optional feature not implemented");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDriverConnectW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
+  } catch (CommunicationLinkFailure&) {
+    TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    connection.getSqlStatus().addMsg(L"08S01", L"Communication link failure");
+    return SQL_ERROR;
   } catch (std::exception) {
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    connection.getSqlStatus().addMsg(L"08003", L"Connection not open SQL_INVALID_HANDLE");
     return SQL_ERROR;
   }
 }
@@ -615,7 +630,7 @@ SQLRETURN SQL_API SQLDescribeColW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     auto columnInfo = statement.getColumnInfo(ColumnNumber);
-    
+
     Argument::fromStdString(columnInfo->getName(), ColumnName, BufferLength, NameLengthPtr);
 
     if (DataTypePtr) {
@@ -654,9 +669,9 @@ SQLRETURN SQL_API SQLColAttributeW(
   SQLSMALLINT *   StringLengthPtr,
   SQLLEN *        NumericAttributePtr) {
   TRACE(
-    L"SQLColAttributeW(StatementHandle = %X, ColumnNumber = %d, FieldIdentifier = %d)\n", 
-    StatementHandle, 
-    ColumnNumber, 
+    L"SQLColAttributeW(StatementHandle = %X, ColumnNumber = %d, FieldIdentifier = %d)\n",
+    StatementHandle,
+    ColumnNumber,
     FieldIdentifier);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
@@ -671,7 +686,7 @@ SQLRETURN SQL_API SQLColAttributeW(
         TRACE(L"SQLColAttributeW returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
     }
-    
+
     TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
     return SQL_ERROR;
   } catch (InvalidHandleException&) {
@@ -876,7 +891,7 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
   SQLSMALLINT   Scope,
   SQLSMALLINT   Nullable) {
   TRACE(
-    L"SQLSpecialColumnsW(StatementHandle = %X, IdentifierType = %d, CatalogName = %s, SchemaName = %s, TableName = %s, Scope = %d, Nullable = %d)\n", 
+    L"SQLSpecialColumnsW(StatementHandle = %X, IdentifierType = %d, CatalogName = %s, SchemaName = %s, TableName = %s, Scope = %d, Nullable = %d)\n",
     StatementHandle,
     IdentifierType,
     CatalogName,
@@ -1094,7 +1109,63 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
   SQLPOINTER DiagInfo,
   SQLSMALLINT BufferLength,
   SQLSMALLINT *StringLength) {
-  TRACE(L"SQLGetDiagFieldW\n");
+  TRACE(L"SQLGetDiagFieldW (HandleType = %d, Handle = %X, RecNumber = %d, DiagIdentifier = %d, DiagInfo = %X, BufferLength = %d, StringLength = %d)\n",
+    HandleType, Handle, RecNumber, DiagIdentifier, DiagInfo, BufferLength, StringLength);
+
+  SQLStatus status;
+
+  switch (HandleType) {
+
+    case SQL_HANDLE_DBC:
+      status = Driver::getInstance().getConnection(Handle).getSqlStatus();
+      break;
+    case SQL_HANDLE_STMT:
+      status = Driver::getInstance().getStatement(Handle).getSqlStatus();
+      break;
+    case SQL_HANDLE_ENV:
+    case SQL_HANDLE_DESC:
+    default:
+      return SQL_ERROR;
+  }
+
+  if (status.getRecCount() + 1 < RecNumber) {
+    return SQL_NO_DATA;
+  }
+
+  auto& code = status.getCode(RecNumber);
+  std::wstring logmsg = L"";
+  SQLSMALLINT copiedLen = 0;
+  switch (DiagIdentifier) {
+    case SQL_DIAG_CLASS_ORIGIN:
+      logmsg = L"ISO 9075";
+      if (code[0] == L'I' && code[1] == L'M') {
+        logmsg = L"ODBC 3.0";
+      }
+      break;
+    case SQL_DIAG_SUBCLASS_ORIGIN:
+      logmsg = L"ISO 9075";
+      if (code[0] == L'I' && code[1] == L'M') {
+        logmsg = L"ODBC 3.0";
+      } else if (code[0] == L'H' && code[1] == L'Y') {
+        logmsg = L"ODBC 3.0";
+      } else if (code[0] == L'2' || code[0] == L'0' || code[0] == L'4') {
+        logmsg = L"ODBC 3.0";
+      }
+      break;
+    case SQL_DIAG_CONNECTION_NAME:
+    case SQL_DIAG_SERVER_NAME:
+      // TODO get connection name from driver
+      logmsg = L"NO DSN";
+      break;
+    case SQL_DIAG_SQLSTATE:
+      logmsg = code;
+      break;
+  }
+
+  if (BufferLength > 0) {
+    Argument::fromStdString(logmsg, static_cast<SQLWCHAR*>(DiagInfo), BufferLength, &copiedLen);
+    return SQL_SUCCESS;
+  }
   return SQL_ERROR;
 }
 
@@ -1107,7 +1178,48 @@ SQLRETURN SQL_API SQLGetDiagRecW(
   SQLWCHAR* MessageText,
   SQLSMALLINT BufferLength,
   SQLSMALLINT *TextLength) {
-  TRACE(L"SQLGetDiagRecW\n");
+  TRACE(L"SQLGetDiagRecW (HandleType = %d, Handle = %X, RecNumber = %d, Sqlstate = %d, NativeError = %X, MessageText = %s, BufferLength = %d, TextLength = )\n",
+    HandleType, Handle, RecNumber, Sqlstate, NativeError, MessageText, BufferLength, TextLength);
+
+
+  SQLStatus status;
+
+  switch (HandleType) {
+
+    case SQL_HANDLE_DBC:
+      status = Driver::getInstance().getConnection(Handle).getSqlStatus();
+      break;
+    case SQL_HANDLE_STMT:
+      status = Driver::getInstance().getStatement(Handle).getSqlStatus();
+      break;
+    case SQL_HANDLE_ENV:
+    case SQL_HANDLE_DESC:
+    default:
+      return SQL_ERROR;
+  }
+
+  if (BufferLength < 0) {
+    return SQL_ERROR;
+  }
+  if (status.getRecCount() + 1 < RecNumber) {
+    return SQL_NO_DATA;
+  }
+
+  auto& code = status.getCode(RecNumber);
+  auto& msg = status.getMessage(RecNumber);
+
+  if (msg.length()) {
+    *TextLength = (SQLSMALLINT)msg.size();
+  }
+  SQLSMALLINT copiedLen = 0;
+  if (code.length() > 0) {
+    Argument::fromStdString(code, Sqlstate, 5, &copiedLen);
+    if (BufferLength > 0) {
+      Argument::fromStdString(msg, MessageText, BufferLength, &copiedLen);
+    }
+    return SQL_SUCCESS;
+  }
+
   return SQL_ERROR;
 }
 
@@ -1242,7 +1354,7 @@ BOOL INSTAPI ConfigDSN(
 
   if (!(fRequest == ODBC_ADD_DSN || fRequest == ODBC_CONFIG_DSN || fRequest == ODBC_REMOVE_DSN)) {
     SQLPostInstallerErrorW(
-      ODBC_ERROR_INVALID_REQUEST_TYPE, 
+      ODBC_ERROR_INVALID_REQUEST_TYPE,
       L"The fRequest argument was not one of the following: ODBC_ADD_DSN, ODBC_CONFIG_DSN, ODBC_REMOVE_DSN.");
     TRACE(L"ConfigDSN returns FALSE\n");
     return FALSE;
@@ -1291,9 +1403,9 @@ BOOL INSTAPI ConfigDriver(
   WORD    cbMsgMax,
   WORD *  pcbMsgOut) {
   TRACE(
-    L"ConfigDriver(hwndParent = %X, fRequest = %d, lpszDriver = %s, lpszArgs = %s)\n", 
-    hwndParent, 
-    fRequest, 
+    L"ConfigDriver(hwndParent = %X, fRequest = %d, lpszDriver = %s, lpszArgs = %s)\n",
+    hwndParent,
+    fRequest,
     lpszDriver,
     lpszArgs);
   TRACE(L"ConfigDSN returns TRUE\n");

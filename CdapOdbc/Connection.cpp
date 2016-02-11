@@ -18,6 +18,7 @@
 #include "Connection.h"
 #include "Environment.h"
 #include "Encoding.h"
+#include "CommunicationLinkFailure.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -49,7 +50,7 @@ void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
   if (this->exploreClient->isAvailable()) {
     this->isOpen = true;
   } else {
-    throw std::exception("Service unavailable.");
+    throw CommunicationLinkFailure("Service unavailable.");
   }
 }
 

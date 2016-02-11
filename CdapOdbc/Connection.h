@@ -18,10 +18,12 @@
 
 #include "ConnectionParams.h"
 #include "ExploreClient.h"
+#include "SQLStatus.h"
 
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
+	class SQLStatus;
 
     /**
      * Represents a connection to a database.
@@ -33,6 +35,7 @@ namespace Cask {
       bool isOpen;
       std::unique_ptr<ConnectionParams> params;
       std::unique_ptr<ExploreClient> exploreClient;
+	  SQLStatus sqlStatus;
 
       web::http::uri resolveUri() const;
 
@@ -71,6 +74,13 @@ namespace Cask {
       Environment* getEnvironment() const {
         return this->environment;
       }
+
+	  /**
+	   * Gets SqlStatus storage
+	   */
+	  SQLStatus& getSqlStatus() {
+		  return this->sqlStatus;
+	  }
 
       /**
        * Opens a connection to explore REST service.

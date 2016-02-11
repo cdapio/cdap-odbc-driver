@@ -19,10 +19,12 @@
 #include "ColumnBinding.h"
 #include "Command.h"
 #include "ColumnInfo.h"
+#include "SQLStatus.h"
 
 namespace Cask {
   namespace CdapOdbc {
     class Connection;
+	class SQLStatus;
 
     /**
     * Represents a SQL statement which can be executed to return some data.
@@ -43,6 +45,7 @@ namespace Cask {
       std::vector<ColumnBinding> columnBindings;
       std::unique_ptr<Command> command;
       std::unique_ptr<DataReader> dataReader;
+	  SQLStatus sqlStatus;
 
       void throwStateError() const;
       void openQuery();
@@ -116,6 +119,13 @@ namespace Cask {
        * Retrieves information about special columns for a table.
        */
       void getSpecialColumns();
+
+	  /**
+	  * Gets SqlStatus storage
+	  */
+	  SQLStatus& getSqlStatus() {
+		  return this->sqlStatus;
+	  }
 
       /**
        * Retrieves the next row for the current statement 
