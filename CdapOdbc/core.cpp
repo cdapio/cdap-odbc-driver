@@ -499,6 +499,7 @@ SQLRETURN SQL_API SQLPrepareW(
     auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
     if (sql) {
       statement.prepare(*sql);
+      statement.execute();
       TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     }
@@ -533,8 +534,9 @@ SQLRETURN SQL_API SQLExecute(
   SQLHSTMT     StatementHandle) {
   TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
   try {
-    auto& statement = Driver::getInstance().getStatement(StatementHandle);
-    statement.execute();
+    // For Tableau, statement execution moved to SQLPrepare
+    // auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    // statement.execute();
     TRACE(L"SQLExecute returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
