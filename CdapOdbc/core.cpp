@@ -17,10 +17,7 @@
 #include "stdafx.h"
 #include "core.h"
 #include "InvalidHandleException.h"
-#include "StillExecutingException.h"
 #include "CancelException.h"
-#include "NoDataException.h"
-#include "CommunicationLinkFailure.h"
 #include "Driver.h"
 #include "Environment.h"
 #include "Connection.h"
@@ -29,6 +26,7 @@
 #include "ConnectionDialog.h"
 #include "Encoding.h"
 #include "SQLStatus.h"
+#include "CdapException.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -199,15 +197,15 @@ SQLRETURN SQL_API SQLDriverConnectW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDriverConnectW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CommunicationLinkFailure&) {
+  } catch (CdapException& cex) {
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    connection.getSqlStatus().addMsg(L"08S01", L"Communication link failure");
-    return SQL_ERROR;
-  } catch (std::exception) {
+    connection.getSqlStatus().addError(cex);
+    return cex.getErrorCode();
+  } catch (std::exception& ex) {
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    connection.getSqlStatus().addMsg(L"08003", L"Connection not open SQL_INVALID_HANDLE");
+    connection.getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -218,13 +216,14 @@ SQLRETURN SQL_API SQLGetTypeInfoW(
   TRACE(L"SQLGetTypeInfoW(StatementHandle = %X, DataType = %d)\n", StatementHandle, DataType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     statement.getDataTypes();
     TRACE(L"SQLGetTypeInfoW returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetTypeInfoW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -352,7 +351,7 @@ SQLRETURN SQL_API SQLGetInfoW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetInfoW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -419,7 +418,7 @@ SQLRETURN SQL_API SQLGetFunctions(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetFunctions returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -479,7 +478,7 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetStmtAttrW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -492,6 +491,7 @@ SQLRETURN SQL_API SQLPrepareW(
   TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
     if (sql) {
       statement.prepare(*sql);
@@ -504,7 +504,7 @@ SQLRETURN SQL_API SQLPrepareW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLPrepareW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLPrepareW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -530,20 +530,20 @@ SQLRETURN SQL_API SQLExecute(
   TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     statement.execute();
     TRACE(L"SQLExecute returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLExecute returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (StillExecutingException&) {
-    TRACE(L"SQLExecute returns SQL_STILL_EXECUTING\n");
-    return SQL_STILL_EXECUTING;
-  } catch (NoDataException&) {
-    TRACE(L"SQLExecute returns SQL_NO_DATA\n");
-    return SQL_NO_DATA;
-  } catch (std::exception&) {
+  } catch (CdapException& cex) {
+    TRACE(L"SQLExecute returns %d\n", cex.getErrorCode());
+    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
+    return cex.getErrorCode();
+  } catch (std::exception& ex) {
     TRACE(L"SQLExecute returns SQL_ERROR\n");
+    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -555,6 +555,7 @@ SQLRETURN SQL_API SQLExecDirectW(
   TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
     if (query) {
       statement.executeDirect(*query);
@@ -567,14 +568,13 @@ SQLRETURN SQL_API SQLExecDirectW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLExecDirectW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (StillExecutingException&) {
-    TRACE(L"SQLExecDirectW returns SQL_STILL_EXECUTING\n");
-    return SQL_STILL_EXECUTING;
-  } catch (NoDataException&) {
-    TRACE(L"SQLExecDirectW returns SQL_NO_DATA\n");
-    return SQL_NO_DATA;
-  } catch (std::exception) {
+  } catch (CdapException& cex) {
+    TRACE(L"SQLExecDirectW returns %d\n", cex.getErrorCode());
+    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
+    return cex.getErrorCode();
+  } catch (std::exception& ex) {
     TRACE(L"SQLExecDirectW returns SQL_ERROR\n");
+    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -599,6 +599,7 @@ SQLRETURN SQL_API SQLNumResultCols(
   TRACE(L"SQLNumResultCols(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     if (!ColumnCountPtr) {
       TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
       return SQL_ERROR;
@@ -610,7 +611,7 @@ SQLRETURN SQL_API SQLNumResultCols(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLNumResultCols returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -629,6 +630,7 @@ SQLRETURN SQL_API SQLDescribeColW(
   TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d)\n", StatementHandle, ColumnNumber);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     auto columnInfo = statement.getColumnInfo(ColumnNumber);
 
     Argument::fromStdString(columnInfo->getName(), ColumnName, BufferLength, NameLengthPtr);
@@ -654,7 +656,7 @@ SQLRETURN SQL_API SQLDescribeColW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDescribeColW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -675,6 +677,7 @@ SQLRETURN SQL_API SQLColAttributeW(
     FieldIdentifier);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     auto& columnInfo = statement.getColumnInfo(ColumnNumber);
 
     switch (FieldIdentifier) {
@@ -692,7 +695,7 @@ SQLRETURN SQL_API SQLColAttributeW(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLColAttributeW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
     return SQL_ERROR;
   }
@@ -713,6 +716,7 @@ SQLRETURN SQL_API SQLBindCol(
     BufferLength);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     if (TargetValuePtr != nullptr) {
       ColumnBinding binding;
       binding.setColumnNumber(ColumnNumber);
@@ -741,18 +745,17 @@ SQLRETURN SQL_API SQLFetch(
   TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     statement.fetch();
     TRACE(L"SQLFetch returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
-  } catch (StillExecutingException&) {
-    TRACE(L"SQLFetch returns SQL_STILL_EXECUTING\n");
-    return SQL_STILL_EXECUTING;
-  } catch (NoDataException&) {
-    TRACE(L"SQLFetch returns SQL_NO_DATA\n");
-    return SQL_NO_DATA;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLFetch returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
+  } catch (CdapException& cex) {
+    TRACE(L"SQLFetch returns %d\n", cex.getErrorCode());
+    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
+    return cex.getErrorCode();
   } catch (std::exception&) {
     TRACE(L"SQLFetch returns SQL_ERROR\n");
     return SQL_ERROR;
@@ -804,6 +807,7 @@ SQLRETURN SQL_API SQLColumnsW(
     ColumnName);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     auto streamName = Argument::toStdString(TableName, NameLength3);
     if (streamName) {
       statement.getColumns(*streamName);
@@ -853,6 +857,8 @@ SQLRETURN SQL_API SQLTablesW(
     TableType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
+
     auto catalogName = Argument::toStdString(CatalogName, NameLength1);
     auto schemaName = Argument::toStdString(SchemaName, NameLength2);
     auto streamName = Argument::toStdString(TableName, NameLength3);
@@ -901,6 +907,8 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
     Nullable);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
+
     statement.getSpecialColumns();
     TRACE(L"SQLSpecialColumnsW returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
@@ -919,6 +927,7 @@ SQLRETURN SQL_API SQLFreeStmt(
   TRACE(L"SQLFreeStmt(StatementHandle = %X, Option = %d)\n", StatementHandle, Option);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    statement.getSqlStatus().clear();
     switch (Option) {
       case SQL_CLOSE:
         statement.reset();
@@ -967,7 +976,7 @@ SQLRETURN SQL_API SQLDisconnect(
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDisconnect returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (std::exception) {
+  } catch (std::exception&) {
     TRACE(L"SQLDisconnect returns SQL_ERROR\n");
     return SQL_ERROR;
   }

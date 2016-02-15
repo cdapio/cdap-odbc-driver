@@ -16,20 +16,22 @@
 
 #pragma once
 
+#include "CdapException.h"
+
 namespace Cask {
   namespace CdapOdbc {
-    class CommunicationLinkFailure :
-      public std::logic_error {
+
+    /**
+     * Represents communication link failure.
+     */
+    class CommunicationLinkFailure : public CdapException {
+    
     public:
+      
       /**
        * Creates an instance of CommunicationLinkFailure.
        */
-      CommunicationLinkFailure(const char* what);
-
-      /**
-       * Destructor.
-       */
-      ~CommunicationLinkFailure() = default;
+      CommunicationLinkFailure();
     };
   }
 }

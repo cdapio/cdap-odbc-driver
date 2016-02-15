@@ -16,6 +16,8 @@
 
 #include "stdafx.h"
 #include "SQLStatus.h"
+#include "Encoding.h"
+#include "CdapException.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -28,6 +30,18 @@ void Cask::CdapOdbc::SQLStatus::addMsg(
   void* binError,
   size_t buffLength) {
   statusItems.push_front(SQLStatusElement(code, msg, binError, buffLength));
+}
+
+void Cask::CdapOdbc::SQLStatus::addError(const std::exception& ex) {
+  const CdapException* cdapEx = dynamic_cast<const CdapException*>(&ex);
+  if (cdapEx) {
+    // Driver-specific errors 
+    statusItems.push_front(SQLStatusElement(cdapEx->getSqlStatusCode(), cdapEx->getMessage()));
+  } else {
+    // Other exceptions
+    auto msg = Encoding::toUtf16(ex.what());
+    statusItems.push_front(SQLStatusElement(L"HY000", msg));
+  }
 }
 
 void Cask::CdapOdbc::SQLStatus::clear() {

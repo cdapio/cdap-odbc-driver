@@ -168,6 +168,9 @@
     <ClInclude Include="BadRequestException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="CdapException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -297,6 +300,9 @@
       <Filter>Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="BadRequestException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="CdapException.cpp">
       <Filter>Exceptions</Filter>
     </ClCompile>
   </ItemGroup>

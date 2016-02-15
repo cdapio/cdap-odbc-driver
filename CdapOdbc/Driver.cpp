@@ -49,7 +49,7 @@ Environment* Cask::CdapOdbc::Driver::findEnvironment(SQLHENV env) {
     return it->second.get();
   }
 
-  throw InvalidHandleException("env", env);
+  throw InvalidHandleException();
 }
 
 Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
@@ -58,7 +58,7 @@ Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
     return it->second.get();
   }
 
-  throw InvalidHandleException("dbc", dbc);
+  throw InvalidHandleException();
 }
 
 void Cask::CdapOdbc::Driver::freeConnections(const Environment& env) {
@@ -136,7 +136,7 @@ Statement& Cask::CdapOdbc::Driver::getStatement(SQLHSTMT stmt) {
     return *(it->second);
   }
 
-  throw InvalidHandleException("stmt", stmt);
+  throw InvalidHandleException();
 }
 
 Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
@@ -146,7 +146,7 @@ Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
     return *(it->second);
   }
 
-  throw InvalidHandleException("desc", desc);
+  throw InvalidHandleException();
 }
 
 SQLHENV Cask::CdapOdbc::Driver::allocEnvironment() {
@@ -185,7 +185,7 @@ void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
 
   auto it = this->environments.find(env);
   if (it == this->environments.end()) {
-    throw InvalidHandleException("env", env);
+    throw InvalidHandleException();
   }
 
   this->freeConnections(*it->second);
@@ -197,7 +197,7 @@ void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
 
   auto it = this->connections.find(dbc);
   if (it == this->connections.end()) {
-    throw InvalidHandleException("dbc", dbc);
+    throw InvalidHandleException();
   }
 
   this->freeDescriptors(*it->second);
@@ -208,14 +208,14 @@ void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
 void Cask::CdapOdbc::Driver::freeStatement(SQLHSTMT stmt) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->statements.erase(stmt) == 0) {
-    throw InvalidHandleException("stmt", stmt);
+    throw InvalidHandleException();
   }
 }
 
 void Cask::CdapOdbc::Driver::freeDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->descriptors.erase(desc) == 0) {
-    throw InvalidHandleException("desc", desc);
+    throw InvalidHandleException();
   }
 }
 

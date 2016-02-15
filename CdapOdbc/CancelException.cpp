@@ -18,5 +18,5 @@
 #include "CancelException.h"
 
 Cask::CdapOdbc::CancelException::CancelException()
-  : std::logic_error("The operation was cancelled.") {
+  : CdapException(SQL_SUCCESS, L"01000", L"The operation was cancelled.") {
 }

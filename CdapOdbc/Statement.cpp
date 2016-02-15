@@ -153,7 +153,7 @@ void Cask::CdapOdbc::Statement::fetch() {
     }
   } else {
     this->state = State::CLOSED;
-    throw NoDataException("No more data in the query.");
+    throw NoDataException(L"No more data in the query.");
   }
 }
 

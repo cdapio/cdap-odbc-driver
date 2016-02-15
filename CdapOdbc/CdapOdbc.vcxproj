@@ -151,6 +151,7 @@
     <ClInclude Include="Argument.h" />
     <ClInclude Include="BadRequestException.h" />
     <ClInclude Include="CancelException.h" />
+    <ClInclude Include="CdapException.h" />
     <ClInclude Include="ColumnBinding.h" />
     <ClInclude Include="ColumnDesc.h" />
     <ClInclude Include="ColumnInfo.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="BadRequestException.cpp" />
     <ClCompile Include="CancelException.cpp" />
+    <ClCompile Include="CdapException.cpp" />
     <ClCompile Include="ColumnBinding.cpp" />
     <ClCompile Include="ColumnDesc.cpp" />
     <ClCompile Include="ColumnInfo.cpp" />

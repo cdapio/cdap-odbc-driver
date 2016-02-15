@@ -17,6 +17,6 @@
 #include "stdafx.h"
 #include "CommunicationLinkFailure.h"
 
-Cask::CdapOdbc::CommunicationLinkFailure::CommunicationLinkFailure(const char* what)
-  : std::logic_error(what) {
+Cask::CdapOdbc::CommunicationLinkFailure::CommunicationLinkFailure()
+  : CdapException(L"08S01", L"Communication link failure.") {
 }

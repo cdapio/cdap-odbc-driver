@@ -17,6 +17,6 @@
 #include "stdafx.h"
 #include "BadRequestException.h"
 
-Cask::CdapOdbc::BadRequestException::BadRequestException(const std::string& what)
-  : message(what) {
+Cask::CdapOdbc::BadRequestException::BadRequestException(const std::wstring& message)
+  : CdapException(message) {
 }

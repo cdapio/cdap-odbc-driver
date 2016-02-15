@@ -50,7 +50,7 @@ void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
   if (this->exploreClient->isAvailable()) {
     this->isOpen = true;
   } else {
-    throw CommunicationLinkFailure("Service unavailable.");
+    throw CommunicationLinkFailure();
   }
 }
 

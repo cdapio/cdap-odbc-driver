@@ -63,6 +63,11 @@ namespace Cask {
       void addMsg(const std::wstring& code, const std::wstring& msg, void* binError = NULL, size_t buffLength = 0);
 
       /**
+       * Adds log error record to the storage
+       */
+      void addError(const std::exception& ex);
+
+      /**
        * Get count of records in storage
        */
       SQLSMALLINT getRecCount();

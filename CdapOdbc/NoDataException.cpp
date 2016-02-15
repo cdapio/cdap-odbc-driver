@@ -17,6 +17,6 @@
 #include "stdafx.h"
 #include "NoDataException.h"
 
-Cask::CdapOdbc::NoDataException::NoDataException(const char* what)
-  : std::logic_error(what) {
+Cask::CdapOdbc::NoDataException::NoDataException(const std::wstring& message)
+  : CdapException(SQL_NO_DATA, L"01000", message) {
 }
