@@ -45,7 +45,12 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
       this->fetchVarchar(this->tableName.c_str(), binding);
       break;
     case 4: // COLUMN_NAME 
-      this->fetchVarchar(names[this->currentRowIndex], binding);
+			if (binding.getTargetType() == SQL_WCHAR) {
+				this->fetchWVarchar(names[this->currentRowIndex], binding);
+			}
+			else {
+				this->fetchVarchar(names[this->currentRowIndex], binding);
+			}
       break;
     case 5: // DATA_TYPE
     case 14: // SQL_DATA_TYPE 
