@@ -23,11 +23,19 @@ Cask::CdapOdbc::DataType::DataType(
   SQLULEN size /* = 0U */, 
   SQLLEN displaySize /* = 0 */, 
   SQLSMALLINT decimalDigits /* = 0 */, 
-  SQLSMALLINT nullable /* = SQL_NULLABLE */)
+  SQLSMALLINT nullable /* = SQL_NULLABLE */,
+  SQLSMALLINT searchable /* = SQL_FALSE */,
+  SQLSMALLINT fixedPrecScale /* = SQL_FALSE */,
+  SQLSMALLINT unsignedAttr /* = SQL_FALSE */,
+  SQLSMALLINT caseSensitive /* = SQL_FALSE*/)
   : name(name)
   , size(size)
   , displaySize(displaySize)
   , sqlType(sqlType)
   , decimalDigits(decimalDigits)
-  , nullable(nullable) {
+  , nullable(nullable)
+  , searchable(searchable)
+  , fixedPrecScale(fixedPrecScale)
+  , unsignedAttr(unsignedAttr)
+  , caseSensitive(caseSensitive) {
 }

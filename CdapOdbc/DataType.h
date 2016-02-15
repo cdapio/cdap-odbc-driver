@@ -32,9 +32,10 @@ namespace Cask {
       SQLSMALLINT nullable;
       SQLSMALLINT searchable;
       SQLSMALLINT fixedPrecScale;
+      SQLSMALLINT unsignedAttr;
+      SQLSMALLINT caseSensitive;
       ////case 4: // LITERAL_PREFIX 
       ////case 5: // LITERAL_SUFFIX
-      ////case 10: // UNSIGNED_ATTRIBUTE
       ////case 12: // AUTO_UNIQUE_VALUE 
       ////case 13: // LOCAL_TYPE_NAME 
       ////case 14: // MINIMUM_SCALE 
@@ -54,7 +55,11 @@ namespace Cask {
         SQLULEN size = 0U,
         SQLLEN displaySize = 0,
         SQLSMALLINT decimalDigits = 0, 
-        SQLSMALLINT nullable = SQL_NULLABLE);
+        SQLSMALLINT nullable = SQL_NULLABLE,
+        SQLSMALLINT searchable = SQL_PRED_NONE,
+        SQLSMALLINT fixedPrecScale = SQL_FALSE,
+        SQLSMALLINT unsignedAttr = SQL_FALSE,
+        SQLSMALLINT caseSensitive = SQL_FALSE);
 
       /**
        * Gets type name.
@@ -98,6 +103,27 @@ namespace Cask {
        */
       SQLLEN getDisplaySize() const {
         return this->displaySize;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type has fixed precision scale.
+       */
+      SQLSMALLINT getFixedPrecScale() const {
+        return this->fixedPrecScale;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type is signed. NULL if not applicable to the type.
+       */
+      SQLSMALLINT getUnsigned() const {
+        return this->unsignedAttr;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type is case sensitive.
+       */
+      SQLSMALLINT getCaseSensitive() const {
+        return this->caseSensitive;
       }
     };
   }
