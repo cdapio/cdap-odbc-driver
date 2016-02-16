@@ -743,7 +743,7 @@ SQLRETURN SQL_API SQLColAttributeW(
       case SQL_COLUMN_LABEL:
         if (CharacterAttributePtr) {
           Argument::fromStdString(
-            columnInfo->getName(),
+            columnInfo->getShortName(),
             static_cast<SQLWCHAR*>(CharacterAttributePtr),
             BufferLength,
             StringLengthPtr
@@ -773,7 +773,7 @@ SQLRETURN SQL_API SQLColAttributeW(
       case SQL_DESC_BASE_COLUMN_NAME:
         if (CharacterAttributePtr) {
           Argument::fromStdString(
-            columnInfo->getName(),
+            columnInfo->getShortName(),
             static_cast<SQLWCHAR*>(CharacterAttributePtr),
             BufferLength,
             StringLengthPtr
@@ -792,9 +792,9 @@ SQLRETURN SQL_API SQLColAttributeW(
       case SQL_DESC_NAME:
         if (CharacterAttributePtr) {
           Argument::fromStdString(
-            columnInfo->getName(),
-            static_cast<SQLWCHAR*>(CharacterAttributePtr), 
-            BufferLength, 
+            columnInfo->getShortName(),
+            static_cast<SQLWCHAR*>(CharacterAttributePtr),
+            BufferLength,
             StringLengthPtr
           );
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
