@@ -41,8 +41,13 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
     case 16: // CHAR_OCTET_LENGTH 
       this->fetchNull(binding);
       break;
-    case 3: // TABLE_NAME 
-      this->fetchVarchar(this->tableName.c_str(), binding);
+    case 3: // TABLE_NAME
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(this->tableName.c_str(), binding);
+      }
+      else {
+        this->fetchVarchar(this->tableName.c_str(), binding);
+      }
       break;
     case 4: // COLUMN_NAME 
 			if (binding.getTargetType() == SQL_WCHAR) {
@@ -56,8 +61,13 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
     case 14: // SQL_DATA_TYPE 
       this->fetchSmallint(SQL_CHAR, binding);
       break;
-    case 6: // TYPE_NAME 
-      this->fetchVarchar(L"string", binding);
+    case 6: // TYPE_NAME
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(L"string", binding);
+      }
+      else {
+        this->fetchVarchar(L"string", binding);
+      }
       break;
     case 7: // COLUMN_SIZE 
       this->fetchInt(std::numeric_limits<std::int32_t>::max(), binding);
@@ -75,7 +85,12 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
       this->fetchInt(this->currentRowIndex + 1, binding);
       break;
     case 18: // IS_NULLABLE 
-      this->fetchVarchar(L"YES", binding);
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(L"YES", binding);
+      }
+      else {
+        this->fetchVarchar(L"YES", binding);
+      }
       break;
   }
 }
