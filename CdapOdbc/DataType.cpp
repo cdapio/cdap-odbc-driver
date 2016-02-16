@@ -21,11 +21,13 @@ Cask::CdapOdbc::DataType::DataType(
   const std::wstring& name, 
   SQLSMALLINT sqlType, 
   SQLULEN size /* = 0U */, 
-  SQLLEN displaySize /* = 0 */, 
-  SQLSMALLINT decimalDigits /* = 0 */, 
+  SQLLEN displaySize /* = 0 */,
+  SQLSMALLINT decimalDigits /* = 0 */,
+  SQLLEN octetLength /* =0 */,
   SQLSMALLINT nullable /* = SQL_NULLABLE */,
   SQLSMALLINT searchable /* = SQL_FALSE */,
   SQLSMALLINT fixedPrecScale /* = SQL_FALSE */,
+  SQLINTEGER precRadix /* = 0 */,
   SQLSMALLINT unsignedAttr /* = SQL_FALSE */,
   SQLSMALLINT caseSensitive /* = SQL_FALSE*/)
   : name(name)
@@ -33,9 +35,11 @@ Cask::CdapOdbc::DataType::DataType(
   , displaySize(displaySize)
   , sqlType(sqlType)
   , decimalDigits(decimalDigits)
+  , octetLength(octetLength)
   , nullable(nullable)
   , searchable(searchable)
   , fixedPrecScale(fixedPrecScale)
+  , precRadix(precRadix)
   , unsignedAttr(unsignedAttr)
   , caseSensitive(caseSensitive) {
 }

@@ -774,7 +774,18 @@ SQLRETURN SQL_API SQLColAttributeW(
       /* Column extended descriptor fields */
       case SQL_DESC_BASE_COLUMN_NAME:
       case SQL_DESC_NUM_PREC_RADIX:
+        if (NumericAttributePtr) {
+          *NumericAttributePtr = columnInfo->getDataType().getPrecRadix();
+          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+          return SQL_SUCCESS;
+        }
         break;
+      case SQL_DESC_OCTET_LENGTH:
+        if (NumericAttributePtr) {
+          *NumericAttributePtr = columnInfo->getDataType().getOctetLength();
+          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+          return SQL_SUCCESS;
+        }
     }
     
     TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
