@@ -838,7 +838,7 @@ SQLRETURN SQL_API SQLColumnsW(
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     statement.getSqlStatus().clear();
     auto streamName = Argument::toStdString(TableName, NameLength3);
-    if (streamName) {
+    if (!streamName) {
       throw CdapException(L"Table name cannot be empty.");
     }
     

@@ -45,7 +45,8 @@ namespace Cask {
       std::vector<ColumnBinding> columnBindings;
       std::unique_ptr<Command> command;
       std::unique_ptr<DataReader> dataReader;
-	  SQLStatus sqlStatus;
+	    SQLStatus sqlStatus;
+      std::map<std::wstring, std::wstring> tableNames;
 
       void throwStateError() const;
       void openQuery();

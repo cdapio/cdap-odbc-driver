@@ -26,12 +26,14 @@ namespace Cask {
      */
     class TablesCommand : public Command {
 
+      std::map<std::wstring, std::wstring>* tableNames;
+
     public:
 
       /**
       * Creates a command instance.
       */
-      TablesCommand(Connection* connection);
+      TablesCommand(Connection* connection, std::map<std::wstring, std::wstring>& tableNames);
 
       /**
        * Executes a command and builds a data reader.

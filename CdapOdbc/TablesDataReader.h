@@ -30,6 +30,7 @@ namespace Cask {
       QueryResult streams;
       QueryResult datasets;
       int currentRowIndex;
+      std::map<std::wstring, std::wstring>* tableNames;
 
       void filterDatasets();
       std::wstring getTableName();
@@ -39,7 +40,7 @@ namespace Cask {
       /**
        * Creates an instance of TablesDataReader.
        */
-      TablesDataReader(const QueryResult& streams, const QueryResult& datasets);
+      TablesDataReader(const QueryResult& streams, const QueryResult& datasets, std::map<std::wstring, std::wstring>& tableNames);
 
       // Inherited via DataReader
       virtual bool read() override;

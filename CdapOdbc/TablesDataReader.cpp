@@ -31,20 +31,30 @@ void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
 }
 
 std::wstring Cask::CdapOdbc::TablesDataReader::getTableName() {
+  std::wstring originalName;
+  std::wstring hiveName;
+
   if (this->currentRowIndex < this->streams.getSize()) {
     // get stream name
-    return L"stream_" + this->streams.getRows().at(this->currentRowIndex).at(L"name").as_string();
+    originalName = this->streams.getRows().at(this->currentRowIndex).at(L"name").as_string();
+    hiveName = L"stream_" + originalName;
   } else {
     // get dataset name
     int rowIndex = this->currentRowIndex - this->streams.getSize();
-    return L"dataset_" + this->datasets.getRows().at(rowIndex).at(L"name").as_string();
+    originalName = this->datasets.getRows().at(rowIndex).at(L"name").as_string();
+    hiveName = L"dataset_" + originalName;
   }
+
+  std::replace(hiveName.begin(), hiveName.end(), '-', '_');
+  this->tableNames->insert_or_assign(hiveName, originalName);
+  return hiveName;
 }
 
-Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& streams, const QueryResult& datasets)
+Cask::CdapOdbc::TablesDataReader::TablesDataReader(const QueryResult& streams, const QueryResult& datasets, std::map<std::wstring, std::wstring>& tableNames)
   : streams(streams)
   , datasets(datasets)
-  , currentRowIndex(-1) {
+  , currentRowIndex(-1)
+  , tableNames(&tableNames) {
   this->filterDatasets();
 }
 
