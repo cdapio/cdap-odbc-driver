@@ -285,7 +285,8 @@ SQLRETURN SQL_API SQLGetInfoW(
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
       case SQL_IDENTIFIER_QUOTE_CHAR:
-        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+//        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
       case SQL_FILE_USAGE:
@@ -686,18 +687,22 @@ SQLRETURN SQL_API SQLColAttributeW(
     switch (FieldIdentifier) {
       /* Column attributes */
       case SQL_COLUMN_TYPE:
+      case SQL_DESC_TYPE: /*SQL_DESC_CONCISE_TYPE in ODBC 2.x */
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getSqlType();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
           return SQL_SUCCESS;
         }
       case SQL_COLUMN_DISPLAY_SIZE:
+      // TODO: double check the applicability of display size as precision!
+      case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
           return SQL_SUCCESS;
         }
       case SQL_COLUMN_NULLABLE:
+      case SQL_DESC_NULLABLE:
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getNullable();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
@@ -757,22 +762,46 @@ SQLRETURN SQL_API SQLColAttributeW(
       case SQL_COLUMN_TABLE_NAME:
       case SQL_COLUMN_OWNER_NAME:
       case SQL_COLUMN_QUALIFIER_NAME:
-      case SQL_COLUMN_LENGTH:
-      case SQL_COLUMN_PRECISION:
-      case SQL_COLUMN_SCALE:
         break;
 
       /* Column description attributes */
-      case SQL_DESC_TYPE:
-      case SQL_DESC_LENGTH:
-      case SQL_DESC_PRECISION:
-      case SQL_DESC_NULLABLE:
-      case SQL_DESC_OCTET_LENGTH:
-      case SQL_DESC_NAME:
+      case SQL_COLUMN_SCALE:
+      case SQL_DESC_SCALE:
         break;
 
       /* Column extended descriptor fields */
       case SQL_DESC_BASE_COLUMN_NAME:
+        if (CharacterAttributePtr) {
+          Argument::fromStdString(
+            columnInfo->getName(),
+            static_cast<SQLWCHAR*>(CharacterAttributePtr),
+            BufferLength,
+            StringLengthPtr
+            );
+          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+            static_cast<SQLWCHAR*>(CharacterAttributePtr)
+          );
+          return SQL_SUCCESS;
+        }
+      case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
+        if (NumericAttributePtr) {
+          *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+          return SQL_SUCCESS;
+        }
+      case SQL_DESC_NAME:
+        if (CharacterAttributePtr) {
+          Argument::fromStdString(
+            columnInfo->getName(),
+            static_cast<SQLWCHAR*>(CharacterAttributePtr), 
+            BufferLength, 
+            StringLengthPtr
+          );
+          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+            static_cast<SQLWCHAR*>(CharacterAttributePtr)
+            );
+          return SQL_SUCCESS;
+        }
       case SQL_DESC_NUM_PREC_RADIX:
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getPrecRadix();
