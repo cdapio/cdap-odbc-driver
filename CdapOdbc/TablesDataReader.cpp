@@ -69,8 +69,13 @@ void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& bindi
 				this->fetchVarchar(name.c_str(), binding);
 			}
       break;
-    case 4: // TABLE_TYPE 
-      this->fetchVarchar(L"TABLE", binding);
+    case 4: // TABLE_TYPE
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(L"TABLE", binding);
+      }
+      else {
+        this->fetchVarchar(L"TABLE", binding);
+      }
       break;
   }
 }
