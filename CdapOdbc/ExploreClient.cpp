@@ -189,15 +189,10 @@ QueryResult Cask::CdapOdbc::ExploreClient::getDatasetFields(const std::wstring& 
 QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
   web::json::value query;
   std::wstring stmt_preproc = statement;
-  size_t pos;
 	// TODO: Remove the wrapping SELECT properly
 	// if (stmt_preproc.find(L"\"") != std::wstring::npos) {
 	//   stmt_preproc = stmt_preproc.substr(18, statement.length() - 21 - 18);
   // }
-  /* Remove quotes around table and column names */
-  while ((pos = stmt_preproc.find(L"\"")) != std::wstring::npos) {
-    stmt_preproc.erase(pos, 1);
-  }
   query[L"query"] = toJson(&stmt_preproc);
   auto value = this->doPost(L"namespaces/" + this->namespace_ + L"/data/explore/queries", query);
   return value.at(L"handle").as_string();
