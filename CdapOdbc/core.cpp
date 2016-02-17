@@ -696,6 +696,7 @@ SQLRETURN SQL_API SQLColAttributeW(
       case SQL_COLUMN_DISPLAY_SIZE:
       // TODO: double check the applicability of display size as precision!
       case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
+        break;
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
@@ -709,6 +710,7 @@ SQLRETURN SQL_API SQLColAttributeW(
           return SQL_SUCCESS;
         }
       case SQL_COLUMN_UNSIGNED:
+        break;
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getUnsigned();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
@@ -784,6 +786,7 @@ SQLRETURN SQL_API SQLColAttributeW(
           return SQL_SUCCESS;
         }
       case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
+        break;
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
@@ -803,6 +806,7 @@ SQLRETURN SQL_API SQLColAttributeW(
           return SQL_SUCCESS;
         }
       case SQL_DESC_NUM_PREC_RADIX:
+        break;
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getPrecRadix();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
@@ -810,6 +814,7 @@ SQLRETURN SQL_API SQLColAttributeW(
         }
         break;
       case SQL_DESC_OCTET_LENGTH:
+        break;
         if (NumericAttributePtr) {
           *NumericAttributePtr = columnInfo->getDataType().getOctetLength();
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
