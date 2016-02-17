@@ -24,8 +24,8 @@ Cask::CdapOdbc::ColumnInfo::ColumnInfo(const ColumnDesc& columnDesc)
   : name(columnDesc.getName())
   , dataType(Driver::getInstance().getDataType(columnDesc.getType())) {
 
-  std::wstring::size_type found;
-  if ((found = this->name.rfind(L".", this->name.length() - 1)) != std::wstring::npos) {
+  std::wstring::size_type found = this->name.rfind(L".", this->name.length() - 1);
+  if (found != std::wstring::npos) {
     this->shortName = columnDesc.getName().substr(found + 1);
   }
   else {
