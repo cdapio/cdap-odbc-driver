@@ -326,6 +326,19 @@ SQLRETURN SQL_API SQLGetInfoW(
         *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 128;
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
         return SQL_SUCCESS;
+      case SQL_NUMERIC_FUNCTIONS:
+        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
+          | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG | SQL_FN_NUM_PI
+          | SQL_FN_NUM_POWER | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_RADIANS
+          | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD;
+        return SQL_SUCCESS;
+      case SQL_AGGREGATE_FUNCTIONS:
+        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
+          | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
+        return SQL_SUCCESS;
+      case SQL_STRING_FUNCTIONS:
+        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+        return SQL_SUCCESS;
       case SQL_CONVERT_BIGINT:
       case SQL_CONVERT_BINARY:
       case SQL_CONVERT_BIT:
