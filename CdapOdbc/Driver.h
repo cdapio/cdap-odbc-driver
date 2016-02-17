@@ -116,7 +116,7 @@ namespace Cask {
       * Allocates a new descriptor and returns its handle.
       */
       SQLHDESC allocDescriptor(SQLHDBC dbc);
-      
+
       /**
        * Destroys an environment freeing all allocated resources.
        */
@@ -151,7 +151,7 @@ namespace Cask {
        * Modifies DSN.
        */
       void modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs);
-    
+
       /**
        * Removes DSN.
        */

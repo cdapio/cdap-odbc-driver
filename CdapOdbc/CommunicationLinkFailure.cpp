@@ -1,5 +1,5 @@
 /*
-* Copyright © 2015 Cask Data, Inc.
+* Copyright © 2016 Cask Data, Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); you may not
 * use this file except in compliance with the License. You may obtain a copy of
@@ -14,22 +14,9 @@
 * the License.
 */
 
-#pragma once
+#include "stdafx.h"
+#include "CommunicationLinkFailure.h"
 
-#include "CdapException.h"
-
-namespace Cask {
-  namespace CdapOdbc {
-    /**
-     * Reports errors that arise because query has no more data.
-     */
-    class CancelException : public CdapException {
-    public:
-
-      /**
-       * Creates an instance.
-       */
-      CancelException();
-    };
-  }
+Cask::CdapOdbc::CommunicationLinkFailure::CommunicationLinkFailure()
+  : CdapException(L"08S01", L"Communication link failure.") {
 }

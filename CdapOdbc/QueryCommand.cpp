@@ -19,6 +19,7 @@
 #include "Connection.h"
 #include "QueryDataReader.h"
 #include "StillExecutingException.h"
+#include "CdapException.h"
 
 Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
   : Command(connection)
@@ -38,14 +39,14 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
     case OperationStatus::INITIALIZED:
     case OperationStatus::PENDING:
     case OperationStatus::RUNNING:
-      throw StillExecutingException("The query is still executing.");
+      throw StillExecutingException();
     case OperationStatus::UNKNOWN:
     case OperationStatus::ERROR:
-      throw std::exception("An error occured during query execution.");
+      throw CdapException(L"An error occured during query execution.");
     case OperationStatus::CANCELED:
-      throw std::exception("Query canceled.");
+      throw CdapException(L"Query canceled.");
     case OperationStatus::CLOSED:
-      throw std::exception("Query closed.");
+      throw CdapException(L"Query closed.");
   }
 
   return std::make_unique<QueryDataReader>(this);

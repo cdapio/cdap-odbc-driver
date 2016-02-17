@@ -26,14 +26,15 @@ namespace Cask {
      */
     class ColumnsCommand : public Command {
 
-      std::wstring tableName;
+      std::wstring realTableName;
+      std::wstring hiveTableName;
 
     public:
 
       /**
        * Creates a command instance.
        */
-      ColumnsCommand(Connection* connection, const std::wstring& tableName);
+      ColumnsCommand(Connection* connection, const std::wstring& realTableName, const std::wstring& hiveTableName);
 
       /**
        * Executes a command and builds a data reader.

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 <?define targetArch =  $(var.CdapOdbc.Platform)  ?>
+<?define InstallName = "CDAP ODBC Driver" ?>
 <?define CdapOdbcDll = "CdapOdbc.dll" ?>
 <?if $(var.CdapOdbc.Configuration) = Debug ?>
   <?define CppRestDll = "cpprest140d_2_7.dll" ?>
@@ -8,10 +9,12 @@
   <?define CppRestDll = "cpprest140_2_7.dll" ?>
 <?endif ?>
 <?if $(var.targetArch) = x64 ?>
+  <?define ProductName = "$(var.InstallName) (x64)" ?>
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
   <?define Win64 = "yes" ?>
 <?else ?>
   <?define targetArch = x86 ?>
+  <?define ProductName = "$(var.InstallName) (x86)" ?>
   <?define ProgramsPath = "ProgramFilesFolder" ?>
   <?define Win64 = "no" ?>
 <?endif ?>
@@ -19,50 +22,12 @@
 <?define redistMSMPath = "C:\Program Files (x86)\Common Files\Merge Modules\" ?>
 <?define nonRedistPath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist\x64\Microsoft.VC140.DebugCRT\" ?>
 
-<?define CurrentVersion="!(bind.fileVersion.$(var.CdapOdbcDll))"?>
-<?define FirstVersion="0.0.0.0"?>
-<?define UpgradeCode="{6A65B544-F23B-4F53-A617-12DD50E2751A}"?>
-
-  <Product Id="*"
-           Name="Cask CDAP ODBC Driver" Language="1033"
-           Version="$(var.CurrentVersion)" Manufacturer="Cask"
-           UpgradeCode="$(var.UpgradeCode)" >
-    <Package InstallerVersion="301"
+	<Product Id="*" Name="Cask CDAP ODBC Driver" Language="1033" Version="1.0.0.1" Manufacturer="Cask" UpgradeCode="6F19DE45-E456-4AE6-BB10-1CB8538A7ED8">
+		<Package InstallerVersion="301"
              Compressed="yes"
              InstallScope="perMachine"
              Platform="x64"  />
-    <Upgrade Id="$(var.UpgradeCode)">
-      <!-- Populate NEWERVERSIONDETECTED if there is an installed
-         package with the same upgrade code
-         and the version is large the version being installed -->
-      <UpgradeVersion
-          Minimum="$(var.CurrentVersion)"
-          IncludeMinimum="no"
-          Maximum="99.99.99.99"
-          IncludeMaximum="yes"
-          Language="1033"
-          Property="NEWERVERSIONDETECTED"
-          OnlyDetect="no" />
-      <!-- Populate PREVIOUSVERSIONSINSTALLED if there is an installed
-         package with the same upgrade code
-         and the version is between the earliest version defined
-         and the version being installed -->
-      <UpgradeVersion
-           Minimum="$(var.FirstVersion)"
-           IncludeMinimum="yes"
-           Maximum="$(var.CurrentVersion)"
-           IncludeMaximum="yes"
-           Language="1033"
-           Property="PREVIOUSVERSIONSINSTALLED"
-           OnlyDetect="no" />
-    </Upgrade>
-    <InstallUISequence>
-      <Show Dialog="AcceptUninstall" After="CostFinalize">NEWERVERSIONDETECTED</Show>
-    </InstallUISequence>
-    <InstallExecuteSequence>
-      <RemoveExistingProducts Before="InstallInitialize">NEWERVERSIONDETECTED OR PREVIOUSVERSIONSINSTALLED</RemoveExistingProducts>
-      <ScheduleReboot After="InstallExecute"/>
-    </InstallExecuteSequence>
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes"/>
     <Feature Id="VCRedist" Title="Visual C++ Runtime" AllowAdvertise="no" Display="hidden" Level="1">
       <MergeRef Id="VCRedist"/>
@@ -76,25 +41,7 @@
 		</Feature>
 	</Product>
 
-  <Fragment>
-    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
-    <UI Id="MyWixUI">
-      <UIRef Id="WixUI_Minimal" />
-      <Dialog Id="AcceptUninstall" Title="Accept uninstall previouse products" Height="80" Width="250">
-        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
-          <Text>A newer version of [ProductName] is already installed. Continue installation?</Text>
-        </Control>
-        <Control Id="No" Type="PushButton" X="132" Y="57" Width="56" Height="17" Default="yes" Cancel="yes" Text="No">
-          <Publish Event="EndDialog" Value="Exit">1</Publish>
-        </Control>
-        <Control Id="Yes" Type="PushButton" X="72" Y="57" Width="56" Height="17" Text="Yes">
-          <Publish Event="EndDialog" Value="Return">1</Publish>
-        </Control>
-      </Dialog>
-    </UI>
-  </Fragment>
-
-  <Fragment>
+	<Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="$(var.ProgramsPath)">
         <Directory Id="VENDORFOLDER" Name="Cask" >
@@ -105,6 +52,7 @@
          <Directory Id="ApplicationProgramsFolder" Name="CDAP ODBC Driver"/>
       </Directory>
 		</Directory>
+    
     <DirectoryRef Id="TARGETDIR">
       <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)Microsoft_VC140_CRT_x64.msm" DiskId="1" Language="0"/>
     </DirectoryRef>
@@ -141,10 +89,11 @@
           <RegistryValue Type="string" Name="FileUsage" Value="0"/>
           <RegistryValue Type="string" Name="DriverODBCVer" Value="03.80"/>
           <RegistryValue Type="string" Name="ConnectFunctions" Value="NYN"/>
-          <RegistryValue Type="string" Name="APILevel" Value="0"/>
+          <RegistryValue Type="string" Name="APILevel" Value="0"/> 
+          <RegistryValue Type="string" Name="CpTimeout" Value="120"/>
         </RegistryKey>
       </Component>
-      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">
+      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">   
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
           <RegistryValue Type="string" Name="CDAP Datasets" Value="[ProductName]"/>
@@ -153,7 +102,8 @@
                   Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
           <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
         </RegistryKey>
-      </Component>
+      </Component>  
+
     </DirectoryRef>
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">

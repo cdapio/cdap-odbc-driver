@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "ExploreClient.h"
 #include "BadRequestException.h"
+#include "CdapException.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -40,11 +41,11 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_reques
     if (response.status_code() == web::http::status_codes::OK) {
       return response.extract_json();
     } else if (response.status_code() == web::http::status_codes::BadRequest) {
-      auto task = response.extract_utf8string();
+      auto task = response.extract_utf16string();
       task.wait();
       throw BadRequestException(task.get());
     } else {
-      throw std::exception("Cannot get the response.");
+      throw CdapException(L"Cannot get the response.");
     }
   });
   task.wait();
@@ -92,7 +93,7 @@ Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, cons
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
   try {
     return (this->doGet(L"explore/status").at(L"status").as_string() == L"OK");
-  } catch (std::exception) {
+  } catch (std::exception&) {
     return false;
   }
 }

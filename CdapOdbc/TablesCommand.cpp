@@ -19,12 +19,13 @@
 #include "Connection.h"
 #include "TablesDataReader.h"
 
-Cask::CdapOdbc::TablesCommand::TablesCommand(Connection* connection)
-  : Command(connection) {
+Cask::CdapOdbc::TablesCommand::TablesCommand(Connection* connection, std::map<std::wstring, std::wstring>& tableNames)
+  : Command(connection)
+  , tableNames(&tableNames) {
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::TablesCommand::executeReader() {
   auto streams = this->getConnection()->getExploreClient().getStreams();
   auto datasets = this->getConnection()->getExploreClient().getDatasets();
-  return std::make_unique<TablesDataReader>(streams, datasets);
+  return std::make_unique<TablesDataReader>(streams, datasets, *tableNames);
 }

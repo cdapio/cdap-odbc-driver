@@ -151,12 +151,14 @@
     <ClInclude Include="Argument.h" />
     <ClInclude Include="BadRequestException.h" />
     <ClInclude Include="CancelException.h" />
+    <ClInclude Include="CdapException.h" />
     <ClInclude Include="ColumnBinding.h" />
     <ClInclude Include="ColumnDesc.h" />
     <ClInclude Include="ColumnInfo.h" />
     <ClInclude Include="ColumnsCommand.h" />
     <ClInclude Include="ColumnsDataReader.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="CommunicationLinkFailure.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionDialog.h" />
     <ClInclude Include="ConnectionParams.h" />
@@ -169,6 +171,7 @@
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="SQLStatus.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
     <ClInclude Include="Library.h" />
@@ -197,12 +200,14 @@
     <ClCompile Include="Argument.cpp" />
     <ClCompile Include="BadRequestException.cpp" />
     <ClCompile Include="CancelException.cpp" />
+    <ClCompile Include="CdapException.cpp" />
     <ClCompile Include="ColumnBinding.cpp" />
     <ClCompile Include="ColumnDesc.cpp" />
     <ClCompile Include="ColumnInfo.cpp" />
     <ClCompile Include="ColumnsCommand.cpp" />
     <ClCompile Include="ColumnsDataReader.cpp" />
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CommunicationLinkFailure.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionDialog.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
@@ -214,6 +219,7 @@
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="SQLStatus.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
     <ClCompile Include="Library.cpp" />

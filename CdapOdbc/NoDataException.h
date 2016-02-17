@@ -16,23 +16,20 @@
 
 #pragma once
 
+#include "CdapException.h"
+
 namespace Cask {
   namespace CdapOdbc {
     /**
      * Reports errors that arise because query has no more data.
      */
-    class NoDataException : public std::logic_error {
+    class NoDataException : public CdapException {
     public:
 
       /**
        * Creates an instance.
        */
-      NoDataException(const char *what);
-      
-      /**
-       * Descructor.
-       */
-      ~NoDataException() = default;
+      NoDataException(const std::wstring& message);
     };
   }
 }

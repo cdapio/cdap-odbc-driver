@@ -18,10 +18,12 @@
 
 #include "ConnectionParams.h"
 #include "ExploreClient.h"
+#include "SQLStatus.h"
 
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
+    class SQLStatus;
 
     /**
      * Represents a connection to a database.
@@ -33,6 +35,7 @@ namespace Cask {
       bool isOpen;
       std::unique_ptr<ConnectionParams> params;
       std::unique_ptr<ExploreClient> exploreClient;
+      SQLStatus sqlStatus;
 
       web::http::uri resolveUri() const;
 
@@ -58,7 +61,7 @@ namespace Cask {
         return this->handle;
       }
 
-      /** 
+      /**
        * Gets an explore client instance.
        */
       ExploreClient& getExploreClient() const {
@@ -73,9 +76,16 @@ namespace Cask {
       }
 
       /**
+       * Gets SqlStatus storage
+       */
+      SQLStatus& getSqlStatus() {
+        return this->sqlStatus;
+      }
+
+      /**
        * Opens a connection to explore REST service.
        *
-       * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2". 
+       * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2".
        * There are the following parameters:
        *   HOST - server name
        *   PORT - port number (default 10000)
@@ -85,7 +95,7 @@ namespace Cask {
        *   VERIFY_SSL_CERT - server certificate verification (default true)
        */
       void open(const std::wstring& connectionString);
-      
+
       /*
        * Closes a connection.
        */

@@ -16,27 +16,21 @@
 
 #pragma once
 
+#include "CdapException.h"
+
 namespace Cask {
   namespace CdapOdbc {
     /**
      * Reports bad request errors.
      */
-    class BadRequestException : public std::exception {
-      std::string message;
+    class BadRequestException : public CdapException {
 
     public:
 
       /**
        * Creates an instance.
        */
-      BadRequestException(const std::string& what);
-      
-      /**
-       * Inherited from std::exception.
-       */
-      virtual char const* what() const override {
-        return message.c_str();
-      }
+      BadRequestException(const std::wstring& message);
     };
   }
 }

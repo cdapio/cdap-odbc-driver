@@ -102,7 +102,7 @@ void Cask::CdapOdbc::Statement::getTables(
     this->throwStateError();
   }
 
-  this->command = std::make_unique<TablesCommand>(this->connection);
+  this->command = std::make_unique<TablesCommand>(this->connection, this->tableNames);
   this->state = State::PREPARE;
 
   this->openQuery();
@@ -124,7 +124,8 @@ void Cask::CdapOdbc::Statement::getColumns(const std::wstring& streamName) {
     this->throwStateError();
   }
 
-  this->command = std::make_unique<ColumnsCommand>(this->connection, streamName);
+  auto& realName = this->tableNames.at(streamName);
+  this->command = std::make_unique<ColumnsCommand>(this->connection, realName, streamName);
   this->state = State::PREPARE;
 
   this->openQuery();
@@ -153,7 +154,7 @@ void Cask::CdapOdbc::Statement::fetch() {
     }
   } else {
     this->state = State::CLOSED;
-    throw NoDataException("No more data in the query.");
+    throw NoDataException(L"No more data in the query.");
   }
 }
 
