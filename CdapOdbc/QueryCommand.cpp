@@ -18,7 +18,6 @@
 #include "QueryCommand.h"
 #include "Connection.h"
 #include "QueryDataReader.h"
-#include "StillExecutingException.h"
 #include "CdapException.h"
 
 Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
@@ -32,14 +31,18 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
   }
 
   auto status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);
+
+  // Synchronous query execution
+  while (status.getOperationStatus() == OperationStatus::INITIALIZED ||
+    status.getOperationStatus() == OperationStatus::PENDING ||
+    status.getOperationStatus() == OperationStatus::RUNNING) {
+    status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);
+  }
+
   switch (status.getOperationStatus()) {
     case OperationStatus::FINISHED:
       this->hasData = status.hasResults();
       break;
-    case OperationStatus::INITIALIZED:
-    case OperationStatus::PENDING:
-    case OperationStatus::RUNNING:
-      throw StillExecutingException();
     case OperationStatus::UNKNOWN:
     case OperationStatus::ERROR:
       throw CdapException(L"An error occured during query execution.");
