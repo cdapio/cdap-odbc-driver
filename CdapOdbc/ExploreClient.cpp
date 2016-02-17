@@ -190,10 +190,14 @@ QueryResult Cask::CdapOdbc::ExploreClient::getDatasetFields(const std::wstring& 
 QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
   web::json::value query;
   std::wstring stmt_preproc = statement;
-	// TODO: Remove the wrapping SELECT properly
-	// if (stmt_preproc.find(L"\"") != std::wstring::npos) {
-	//   stmt_preproc = stmt_preproc.substr(18, statement.length() - 21 - 18);
-  // }
+  std::wstring::size_type found;
+
+  /* Remove 'HAVING (COUNT(1) > 0) clause' */
+  found = stmt_preproc.find(L"HAVING (COUNT(1) > 0)", 0);
+  if (found != std::wstring::npos) {
+    stmt_preproc.erase(found, 21);
+  }
+
   query[L"query"] = toJson(&stmt_preproc);
   auto value = this->doPost(L"namespaces/" + this->namespace_ + L"/data/explore/queries", query);
   return value.at(L"handle").as_string();
