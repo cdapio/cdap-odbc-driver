@@ -136,6 +136,8 @@ SQLRETURN SQL_API SQLDriverConnectW(
     }
 
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::lock_guard<Connection> lock(connection);
+
     std::unique_ptr<std::wstring> connectionString;
     std::wstring newConnectionString;
     std::unique_ptr<ConnectionDialog> dialog;
@@ -216,6 +218,8 @@ SQLRETURN SQL_API SQLGetTypeInfoW(
   TRACE(L"SQLGetTypeInfoW(StatementHandle = %X, DataType = %d)\n", StatementHandle, DataType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     statement.getDataTypes();
     TRACE(L"SQLGetTypeInfoW returns SQL_SUCCESS\n");
@@ -246,7 +250,8 @@ SQLRETURN SQL_API SQLGetInfoW(
       *StringLengthPtr = 0;
     }
 
-    Driver::getInstance().getConnection(ConnectionHandle);
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::lock_guard<Connection> lock(connection);
 
     if (InfoValuePtr == nullptr) {
       TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
@@ -382,7 +387,9 @@ SQLRETURN SQL_API SQLGetFunctions(
   TRACE(L"SQLGetFunctions(ConnectionHandle = %X, FunctionId = %d)\n", ConnectionHandle, FunctionId);
   try {
     if (SupportedPtr) {
-      Driver::getInstance().getConnection(ConnectionHandle);
+      auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+      std::lock_guard<Connection> lock(connection);
+      
       if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
         Driver::getInstance().setupSupportedFunctions(SupportedPtr);
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
@@ -463,7 +470,8 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
 
   TRACE(L"SQLGetStmtAttrW(StatementHandle = %X, Attribute = %d)\n", StatementHandle, Attribute);
   try {
-    Driver::getInstance().getStatement(StatementHandle);
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
 
     switch (Attribute) {
       case SQL_ATTR_APP_PARAM_DESC:
@@ -496,6 +504,8 @@ SQLRETURN SQL_API SQLPrepareW(
   TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
     if (!sql) {
@@ -539,6 +549,8 @@ SQLRETURN SQL_API SQLExecute(
   TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     statement.execute();
     TRACE(L"SQLExecute returns SQL_SUCCESS\n");
@@ -564,6 +576,8 @@ SQLRETURN SQL_API SQLExecDirectW(
   TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
     if (!query) {
@@ -607,6 +621,8 @@ SQLRETURN SQL_API SQLNumResultCols(
   TRACE(L"SQLNumResultCols(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     if (!ColumnCountPtr) {
       TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
@@ -643,6 +659,8 @@ SQLRETURN SQL_API SQLDescribeColW(
   TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d)\n", StatementHandle, ColumnNumber);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     auto columnInfo = statement.getColumnInfo(ColumnNumber);
 
@@ -695,6 +713,8 @@ SQLRETURN SQL_API SQLColAttributeW(
     FieldIdentifier);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     auto& columnInfo = statement.getColumnInfo(ColumnNumber);
 
@@ -739,6 +759,8 @@ SQLRETURN SQL_API SQLBindCol(
     BufferLength);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     if (TargetValuePtr != nullptr) {
       ColumnBinding binding;
@@ -773,6 +795,8 @@ SQLRETURN SQL_API SQLFetch(
   TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     statement.fetch();
     TRACE(L"SQLFetch returns SQL_SUCCESS\n");
@@ -836,6 +860,8 @@ SQLRETURN SQL_API SQLColumnsW(
     ColumnName);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     auto streamName = Argument::toStdString(TableName, NameLength3);
     if (!streamName) {
@@ -890,6 +916,8 @@ SQLRETURN SQL_API SQLTablesW(
     TableType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
 
     auto catalogName = Argument::toStdString(CatalogName, NameLength1);
@@ -945,6 +973,8 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
     Nullable);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
 
     statement.getSpecialColumns();
@@ -970,6 +1000,8 @@ SQLRETURN SQL_API SQLFreeStmt(
   TRACE(L"SQLFreeStmt(StatementHandle = %X, Option = %d)\n", StatementHandle, Option);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+
     statement.getSqlStatus().clear();
     switch (Option) {
       case SQL_CLOSE:
@@ -1018,7 +1050,9 @@ SQLRETURN SQL_API SQLDisconnect(
   SQLHDBC     ConnectionHandle) {
   TRACE(L"SQLDisconnect(ConnectionHandle = %X)\n", ConnectionHandle);
   try {
-    Driver::getInstance().getConnection(ConnectionHandle).close();
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::lock_guard<Connection> lock(connection);
+    connection.close();
     TRACE(L"SQLDisconnect returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
