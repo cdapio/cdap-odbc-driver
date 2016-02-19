@@ -67,14 +67,11 @@ void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
 }
 
 void Cask::CdapOdbc::Statement::removeColumnBinding(SQLUSMALLINT columnNumber) {
-  //if (this->state == State::CLOSED) {
-  //  this->throwStateError();
-  //}
-
   auto it = std::find_if(
     this->columnBindings.begin(),
     this->columnBindings.end(),
-    [columnNumber](auto& b) { return b.getColumnNumber() == columnNumber; });
+    [columnNumber](auto& b) { return b.getColumnNumber() == columnNumber; }
+  );
   if (it == this->columnBindings.end()) {
     throw std::invalid_argument("columnNumber");
   }
