@@ -287,7 +287,7 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
 
 void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
   std::lock_guard<std::mutex> lock(this->mutex);
-  
+
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
   if (!dialog->show()) {
     throw CancelException();

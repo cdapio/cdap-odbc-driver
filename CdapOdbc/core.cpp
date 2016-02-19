@@ -421,7 +421,7 @@ SQLRETURN SQL_API SQLGetFunctions(
     if (SupportedPtr) {
       auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
       std::lock_guard<Connection> lock(connection);
-      
+
       if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
         Driver::getInstance().setupSupportedFunctions(SupportedPtr);
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
