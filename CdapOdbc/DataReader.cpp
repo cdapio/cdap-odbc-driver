@@ -199,7 +199,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         sbintValue = std::wcstol(value.as_string().c_str(), nullptr, 0);
       } else if (value.is_number()) {
         sbintValue = value.as_number().to_int64();
-      }	else if (value.is_boolean()) {
+      } else if (value.is_boolean()) {
         sbintValue = value.as_bool() ? 1L : 0L;
       }
 

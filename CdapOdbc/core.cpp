@@ -305,7 +305,6 @@ SQLRETURN SQL_API SQLGetInfoW(
         return SQL_SUCCESS;
       case SQL_IDENTIFIER_QUOTE_CHAR:
         Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-//        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
         return SQL_SUCCESS;
       case SQL_FILE_USAGE:
@@ -382,7 +381,7 @@ SQLRETURN SQL_API SQLGetInfoW(
         *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
         TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
         return SQL_SUCCESS;
-		}
+    } // end switch
 
     TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
     return SQL_ERROR;
@@ -787,11 +786,11 @@ SQLRETURN SQL_API SQLColAttributeW(
             static_cast<SQLWCHAR*>(CharacterAttributePtr),
             BufferLength,
             StringLengthPtr
-            );
+          );
           TRACE(
             L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
             static_cast<SQLWCHAR*>(CharacterAttributePtr)
-            );
+          );
           return SQL_SUCCESS;
         }
       case SQL_COLUMN_LABEL:
@@ -801,11 +800,11 @@ SQLRETURN SQL_API SQLColAttributeW(
             static_cast<SQLWCHAR*>(CharacterAttributePtr),
             BufferLength,
             StringLengthPtr
-            );
+          );
           TRACE(
             L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
             static_cast<SQLWCHAR*>(CharacterAttributePtr)
-            );
+          );
           return SQL_SUCCESS;
         }
 
@@ -831,7 +830,7 @@ SQLRETURN SQL_API SQLColAttributeW(
             static_cast<SQLWCHAR*>(CharacterAttributePtr),
             BufferLength,
             StringLengthPtr
-            );
+          );
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
             static_cast<SQLWCHAR*>(CharacterAttributePtr)
           );
@@ -872,7 +871,7 @@ SQLRETURN SQL_API SQLColAttributeW(
           TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
           return SQL_SUCCESS;
         }
-    }
+    } // end try
 
     TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
     return SQL_ERROR;
@@ -902,7 +901,8 @@ SQLRETURN SQL_API SQLBindCol(
     StatementHandle,
     ColumnNumber,
     TargetType,
-    BufferLength);
+    BufferLength
+  );
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     statement.getSqlStatus().clear();
@@ -916,7 +916,7 @@ SQLRETURN SQL_API SQLBindCol(
       statement.addColumnBinding(binding);
     } else {
       statement.removeColumnBinding(ColumnNumber);
-    }
+    } // end try
 
     TRACE(L"SQLBindCol returns SQL_SUCCESS\n");
     return SQL_SUCCESS;
@@ -999,7 +999,8 @@ SQLRETURN SQL_API SQLColumnsW(
     CatalogName,
     SchemaName,
     TableName,
-    ColumnName);
+    ColumnName
+  );
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     statement.getSqlStatus().clear();
