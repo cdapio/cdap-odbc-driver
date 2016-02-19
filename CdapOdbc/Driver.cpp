@@ -286,6 +286,8 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
 }
 
 void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
   if (!dialog->show()) {
     throw CancelException();
@@ -301,6 +303,8 @@ void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring
 }
 
 void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   auto params = ConnectionParams(attrs);
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
   dialog->setName(params.getDsn());
@@ -321,6 +325,8 @@ void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstr
 }
 
 void Cask::CdapOdbc::Driver::deleteDataSource(const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   auto params = ConnectionParams(attrs);
   ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
 }

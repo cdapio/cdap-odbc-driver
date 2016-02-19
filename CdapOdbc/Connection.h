@@ -83,6 +83,20 @@ namespace Cask {
       }
 
       /**
+       * Locks the mutex.
+       */ 
+      void lock() {
+        this->mutex.lock();
+      }
+
+      /**
+       * Unlocks the mutex
+       */
+      void unlock() {
+        this->mutex.unlock();
+      }
+
+      /**
        * Opens a connection to explore REST service.
        *
        * Connection string has a form "PARAM1=VALUE1;PARAM2=VALUE2".

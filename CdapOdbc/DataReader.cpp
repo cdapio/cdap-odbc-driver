@@ -156,8 +156,8 @@ void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBi
 void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
   std::wstring strValue;
   SQLDOUBLE dblValue = NAN;
-  SQLUBIGINT ubintValue = NAN;
-  SQLBIGINT sbintValue = NAN;
+  SQLUBIGINT ubintValue = 0ULL;
+  SQLBIGINT sbintValue = 0LL;
   switch (binding.getTargetType()) {
     case SQL_C_CHAR: /* SQL_CHAR */
       strValue = toWString(value, binding);
