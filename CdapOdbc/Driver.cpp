@@ -97,14 +97,16 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
 }
 
 void Cask::CdapOdbc::Driver::initializeDataTypes() {
-  this->dataTypes.insert({ L"boolean", DataType(L"boolean", SQL_BIT, 0, 1) });
-  this->dataTypes.insert({ L"binary", DataType(L"binary", SQL_BINARY, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
-  this->dataTypes.insert({ L"double", DataType(L"double", SQL_DOUBLE, 0, 24) });
-  this->dataTypes.insert({ L"float", DataType(L"float", SQL_REAL, 0, 12) });
-  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11) });
-  this->dataTypes.insert({ L"bigint", DataType(L"bigint", SQL_BIGINT, 0, 20) });
-  this->dataTypes.insert({ L"string", DataType(L"string", SQL_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
-  this->dataTypes.insert({ L"map<string,string>", DataType(L"string", SQL_CHAR, std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()) });
+  int INT32MAX = std::numeric_limits<std::int32_t>::max();
+
+  this->dataTypes.insert({ L"boolean", DataType(L"boolean", SQL_BIT, 0, 1, 0, 1, 1, SQL_PRED_BASIC, 0, 0, 1, 0) });
+  this->dataTypes.insert({ L"binary", DataType(L"binary", SQL_BINARY, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_PRED_NONE, 0, 0, 0, 0) });
+  this->dataTypes.insert({ L"double", DataType(L"double", SQL_DOUBLE, 0, 24, 24, 8, 1, SQL_PRED_BASIC, 0, 2, 1, 0) });
+  this->dataTypes.insert({ L"float", DataType(L"float", SQL_REAL, 0, 12, 12, 4, 1, SQL_PRED_BASIC, 0, 2, 1, 0) });
+  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11, 11, 4, 1, SQL_PRED_BASIC, 0, 10, 1, 0) });
+  this->dataTypes.insert({ L"bigint", DataType(L"bigint", SQL_BIGINT, 0, 20, 20, 8, 1, SQL_PRED_BASIC, 0, 10, 1, 0) });
+  this->dataTypes.insert({ L"string", DataType(L"string", SQL_CHAR, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_SEARCHABLE, 0, 0, 0, 1) });
+  this->dataTypes.insert({ L"map<string,string>", DataType(L"string", SQL_CHAR, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_SEARCHABLE, 0, 0, 0, 1) });
 }
 
 Cask::CdapOdbc::Driver::Driver() {

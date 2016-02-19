@@ -26,6 +26,7 @@ namespace Cask {
      */
     class ColumnInfo {
       std::wstring name;
+      std::wstring shortName;
       const DataType& dataType;
       //std::wstring createParams;
       //SQLSMALLINT searchable;
@@ -53,6 +54,10 @@ namespace Cask {
        */
       const std::wstring& getName() const {
         return this->name;
+      }
+
+      const std::wstring& getShortName() const {
+        return this->shortName;
       }
 
       /**

@@ -29,12 +29,15 @@ namespace Cask {
       SQLLEN displaySize;
       SQLSMALLINT sqlType;
       SQLSMALLINT decimalDigits;
+      SQLLEN octetLength;
       SQLSMALLINT nullable;
       SQLSMALLINT searchable;
       SQLSMALLINT fixedPrecScale;
+      SQLINTEGER precRadix;
+      SQLSMALLINT unsignedAttr;
+      SQLSMALLINT caseSensitive;
       ////case 4: // LITERAL_PREFIX 
       ////case 5: // LITERAL_SUFFIX
-      ////case 10: // UNSIGNED_ATTRIBUTE
       ////case 12: // AUTO_UNIQUE_VALUE 
       ////case 13: // LOCAL_TYPE_NAME 
       ////case 14: // MINIMUM_SCALE 
@@ -49,12 +52,18 @@ namespace Cask {
        * Creates an instance of DataType.
        */
       DataType(
-        const std::wstring& name, 
-        SQLSMALLINT sqlType, 
+        const std::wstring& name,
+        SQLSMALLINT sqlType,
         SQLULEN size = 0U,
         SQLLEN displaySize = 0,
-        SQLSMALLINT decimalDigits = 0, 
-        SQLSMALLINT nullable = SQL_NULLABLE);
+        SQLSMALLINT decimalDigits = 0,
+        SQLLEN octetLength = 0,
+        SQLSMALLINT nullable = SQL_NULLABLE,
+        SQLSMALLINT searchable = SQL_PRED_NONE,
+        SQLSMALLINT fixedPrecScale = SQL_FALSE,
+        SQLINTEGER precRadix = 0,
+        SQLSMALLINT unsignedAttr = SQL_FALSE,
+        SQLSMALLINT caseSensitive = SQL_FALSE);
 
       /**
        * Gets type name.
@@ -86,6 +95,10 @@ namespace Cask {
         return this->decimalDigits;
       }
 
+      SQLLEN getOctetLength() const {
+        return this->octetLength;
+      }
+
       /**
        * Gets a value that indicates whether the column allows NULL values.
        */
@@ -98,6 +111,34 @@ namespace Cask {
        */
       SQLLEN getDisplaySize() const {
         return this->displaySize;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type has fixed precision scale.
+       */
+      SQLSMALLINT getFixedPrecScale() const {
+        return this->fixedPrecScale;
+      }
+
+      /**
+       * Gets a radix value (0 for non-numerics, 2 for approximate numerics, 10 for exact numerics)
+       */
+      SQLINTEGER getPrecRadix() const {
+        return this->precRadix;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type is signed. NULL if not applicable to the type.
+       */
+      SQLSMALLINT getUnsigned() const {
+        return this->unsignedAttr;
+      }
+
+      /**
+       * Gets a value that indicates whether the column type is case sensitive.
+       */
+      SQLSMALLINT getCaseSensitive() const {
+        return this->caseSensitive;
       }
     };
   }

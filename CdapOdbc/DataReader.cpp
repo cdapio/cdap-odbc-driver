@@ -143,11 +143,23 @@ void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBindin
   *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
 }
 
+void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
+  assert(binding.getTargetType() == SQL_C_ULONG || binding.getTargetType() == SQL_DEFAULT);
+  *(reinterpret_cast<SQLUBIGINT*>(binding.getTargetValuePtr())) = value;
+}
+
+void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding) {
+  assert(binding.getTargetType() == SQL_C_SBIGINT || binding.getTargetType() == SQL_DEFAULT);
+  *(reinterpret_cast<SQLBIGINT*>(binding.getTargetValuePtr())) = value;
+}
+
 void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
   std::wstring strValue;
   SQLDOUBLE dblValue = NAN;
+  SQLUBIGINT ubintValue = NAN;
+  SQLBIGINT sbintValue = NAN;
   switch (binding.getTargetType()) {
-    case SQL_CHAR:
+    case SQL_C_CHAR: /* SQL_CHAR */
       strValue = toWString(value, binding);
       this->fetchVarchar(strValue.c_str(), binding);
       break;
@@ -155,7 +167,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       strValue = toWString(value, binding);
       this->fetchWVarchar(strValue.c_str(), binding);
       break;
-    case SQL_DOUBLE:
+    case SQL_C_DOUBLE: /* SQL_DOUBLE*/
       if (value.is_string()) {
         dblValue = std::wcstod(value.as_string().c_str(), nullptr);
       } else if (value.is_integer()) {
@@ -169,6 +181,29 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       }
 
       this->fetchDouble(dblValue, binding);
+      break;
+    case SQL_C_ULONG:
+      if (value.is_string()) {
+        ubintValue = std::wcstoul(value.as_string().c_str(), nullptr, 0);
+      } else if (value.is_number()) {
+        ubintValue = value.as_number().to_uint64();
+      } else if (value.is_boolean()) {
+        ubintValue = value.as_bool() ? 1UL : 0UL;
+      }
+
+      this->fetchUnsignedLong(ubintValue, binding);
+      break;
+
+    case SQL_C_SBIGINT:
+      if (value.is_string()) {
+        sbintValue = std::wcstol(value.as_string().c_str(), nullptr, 0);
+      } else if (value.is_number()) {
+        sbintValue = value.as_number().to_int64();
+      }	else if (value.is_boolean()) {
+        sbintValue = value.as_bool() ? 1L : 0L;
+      }
+
+      this->fetchSignedLong(sbintValue, binding);
       break;
   }
 }
