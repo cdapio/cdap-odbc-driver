@@ -137,36 +137,18 @@ SQLRETURN SQL_API SQLDriverConnectW(
 
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
+    try {
+      std::unique_ptr<std::wstring> connectionString;
+      std::wstring newConnectionString;
+      std::unique_ptr<ConnectionDialog> dialog;
 
-    std::unique_ptr<std::wstring> connectionString;
-    std::wstring newConnectionString;
-    std::unique_ptr<ConnectionDialog> dialog;
+      // Clear Connection SQL Status
+      connection.getSqlStatus().clear();
 
-    // Clear Connection SQL Status
-    connection.getSqlStatus().clear();
-
-    switch (DriverCompletion) {
-      case SQL_DRIVER_PROMPT:
-        // DRIVER
-        connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        dialog = std::make_unique<ConnectionDialog>(WindowHandle);
-        dialog->setParams(ConnectionParams(*connectionString));
-        if (!dialog->show()) {
-          TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
-          // Not an error
-          return SQL_NO_DATA;
-        }
-
-        newConnectionString = dialog->getParams().getFullConnectionString();
-        connection.open(newConnectionString);
-        Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
-        TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
-        return SQL_SUCCESS;
-      case SQL_DRIVER_COMPLETE:
-      case SQL_DRIVER_COMPLETE_REQUIRED:
-        // DSN
-        connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        if (connectionString->find(L"DSN") != std::wstring::npos) {
+      switch (DriverCompletion) {
+        case SQL_DRIVER_PROMPT:
+          // DRIVER
+          connectionString = Argument::toStdString(InConnectionString, StringLength1);
           dialog = std::make_unique<ConnectionDialog>(WindowHandle);
           dialog->setParams(ConnectionParams(*connectionString));
           if (!dialog->show()) {
@@ -176,38 +158,56 @@ SQLRETURN SQL_API SQLDriverConnectW(
           }
 
           newConnectionString = dialog->getParams().getFullConnectionString();
-        } else {
-          newConnectionString = *connectionString;
-        }
+          connection.open(newConnectionString);
+          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
+          return SQL_SUCCESS;
+        case SQL_DRIVER_COMPLETE:
+        case SQL_DRIVER_COMPLETE_REQUIRED:
+          // DSN
+          connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          if (connectionString->find(L"DSN") != std::wstring::npos) {
+            dialog = std::make_unique<ConnectionDialog>(WindowHandle);
+            dialog->setParams(ConnectionParams(*connectionString));
+            if (!dialog->show()) {
+              TRACE(L"SQLDriverConnectW returns SQL_NO_DATA\n");
+              // Not an error
+              return SQL_NO_DATA;
+            }
 
-        connection.open(newConnectionString);
-        Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
-        TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
-        return SQL_SUCCESS;
-      case SQL_DRIVER_NOPROMPT:
-        // DRIVER 2
-        connectionString = Argument::toStdString(InConnectionString, StringLength1);
-        connection.open(*connectionString);
-        Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
-        TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
-        return SQL_SUCCESS;
+            newConnectionString = dialog->getParams().getFullConnectionString();
+          } else {
+            newConnectionString = *connectionString;
+          }
+
+          connection.open(newConnectionString);
+          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
+          return SQL_SUCCESS;
+        case SQL_DRIVER_NOPROMPT:
+          // DRIVER 2
+          connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          connection.open(*connectionString);
+          Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
+          return SQL_SUCCESS;
+        default:
+          throw CdapException(L"Unknown DriverCompletion option.");
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-    connection.getSqlStatus().addMsg(L"HYC00", L"Optional feature not implemented");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDriverConnectW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    connection.getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLDriverConnectW returns SQL_ERROR\n");
-    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-    connection.getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -219,21 +219,25 @@ SQLRETURN SQL_API SQLGetTypeInfoW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
-
-    statement.getSqlStatus().clear();
-    statement.getDataTypes();
-    TRACE(L"SQLGetTypeInfoW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
+    try {
+      statement.getSqlStatus().clear();
+      statement.getDataTypes();
+      TRACE(L"SQLGetTypeInfoW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetTypeInfoW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLGetTypeInfoW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -252,145 +256,153 @@ SQLRETURN SQL_API SQLGetInfoW(
 
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
+    try {
+      if (InfoValuePtr == nullptr) {
+        TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
+        return SQL_ERROR;
+      }
 
-    if (InfoValuePtr == nullptr) {
-      TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
+      switch (InfoType) {
+        case SQL_DRIVER_ODBC_VER:
+          Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_DATA_SOURCE_NAME:
+          Argument::fromStdString(L"CDAP Datasets", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_SEARCH_PATTERN_ESCAPE:
+          Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_GETDATA_EXTENSIONS:
+          assert(BufferLength == sizeof(SQLUINTEGER));
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND\n");
+          return SQL_SUCCESS;
+        case SQL_CURSOR_COMMIT_BEHAVIOR:
+        case SQL_CURSOR_ROLLBACK_BEHAVIOR:
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CB_PRESERVE;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_CB_PRESERVE\n");
+          return SQL_SUCCESS;
+        case SQL_ACTIVE_STATEMENTS:
+          assert(BufferLength >= sizeof(SQLUSMALLINT));
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_DATA_SOURCE_READ_ONLY:
+          Argument::fromStdString(L"Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_DRIVER_NAME:
+          Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_CORRELATION_NAME:
+          assert(BufferLength == sizeof(SQLUSMALLINT));
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_CN_DIFFERENT\n");
+          return SQL_SUCCESS;
+        case SQL_NON_NULLABLE_COLUMNS:
+          assert(BufferLength == sizeof(SQLUSMALLINT));
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_NNC_NON_NULL\n");
+          return SQL_SUCCESS;
+        case SQL_QUALIFIER_NAME_SEPARATOR:
+          Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_IDENTIFIER_QUOTE_CHAR:
+          Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          //        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_FILE_USAGE:
+          assert(BufferLength == sizeof(SQLUSMALLINT));
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FILE_CATALOG\n");
+          return SQL_SUCCESS;
+        case SQL_QUALIFIER_TERM:
+          Argument::fromStdString(L"CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_DATABASE_NAME:
+          Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_MAX_OWNER_NAME_LEN:
+          assert(BufferLength == sizeof(SQLUSMALLINT));
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 128;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
+          return SQL_SUCCESS;
+        case SQL_NUMERIC_FUNCTIONS:
+          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
+            | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG | SQL_FN_NUM_PI
+            | SQL_FN_NUM_POWER | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_RADIANS
+            | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD;
+          return SQL_SUCCESS;
+        case SQL_AGGREGATE_FUNCTIONS:
+          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
+            | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
+          return SQL_SUCCESS;
+        case SQL_STRING_FUNCTIONS:
+          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+          return SQL_SUCCESS;
+        case SQL_CONVERT_BIGINT:
+        case SQL_CONVERT_BINARY:
+        case SQL_CONVERT_BIT:
+        case SQL_CONVERT_CHAR:
+        case SQL_CONVERT_DATE:
+        case SQL_CONVERT_DECIMAL:
+        case SQL_CONVERT_DOUBLE:
+        case SQL_CONVERT_FLOAT:
+        case SQL_CONVERT_INTEGER:
+        case SQL_CONVERT_LONGVARCHAR:
+        case SQL_CONVERT_NUMERIC:
+        case SQL_CONVERT_REAL:
+        case SQL_CONVERT_SMALLINT:
+        case SQL_CONVERT_TIME:
+        case SQL_CONVERT_TIMESTAMP:
+        case SQL_CONVERT_TINYINT:
+        case SQL_CONVERT_VARBINARY:
+        case SQL_CONVERT_VARCHAR:
+        case SQL_CONVERT_LONGVARBINARY:
+          assert(BufferLength == sizeof(SQLUINTEGER));
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_TXN_CAPABLE:
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_TC_DML;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1\n");
+          return SQL_SUCCESS;
+        case SQL_DBMS_NAME:
+          Argument::fromStdString(L"CDAP Databases", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_DBMS_VER:
+          Argument::fromStdString(L"00.00.0000", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_ODBC_INTERFACE_CONFORMANCE:
+          *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_OIC_CORE;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          return SQL_SUCCESS;
+        case SQL_SQL_CONFORMANCE:
+          *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          return SQL_SUCCESS;
+        default:
+          throw CdapException(L"Unknown info type.");
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(ex);
       return SQL_ERROR;
     }
-
-    switch (InfoType) {
-      case SQL_DRIVER_ODBC_VER:
-        Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_DATA_SOURCE_NAME:
-        Argument::fromStdString(L"CDAP Datasets", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_SEARCH_PATTERN_ESCAPE:
-        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_GETDATA_EXTENSIONS:
-        assert(BufferLength == sizeof(SQLUINTEGER));
-        *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND\n");
-        return SQL_SUCCESS;
-      case SQL_CURSOR_COMMIT_BEHAVIOR:
-      case SQL_CURSOR_ROLLBACK_BEHAVIOR:
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CB_PRESERVE;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_CB_PRESERVE\n");
-        return SQL_SUCCESS;
-      case SQL_ACTIVE_STATEMENTS:
-        assert(BufferLength >= sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 0;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
-        return SQL_SUCCESS;
-      case SQL_DATA_SOURCE_READ_ONLY:
-        Argument::fromStdString(L"Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_DRIVER_NAME:
-        Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_CORRELATION_NAME:
-        assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_CN_DIFFERENT\n");
-        return SQL_SUCCESS;
-      case SQL_NON_NULLABLE_COLUMNS:
-        assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_NNC_NON_NULL\n");
-        return SQL_SUCCESS;
-      case SQL_QUALIFIER_NAME_SEPARATOR:
-        Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_IDENTIFIER_QUOTE_CHAR:
-        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-//        Argument::fromStdString(L"\"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_FILE_USAGE:
-        assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FILE_CATALOG\n");
-        return SQL_SUCCESS;
-      case SQL_QUALIFIER_TERM:
-        Argument::fromStdString(L"CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_DATABASE_NAME:
-        Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_MAX_OWNER_NAME_LEN:
-        assert(BufferLength == sizeof(SQLUSMALLINT));
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = 128;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
-        return SQL_SUCCESS;
-      case SQL_NUMERIC_FUNCTIONS:
-        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
-          | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG | SQL_FN_NUM_PI
-          | SQL_FN_NUM_POWER | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_RADIANS
-          | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD;
-        return SQL_SUCCESS;
-      case SQL_AGGREGATE_FUNCTIONS:
-        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
-          | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
-        return SQL_SUCCESS;
-      case SQL_STRING_FUNCTIONS:
-        *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
-        return SQL_SUCCESS;
-      case SQL_CONVERT_BIGINT:
-      case SQL_CONVERT_BINARY:
-      case SQL_CONVERT_BIT:
-      case SQL_CONVERT_CHAR:
-      case SQL_CONVERT_DATE:
-      case SQL_CONVERT_DECIMAL:
-      case SQL_CONVERT_DOUBLE:
-      case SQL_CONVERT_FLOAT:
-      case SQL_CONVERT_INTEGER:
-      case SQL_CONVERT_LONGVARCHAR:
-      case SQL_CONVERT_NUMERIC:
-      case SQL_CONVERT_REAL:
-      case SQL_CONVERT_SMALLINT:
-      case SQL_CONVERT_TIME:
-      case SQL_CONVERT_TIMESTAMP:
-      case SQL_CONVERT_TINYINT:
-      case SQL_CONVERT_VARBINARY:
-      case SQL_CONVERT_VARCHAR:
-      case SQL_CONVERT_LONGVARBINARY:
-        assert(BufferLength == sizeof(SQLUINTEGER));
-        *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
-        return SQL_SUCCESS;
-      case SQL_TXN_CAPABLE:
-        *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_TC_DML;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1\n");
-        return SQL_SUCCESS;
-      case SQL_DBMS_NAME:
-        Argument::fromStdString(L"CDAP Databases", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_DBMS_VER:
-        Argument::fromStdString(L"00.00.0000", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-        return SQL_SUCCESS;
-      case SQL_ODBC_INTERFACE_CONFORMANCE:
-        *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_OIC_CORE;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
-        return SQL_SUCCESS;
-      case SQL_SQL_CONFORMANCE:
-        *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
-        TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
-        return SQL_SUCCESS;
-    }
-
-    TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetInfoW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
@@ -419,10 +431,9 @@ SQLRETURN SQL_API SQLGetFunctions(
   SQLUSMALLINT *    SupportedPtr) {
   TRACE(L"SQLGetFunctions(ConnectionHandle = %X, FunctionId = %d)\n", ConnectionHandle, FunctionId);
   try {
-    if (SupportedPtr) {
-      auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
-      std::lock_guard<Connection> lock(connection);
-      
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::lock_guard<Connection> lock(connection);
+    try {
       if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
         Driver::getInstance().setupSupportedFunctions(SupportedPtr);
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
@@ -455,11 +466,18 @@ SQLRETURN SQL_API SQLGetFunctions(
 
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
+      } else {
+        throw CdapException(L"Unsupported FunctionId.");
       }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetFunctions returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
@@ -497,7 +515,6 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
   SQLPOINTER      ValuePtr,
   SQLINTEGER      BufferLength,
   SQLINTEGER *    StringLengthPtr) {
-
   // Dummy address for setting dummy statement descriptors.
   static char dummyDesc = '\0';
 
@@ -505,22 +522,31 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
-
-    switch (Attribute) {
-      case SQL_ATTR_APP_PARAM_DESC:
-      case SQL_ATTR_APP_ROW_DESC:
-      case SQL_ATTR_IMP_ROW_DESC:
-      case SQL_ATTR_IMP_PARAM_DESC:
-        assert(BufferLength == SQL_IS_POINTER);
-        // Requires by MSQUERY to be not null.
-        // Set to dummy pointer.
-        *(static_cast<SQLHDESC*>(ValuePtr)) = &dummyDesc;
-        TRACE(L"SQLGetStmtAttrW returns SQL_SUCCESS, *ValuePtr = dummy descriptor\n");
-        return SQL_SUCCESS;
+    try {
+      statement.getSqlStatus().clear();
+      switch (Attribute) {
+        case SQL_ATTR_APP_PARAM_DESC:
+        case SQL_ATTR_APP_ROW_DESC:
+        case SQL_ATTR_IMP_ROW_DESC:
+        case SQL_ATTR_IMP_PARAM_DESC:
+          assert(BufferLength == SQL_IS_POINTER);
+          // Requires by MSQUERY to be not null.
+          // Set to dummy pointer.
+          *(static_cast<SQLHDESC*>(ValuePtr)) = &dummyDesc;
+          TRACE(L"SQLGetStmtAttrW returns SQL_SUCCESS, *ValuePtr = dummy descriptor\n");
+          return SQL_SUCCESS;
+        default:
+          throw CdapException(L"Unknown attribute.");
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLGetStmtAttrW returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLGetStmtAttrW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
@@ -538,31 +564,32 @@ SQLRETURN SQL_API SQLPrepareW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      if (!sql) {
+        throw CdapException(L"Statement text cannot be empty.");
+      }
 
-    statement.getSqlStatus().clear();
-    auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
-    if (sql) {
       statement.prepare(*sql);
       statement.execute();
+
       TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
-    } else {
-      throw CdapException(L"Statement text cannot be empty.");
+    } catch (CdapException& cex) {
+      TRACE(L"SQLPrepareW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLPrepareW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-    
-    statement.prepare(*sql);
-    TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLPrepareW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLPrepareW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLPrepareW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -585,24 +612,11 @@ SQLRETURN SQL_API SQLBindParameter(
 SQLRETURN SQL_API SQLExecute(
   SQLHSTMT     StatementHandle) {
   TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
-  try {
-    // For Tableau, statement execution moved to SQLPrepare
-    // auto& statement = Driver::getInstance().getStatement(StatementHandle);
-    // statement.execute();
-    TRACE(L"SQLExecute returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
-  } catch (InvalidHandleException&) {
-    TRACE(L"SQLExecute returns SQL_INVALID_HANDLE\n");
-    return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
-    TRACE(L"SQLExecute returns %d\n", cex.getErrorCode());
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLExecute returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
-    return SQL_ERROR;
-  }
+  // For Tableau, statement execution moved to SQLPrepare
+  // auto& statement = Driver::getInstance().getStatement(StatementHandle);
+  // statement.execute();
+  TRACE(L"SQLExecute returns SQL_SUCCESS\n");
+  return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLExecDirectW(
@@ -613,26 +627,30 @@ SQLRETURN SQL_API SQLExecDirectW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      if (!query) {
+        throw CdapException(L"Statement text cannot be empty.");
+      }
 
-    statement.getSqlStatus().clear();
-    auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
-    if (!query) {
-      throw CdapException(L"Statement text cannot be empty.");
+      statement.executeDirect(*query);
+      TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLExecDirectW returns %d\n", cex.getErrorCode());
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLExecDirectW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    statement.executeDirect(*query);
-    TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLExecDirectW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
-    TRACE(L"SQLExecDirectW returns %d\n", cex.getErrorCode());
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
+  } catch (std::exception&) {
     TRACE(L"SQLExecDirectW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -658,26 +676,30 @@ SQLRETURN SQL_API SQLNumResultCols(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      if (!ColumnCountPtr) {
+        TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+        return SQL_ERROR;
+      }
 
-    statement.getSqlStatus().clear();
-    if (!ColumnCountPtr) {
+      *ColumnCountPtr = statement.getColumnCount();
+      TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
       TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
       return SQL_ERROR;
     }
-
-    *ColumnCountPtr = statement.getColumnCount();
-    TRACE(L"SQLNumResultCols returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLNumResultCols returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLNumResultCols returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -696,40 +718,44 @@ SQLRETURN SQL_API SQLDescribeColW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      auto columnInfo = statement.getColumnInfo(ColumnNumber);
 
-    statement.getSqlStatus().clear();
-    auto columnInfo = statement.getColumnInfo(ColumnNumber);
+      Argument::fromStdString(columnInfo->getName(), ColumnName, BufferLength, NameLengthPtr);
 
-    Argument::fromStdString(columnInfo->getName(), ColumnName, BufferLength, NameLengthPtr);
+      if (DataTypePtr) {
+        *DataTypePtr = columnInfo->getDataType().getSqlType();
+      }
 
-    if (DataTypePtr) {
-      *DataTypePtr = columnInfo->getDataType().getSqlType();
+      if (ColumnSizePtr) {
+        *ColumnSizePtr = columnInfo->getDataType().getSize();
+      }
+
+      if (DecimalDigitsPtr) {
+        *DecimalDigitsPtr = columnInfo->getDataType().getDecimalDigits();
+      }
+
+      if (NullablePtr) {
+        *NullablePtr = columnInfo->getDataType().getNullable();
+      }
+
+      TRACE(L"SQLDescribeColW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    if (ColumnSizePtr) {
-      *ColumnSizePtr = columnInfo->getDataType().getSize();
-    }
-
-    if (DecimalDigitsPtr) {
-      *DecimalDigitsPtr = columnInfo->getDataType().getDecimalDigits();
-    }
-
-    if (NullablePtr) {
-      *NullablePtr = columnInfo->getDataType().getNullable();
-    }
-
-    TRACE(L"SQLDescribeColW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDescribeColW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLDescribeColW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -750,160 +776,184 @@ SQLRETURN SQL_API SQLColAttributeW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      auto& columnInfo = statement.getColumnInfo(ColumnNumber);
+      switch (FieldIdentifier) {
+        /* Column attributes */
+        case SQL_COLUMN_TYPE:
+        case SQL_DESC_TYPE: /*SQL_DESC_CONCISE_TYPE in ODBC 2.x */
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getSqlType();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-    statement.getSqlStatus().clear();
-    auto& columnInfo = statement.getColumnInfo(ColumnNumber);
+          break;
+        case SQL_COLUMN_DISPLAY_SIZE:
+          // TODO: double check the applicability of display size as precision!
+        case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-    switch (FieldIdentifier) {
-      /* Column attributes */
-      case SQL_COLUMN_TYPE:
-      case SQL_DESC_TYPE: /*SQL_DESC_CONCISE_TYPE in ODBC 2.x */
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getSqlType();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_DISPLAY_SIZE:
-      // TODO: double check the applicability of display size as precision!
-      case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
-        break;
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_NULLABLE:
-      case SQL_DESC_NULLABLE:
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getNullable();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_UNSIGNED:
-        break;
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getUnsigned();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_DESC_FIXED_PREC_SCALE:
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getFixedPrecScale();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_CASE_SENSITIVE:
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getCaseSensitive();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_TYPE_NAME:
-        if (CharacterAttributePtr) {
-          Argument::fromStdString(
-            columnInfo->getDataType().getName(),
-            static_cast<SQLWCHAR*>(CharacterAttributePtr),
-            BufferLength,
-            StringLengthPtr
-            );
-          TRACE(
-            L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
-            static_cast<SQLWCHAR*>(CharacterAttributePtr)
-            );
-          return SQL_SUCCESS;
-        }
-      case SQL_COLUMN_LABEL:
-        if (CharacterAttributePtr) {
-          Argument::fromStdString(
-            columnInfo->getShortName(),
-            static_cast<SQLWCHAR*>(CharacterAttributePtr),
-            BufferLength,
-            StringLengthPtr
-            );
-          TRACE(
-            L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
-            static_cast<SQLWCHAR*>(CharacterAttributePtr)
-            );
-          return SQL_SUCCESS;
-        }
+          break;
+        case SQL_COLUMN_NULLABLE:
+        case SQL_DESC_NULLABLE:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getNullable();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-      /* Not implemented column attributes*/
-      case SQL_COLUMN_UPDATABLE:
-      case SQL_COLUMN_AUTO_INCREMENT:
-      case SQL_COLUMN_SEARCHABLE:
-      case SQL_COLUMN_TABLE_NAME:
-      case SQL_COLUMN_OWNER_NAME:
-      case SQL_COLUMN_QUALIFIER_NAME:
-        break;
+          break;
+        case SQL_COLUMN_UNSIGNED:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getUnsigned();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-      /* Column description attributes */
-      case SQL_COLUMN_SCALE:
-      case SQL_DESC_SCALE:
-        break;
+          break;
+        case SQL_DESC_FIXED_PREC_SCALE:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getFixedPrecScale();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-      /* Column extended descriptor fields */
-      case SQL_DESC_BASE_COLUMN_NAME:
-        if (CharacterAttributePtr) {
-          Argument::fromStdString(
-            columnInfo->getShortName(),
-            static_cast<SQLWCHAR*>(CharacterAttributePtr),
-            BufferLength,
-            StringLengthPtr
-            );
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
-            static_cast<SQLWCHAR*>(CharacterAttributePtr)
-          );
-        return SQL_SUCCESS;
+          break;
+        case SQL_COLUMN_CASE_SENSITIVE:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getCaseSensitive();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_COLUMN_TYPE_NAME:
+          if (CharacterAttributePtr) {
+            Argument::fromStdString(
+              columnInfo->getDataType().getName(),
+              static_cast<SQLWCHAR*>(CharacterAttributePtr),
+              BufferLength,
+              StringLengthPtr
+              );
+            TRACE(
+              L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+              static_cast<SQLWCHAR*>(CharacterAttributePtr)
+              );
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_COLUMN_LABEL:
+          if (CharacterAttributePtr) {
+            Argument::fromStdString(
+              columnInfo->getShortName(),
+              static_cast<SQLWCHAR*>(CharacterAttributePtr),
+              BufferLength,
+              StringLengthPtr
+              );
+            TRACE(
+              L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+              static_cast<SQLWCHAR*>(CharacterAttributePtr)
+              );
+            return SQL_SUCCESS;
+          }
+
+          break;
+        /* Not implemented column attributes*/
+        case SQL_COLUMN_UPDATABLE:
+        case SQL_COLUMN_AUTO_INCREMENT:
+        case SQL_COLUMN_SEARCHABLE:
+        case SQL_COLUMN_TABLE_NAME:
+        case SQL_COLUMN_OWNER_NAME:
+        case SQL_COLUMN_QUALIFIER_NAME:
+          break;
+
+          /* Column description attributes */
+        case SQL_COLUMN_SCALE:
+        case SQL_DESC_SCALE:
+          break;
+
+          /* Column extended descriptor fields */
+        case SQL_DESC_BASE_COLUMN_NAME:
+          if (CharacterAttributePtr) {
+            Argument::fromStdString(
+              columnInfo->getShortName(),
+              static_cast<SQLWCHAR*>(CharacterAttributePtr),
+              BufferLength,
+              StringLengthPtr
+              );
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+              static_cast<SQLWCHAR*>(CharacterAttributePtr)
+              );
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_NAME:
+          if (CharacterAttributePtr) {
+            Argument::fromStdString(
+              columnInfo->getShortName(),
+              static_cast<SQLWCHAR*>(CharacterAttributePtr),
+              BufferLength,
+              StringLengthPtr
+              );
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
+              static_cast<SQLWCHAR*>(CharacterAttributePtr)
+              );
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_NUM_PREC_RADIX:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getPrecRadix();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_OCTET_LENGTH:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getOctetLength();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        default:
+          throw CdapException(L"Unsupported field.");
+      }
+
+      TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
+      return SQL_ERROR;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-      case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
-        break;
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-      case SQL_DESC_NAME:
-        if (CharacterAttributePtr) {
-          Argument::fromStdString(
-            columnInfo->getShortName(),
-            static_cast<SQLWCHAR*>(CharacterAttributePtr),
-            BufferLength,
-            StringLengthPtr
-          );
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *CharacterAttributePtr = %s\n",
-            static_cast<SQLWCHAR*>(CharacterAttributePtr)
-            );
-          return SQL_SUCCESS;
-        }
-      case SQL_DESC_NUM_PREC_RADIX:
-        break;
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getPrecRadix();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-        break;
-      case SQL_DESC_OCTET_LENGTH:
-        break;
-        if (NumericAttributePtr) {
-          *NumericAttributePtr = columnInfo->getDataType().getOctetLength();
-          TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
-          return SQL_SUCCESS;
-        }
-    }
-
-    TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLColAttributeW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLColAttributeW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -924,32 +974,36 @@ SQLRETURN SQL_API SQLBindCol(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      if (TargetValuePtr != nullptr) {
+        ColumnBinding binding;
+        binding.setColumnNumber(ColumnNumber);
+        binding.setTargetType(TargetType);
+        binding.setTargetValuePtr(TargetValuePtr);
+        binding.setBufferLength(BufferLength);
+        binding.setStrLenOrInd(StrLen_or_Ind);
+        statement.addColumnBinding(binding);
+      } else {
+        statement.removeColumnBinding(ColumnNumber);
+      }
 
-    statement.getSqlStatus().clear();
-    if (TargetValuePtr != nullptr) {
-      ColumnBinding binding;
-      binding.setColumnNumber(ColumnNumber);
-      binding.setTargetType(TargetType);
-      binding.setTargetValuePtr(TargetValuePtr);
-      binding.setBufferLength(BufferLength);
-      binding.setStrLenOrInd(StrLen_or_Ind);
-      statement.addColumnBinding(binding);
-    } else {
-      statement.removeColumnBinding(ColumnNumber);
+      TRACE(L"SQLBindCol returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLBindCol returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLBindCol returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLBindCol returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLBindCol returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLBindCol returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLBindCol returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -960,21 +1014,25 @@ SQLRETURN SQL_API SQLFetch(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
-
-    statement.getSqlStatus().clear();
-    statement.fetch();
-    TRACE(L"SQLFetch returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
+    try {
+      statement.getSqlStatus().clear();
+      statement.fetch();
+      TRACE(L"SQLFetch returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLFetch returns %d\n", cex.getErrorCode());
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLFetch returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
   } catch (InvalidHandleException&) {
     TRACE(L"SQLFetch returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
-    TRACE(L"SQLFetch returns %d\n", cex.getErrorCode());
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
+  } catch (std::exception&) {
     TRACE(L"SQLFetch returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1025,26 +1083,30 @@ SQLRETURN SQL_API SQLColumnsW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      auto streamName = Argument::toStdString(TableName, NameLength3);
+      if (!streamName) {
+        throw CdapException(L"Table name cannot be empty.");
+      }
 
-    statement.getSqlStatus().clear();
-    auto streamName = Argument::toStdString(TableName, NameLength3);
-    if (!streamName) {
-      throw CdapException(L"Table name cannot be empty.");
+      statement.getColumns(*streamName);
+      TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLColumnsW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLColumnsW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-    
-    statement.getColumns(*streamName);
-    TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLColumnsW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLColumnsW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLColumnsW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1081,36 +1143,39 @@ SQLRETURN SQL_API SQLTablesW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
 
-    statement.getSqlStatus().clear();
+      auto catalogName = Argument::toStdString(CatalogName, NameLength1);
+      auto schemaName = Argument::toStdString(SchemaName, NameLength2);
+      auto streamName = Argument::toStdString(TableName, NameLength3);
+      auto tableTypes = Argument::toStdString(TableType, NameLength4);
 
-    auto catalogName = Argument::toStdString(CatalogName, NameLength1);
-    auto schemaName = Argument::toStdString(SchemaName, NameLength2);
-    auto streamName = Argument::toStdString(TableName, NameLength3);
-    auto tableTypes = Argument::toStdString(TableType, NameLength4);
+      if (schemaName && *schemaName == L"%") {
+        statement.getSchemas(catalogName.get(), schemaName.get());
+        TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      } else if (tableTypes) {
+        statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
+        TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      }
 
-    if (schemaName && *schemaName == L"%") {
-      statement.getSchemas(catalogName.get(), schemaName.get());
-      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
-      return SQL_SUCCESS;
-    } else if (tableTypes) {
-      statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
-      TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
-      return SQL_SUCCESS;
+      throw CdapException(L"HYC00", L"Optional feature not implemented.");
+    } catch (CdapException& cex) {
+      TRACE(L"SQLTablesW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLTablesW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLTablesW returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLTablesW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLTablesW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLTablesW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1138,22 +1203,25 @@ SQLRETURN SQL_API SQLSpecialColumnsW(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
-
-    statement.getSqlStatus().clear();
-
-    statement.getSpecialColumns();
-    TRACE(L"SQLSpecialColumnsW returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
+    try {
+      statement.getSqlStatus().clear();
+      statement.getSpecialColumns();
+      TRACE(L"SQLSpecialColumnsW returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLSpecialColumnsW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLSpecialColumnsW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
   } catch (InvalidHandleException&) {
     TRACE(L"SQLSpecialColumnsW returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLSpecialColumnsW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLSpecialColumnsW returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1165,35 +1233,38 @@ SQLRETURN SQL_API SQLFreeStmt(
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
-
-    statement.getSqlStatus().clear();
-    switch (Option) {
-      case SQL_CLOSE:
-        statement.reset();
-        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
-        return SQL_SUCCESS;
-      case SQL_UNBIND:
-        statement.unbindColumns();
-        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
-        return SQL_SUCCESS;
-      case SQL_RESET_PARAMS:
-        statement.resetParameters();
-        TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
-        return SQL_SUCCESS;
+    try {
+      statement.getSqlStatus().clear();
+      switch (Option) {
+        case SQL_CLOSE:
+          statement.reset();
+          TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        case SQL_UNBIND:
+          statement.unbindColumns();
+          TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        case SQL_RESET_PARAMS:
+          statement.resetParameters();
+          TRACE(L"SQLFreeStmt returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        default:
+          throw CdapException(L"Unknown option.");
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
     }
-
-    TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
-    return SQL_ERROR;
   } catch (InvalidHandleException&) {
     TRACE(L"SQLFreeStmt returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLFreeStmt returns SQL_ERROR\n");
-    Driver::getInstance().getStatement(StatementHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1216,19 +1287,24 @@ SQLRETURN SQL_API SQLDisconnect(
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
-    connection.close();
-    TRACE(L"SQLDisconnect returns SQL_SUCCESS\n");
-    return SQL_SUCCESS;
+    try {
+      connection.close();
+      TRACE(L"SQLDisconnect returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLDisconnect returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLDisconnect returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
   } catch (InvalidHandleException&) {
     TRACE(L"SQLDisconnect returns SQL_INVALID_HANDLE\n");
     return SQL_INVALID_HANDLE;
-  } catch (CdapException& cex) {
+  } catch (std::exception&) {
     TRACE(L"SQLDisconnect returns SQL_ERROR\n");
-    Driver::getInstance().getConnection(ConnectionHandle).getSqlStatus().addError(cex);
-    return cex.getErrorCode();
-  } catch (std::exception& ex) {
-    TRACE(L"SQLDisconnect returns SQL_ERROR\n");
-    Driver::getInstance().getConnection(ConnectionHandle).getSqlStatus().addError(ex);
     return SQL_ERROR;
   }
 }
@@ -1369,13 +1445,19 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
   SQLPOINTER DiagInfo,
   SQLSMALLINT BufferLength,
   SQLSMALLINT *StringLength) {
-  TRACE(L"SQLGetDiagFieldW (HandleType = %d, Handle = %X, RecNumber = %d, DiagIdentifier = %d, DiagInfo = %X, BufferLength = %d, StringLength = %d)\n",
-    HandleType, Handle, RecNumber, DiagIdentifier, DiagInfo, BufferLength, StringLength);
+  TRACE(
+    L"SQLGetDiagFieldW (HandleType = %d, Handle = %X, RecNumber = %d, DiagIdentifier = %d, DiagInfo = %X, BufferLength = %d, StringLength = %d)\n",
+    HandleType,
+    Handle,
+    RecNumber,
+    DiagIdentifier,
+    DiagInfo,
+    BufferLength,
+    StringLength);
 
   SQLStatus status;
 
   switch (HandleType) {
-
     case SQL_HANDLE_DBC:
       status = Driver::getInstance().getConnection(Handle).getSqlStatus();
       break;
@@ -1385,7 +1467,7 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
     case SQL_HANDLE_ENV:
     case SQL_HANDLE_DESC:
     default:
-      return SQL_ERROR;
+      return SQL_NO_DATA;
   }
 
   if (status.getRecCount() + 1 < RecNumber) {
@@ -1393,7 +1475,7 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
   }
 
   auto& code = status.getCode(RecNumber);
-  std::wstring logmsg = L"";
+  std::wstring logmsg;
   SQLSMALLINT copiedLen = 0;
   switch (DiagIdentifier) {
     case SQL_DIAG_CLASS_ORIGIN:
@@ -1401,6 +1483,7 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
       if (code[0] == L'I' && code[1] == L'M') {
         logmsg = L"ODBC 3.0";
       }
+
       break;
     case SQL_DIAG_SUBCLASS_ORIGIN:
       logmsg = L"ISO 9075";
@@ -1411,6 +1494,7 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
       } else if (code[0] == L'2' || code[0] == L'0' || code[0] == L'4') {
         logmsg = L"ODBC 3.0";
       }
+
       break;
     case SQL_DIAG_CONNECTION_NAME:
     case SQL_DIAG_SERVER_NAME:
@@ -1420,13 +1504,15 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
     case SQL_DIAG_SQLSTATE:
       logmsg = code;
       break;
+    default:
+      return SQL_NO_DATA;
   }
 
   if (BufferLength > 0) {
     Argument::fromStdString(logmsg, static_cast<SQLWCHAR*>(DiagInfo), BufferLength, &copiedLen);
-    return SQL_SUCCESS;
   }
-  return SQL_ERROR;
+
+  return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLGetDiagRecW(
@@ -1440,19 +1526,18 @@ SQLRETURN SQL_API SQLGetDiagRecW(
   SQLSMALLINT *TextLength) {
   TRACE(
     L"SQLGetDiagRecW (HandleType = %d, Handle = %X, RecNumber = %d, Sqlstate = %d, NativeError = %X, MessageText = %s, BufferLength = %d, TextLength = )\n",
-    HandleType, 
-    Handle, 
-    RecNumber, 
-    Sqlstate, 
-    NativeError, 
-    MessageText, 
-    BufferLength, 
+    HandleType,
+    Handle,
+    RecNumber,
+    Sqlstate,
+    NativeError,
+    MessageText,
+    BufferLength,
     TextLength);
-  
+
   SQLStatus status;
 
   switch (HandleType) {
-
     case SQL_HANDLE_DBC:
       status = Driver::getInstance().getConnection(Handle).getSqlStatus();
       break;
@@ -1462,7 +1547,7 @@ SQLRETURN SQL_API SQLGetDiagRecW(
     case SQL_HANDLE_ENV:
     case SQL_HANDLE_DESC:
     default:
-      return SQL_ERROR;
+      return SQL_NO_DATA;
   }
 
   if (BufferLength < 0) {
@@ -1479,6 +1564,7 @@ SQLRETURN SQL_API SQLGetDiagRecW(
   if (msg.length()) {
     *TextLength = (SQLSMALLINT)msg.size();
   }
+
   SQLSMALLINT copiedLen = 0;
   if (code.length() > 0) {
     Argument::fromStdString(code, Sqlstate, 5, &copiedLen);
@@ -1606,77 +1692,4 @@ SQLRETURN SQL_API SQLStatisticsW(
   SQLUSMALLINT Reserved) {
   TRACE(L"SQLStatisticsW\n");
   return SQL_ERROR;
-}
-
-BOOL INSTAPI ConfigDSN(
-  HWND     hwndParent,
-  WORD     fRequest,
-  LPCSTR   lpszDriver,
-  LPCSTR   lpszAttributes) {
-  TRACE(L"ConfigDSN(hwndParent = %X, fRequest = %d)\n", hwndParent, fRequest);
-
-  if (hwndParent == INVALID_HANDLE_VALUE) {
-    SQLPostInstallerErrorW(ODBC_ERROR_INVALID_HWND, L"The hwndParent argument was invalid.");
-    TRACE(L"ConfigDSN returns FALSE\n");
-    return FALSE;
-  }
-
-  if (!(fRequest == ODBC_ADD_DSN || fRequest == ODBC_CONFIG_DSN || fRequest == ODBC_REMOVE_DSN)) {
-    SQLPostInstallerErrorW(
-      ODBC_ERROR_INVALID_REQUEST_TYPE,
-      L"The fRequest argument was not one of the following: ODBC_ADD_DSN, ODBC_CONFIG_DSN, ODBC_REMOVE_DSN.");
-    TRACE(L"ConfigDSN returns FALSE\n");
-    return FALSE;
-  }
-
-  try {
-    auto driver = Encoding::toUtf16(lpszDriver);
-    auto attrs = Encoding::toUtf16(lpszAttributes);
-    TRACE(L"ConfigDSN - lpszDriver = %s, lpszAttributes = %s\n", driver.c_str(), attrs.c_str());
-    switch (fRequest) {
-      case ODBC_ADD_DSN:
-        Driver::getInstance().addDataSource(hwndParent, driver, attrs);
-        TRACE(L"ConfigDSN returns TRUE\n");
-        return TRUE;
-      case ODBC_CONFIG_DSN:
-        Driver::getInstance().modifyDataSource(hwndParent, driver, attrs);
-        TRACE(L"ConfigDSN returns TRUE\n");
-        return TRUE;
-      case ODBC_REMOVE_DSN:
-        Driver::getInstance().deleteDataSource(driver, attrs);
-        TRACE(L"ConfigDSN returns TRUE\n");
-        return TRUE;
-    }
-
-    TRACE(L"ConfigDSN returns FALSE\n");
-    return FALSE;
-  } catch (CancelException cex) {
-    std::wstring msg = Encoding::toUtf16(cex.what());
-    SQLPostInstallerErrorW(ODBC_ERROR_USER_CANCELED, msg.c_str());
-    TRACE(L"ConfigDSN returns FALSE\n");
-    return FALSE;
-  } catch (std::exception& ex) {
-    std::wstring msg = Encoding::toUtf16(ex.what());
-    SQLPostInstallerErrorW(ODBC_ERROR_GENERAL_ERR, msg.c_str());
-    TRACE(L"ConfigDSN returns FALSE\n");
-    return FALSE;
-  }
-}
-
-BOOL INSTAPI ConfigDriver(
-  HWND    hwndParent,
-  WORD    fRequest,
-  LPCSTR  lpszDriver,
-  LPCSTR  lpszArgs,
-  LPSTR   lpszMsg,
-  WORD    cbMsgMax,
-  WORD *  pcbMsgOut) {
-  TRACE(
-    L"ConfigDriver(hwndParent = %X, fRequest = %d, lpszDriver = %s, lpszArgs = %s)\n",
-    hwndParent,
-    fRequest,
-    lpszDriver,
-    lpszArgs);
-  TRACE(L"ConfigDSN returns TRUE\n");
-  return TRUE;
 }

@@ -24,7 +24,7 @@
 namespace Cask {
   namespace CdapOdbc {
     class Connection;
-	class SQLStatus;
+  class SQLStatus;
 
     /**
     * Represents a SQL statement which can be executed to return some data.
@@ -45,7 +45,7 @@ namespace Cask {
       std::vector<ColumnBinding> columnBindings;
       std::unique_ptr<Command> command;
       std::unique_ptr<DataReader> dataReader;
-	    SQLStatus sqlStatus;
+      SQLStatus sqlStatus;
       std::map<std::wstring, std::wstring> tableNames;
 
       void throwStateError() const;
@@ -121,12 +121,12 @@ namespace Cask {
        */
       void getSpecialColumns();
 
-	  /**
-	  * Gets SqlStatus storage
-	  */
-	  SQLStatus& getSqlStatus() {
-		  return this->sqlStatus;
-	  }
+    /**
+    * Gets SqlStatus storage
+    */
+    SQLStatus& getSqlStatus() {
+      return this->sqlStatus;
+    }
 
       /**
        * Retrieves the next row for the current statement 

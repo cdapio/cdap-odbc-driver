@@ -171,6 +171,7 @@
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="setup.h" />
     <ClInclude Include="SQLStatus.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="setup.cpp" />
     <ClCompile Include="SQLStatus.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
