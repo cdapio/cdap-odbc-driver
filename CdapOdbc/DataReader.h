@@ -38,7 +38,9 @@ namespace Cask {
       void fetchWVarchar(const wchar_t* str, const ColumnBinding& binding);
       void fetchInt(SQLINTEGER value, const ColumnBinding& binding);
       void fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding);
-      void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding);
+			void fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding);
+			void fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding);
+			void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding);
       void fetchValue(const web::json::value& value, const ColumnBinding& binding);
 
     public:
