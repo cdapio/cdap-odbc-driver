@@ -99,14 +99,134 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
 void Cask::CdapOdbc::Driver::initializeDataTypes() {
   int INT32MAX = std::numeric_limits<std::int32_t>::max();
 
-  this->dataTypes.insert({ L"boolean", DataType(L"boolean", SQL_BIT, 0, 1, 0, 1, 1, SQL_PRED_BASIC, 0, 0, 1, 0) });
-  this->dataTypes.insert({ L"binary", DataType(L"binary", SQL_BINARY, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_PRED_NONE, 0, 0, 0, 0) });
-  this->dataTypes.insert({ L"double", DataType(L"double", SQL_DOUBLE, 0, 24, 24, 8, 1, SQL_PRED_BASIC, 0, 2, 1, 0) });
-  this->dataTypes.insert({ L"float", DataType(L"float", SQL_REAL, 0, 12, 12, 4, 1, SQL_PRED_BASIC, 0, 2, 1, 0) });
-  this->dataTypes.insert({ L"int", DataType(L"int", SQL_INTEGER, 0, 11, 11, 4, 1, SQL_PRED_BASIC, 0, 10, 1, 0) });
-  this->dataTypes.insert({ L"bigint", DataType(L"bigint", SQL_BIGINT, 0, 20, 20, 8, 1, SQL_PRED_BASIC, 0, 10, 1, 0) });
-  this->dataTypes.insert({ L"string", DataType(L"string", SQL_CHAR, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_SEARCHABLE, 0, 0, 0, 1) });
-  this->dataTypes.insert({ L"map<string,string>", DataType(L"string", SQL_CHAR, INT32MAX, INT32MAX, INT32MAX, INT32MAX, 1, SQL_SEARCHABLE, 0, 0, 0, 1) });
+  this->dataTypes.insert({ L"boolean", 
+    DataType(
+      L"boolean"      /* name */,
+      SQL_BIT         /* sqlType */,
+      0               /* size */,
+      1               /* displaySize */,
+      0               /* decimalDigits*/,
+      1               /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"binary", 
+    DataType(
+      L"binary"       /* name */,
+      SQL_BINARY      /* sqlType */,
+      INT32MAX        /* size */,
+      INT32MAX        /* displaySize */,
+      INT32MAX        /* decimalDigits*/,
+      INT32MAX        /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_NONE   /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"double",
+    DataType(
+      L"double"       /* name */,
+      SQL_DOUBLE      /* sqlType */,
+      0               /* size */,
+      24              /* displaySize */,
+      24              /* decimalDigits*/,
+      8               /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      2               /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"float",
+    DataType(
+      L"float"        /* name */,
+      SQL_REAL        /* sqlType */,
+      0               /* size */,
+      12              /* displaySize */,
+      12              /* decimalDigits*/,
+      4               /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      2               /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"int",
+    DataType(
+      L"int"          /* name */,
+      SQL_INTEGER     /* sqlType */,
+      0               /* size */,
+      11              /* displaySize */,
+      11              /* decimalDigits*/,
+      4               /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      10              /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"bigint",
+    DataType(
+      L"bigint"       /* name */,
+      SQL_BIGINT      /* sqlType */,
+      0               /* size */,
+      20              /* displaySize */,
+      20              /* decimalDigits*/,
+      8               /* octetLength */,
+      1               /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      10              /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"string",
+    DataType(
+      L"string"       /* name */,
+      SQL_CHAR        /* sqlType */,
+      INT32MAX        /* size */,
+      INT32MAX        /* displaySize */,
+      INT32MAX,       /* decimalDigits*/
+      INT32MAX        /* octetLength */,
+      1               /* nullable */,
+      SQL_SEARCHABLE  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      1               /* caseSensitive */
+    )}
+  );
+  this->dataTypes.insert({ L"map<string,string>",
+    DataType(
+      L"string"       /* name */,
+      SQL_CHAR        /* sqlType */,
+      INT32MAX        /* size */,
+      INT32MAX        /* displaySize */,
+      INT32MAX,       /* decimalDigits*/
+      INT32MAX        /* octetLength */,
+      1               /* nullable */,
+      SQL_SEARCHABLE  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      1               /* caseSensitive */
+    )}
+  );
 }
 
 Cask::CdapOdbc::Driver::Driver() {
