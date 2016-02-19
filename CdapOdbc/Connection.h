@@ -84,7 +84,7 @@ namespace Cask {
 
       /**
        * Locks the mutex.
-       */ 
+       */
       void lock() {
         this->mutex.lock();
       }

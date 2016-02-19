@@ -50,12 +50,11 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
       }
       break;
     case 4: // COLUMN_NAME 
-			if (binding.getTargetType() == SQL_WCHAR) {
-				this->fetchWVarchar(names[this->currentRowIndex], binding);
-			}
-			else {
-				this->fetchVarchar(names[this->currentRowIndex], binding);
-			}
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(names[this->currentRowIndex], binding);
+      } else {
+        this->fetchVarchar(names[this->currentRowIndex], binding);
+      }
       break;
     case 5: // DATA_TYPE
     case 14: // SQL_DATA_TYPE 
@@ -64,8 +63,7 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
     case 6: // TYPE_NAME
       if (binding.getTargetType() == SQL_WCHAR) {
         this->fetchWVarchar(L"string", binding);
-      }
-      else {
+      } else {
         this->fetchVarchar(L"string", binding);
       }
       break;
@@ -87,8 +85,7 @@ void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBindi
     case 18: // IS_NULLABLE 
       if (binding.getTargetType() == SQL_WCHAR) {
         this->fetchWVarchar(L"YES", binding);
-      }
-      else {
+      } else {
         this->fetchVarchar(L"YES", binding);
       }
       break;
