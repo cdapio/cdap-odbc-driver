@@ -37,7 +37,8 @@ web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
 Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   : environment(environment)
   , handle(handle)
-  , isOpen(false) {
+  , isOpen(false)
+  , isAsync(false) {
   assert(environment);
   assert(handle);
 }

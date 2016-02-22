@@ -36,6 +36,8 @@ namespace Cask {
       std::unique_ptr<ConnectionParams> params;
       std::unique_ptr<ExploreClient> exploreClient;
       SQLStatus sqlStatus;
+      bool isAsync;
+      bool isFunctionsAsync;
 
       web::http::uri resolveUri() const;
 
@@ -76,10 +78,38 @@ namespace Cask {
       }
 
       /**
-       * Gets SqlStatus storage
+       * Gets SqlStatus storage.
        */
       SQLStatus& getSqlStatus() {
         return this->sqlStatus;
+      }
+
+      /**
+       * Gets connection async mode. 
+       */
+      bool getIsAsync() const {
+        return this->isAsync;
+      }
+
+      /**
+       * Gets connection functions async mode.
+       */
+      bool getIsFunctionsAsync() const {
+        return this->isFunctionsAsync;
+      }
+
+      /**
+       * Sets connection async mode. 
+       */
+      void setAsync(bool value) {
+        this->isAsync = value;
+      }
+
+      /**
+       * Sets connection async mode.
+       */
+      void setFunctionsAsync(bool value) {
+        this->isFunctionsAsync = value;
       }
 
       /**

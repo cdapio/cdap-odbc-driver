@@ -47,6 +47,7 @@ namespace Cask {
       std::unique_ptr<DataReader> dataReader;
       SQLStatus sqlStatus;
       std::map<std::wstring, std::wstring> tableNames;
+      bool isAsync;
 
       void throwStateError() const;
       void openQuery();
@@ -79,6 +80,18 @@ namespace Cask {
       Connection* getConnection() const {
         return this->connection;
       }
+
+      /**
+      * Gets statement async mode.
+      */
+      bool getIsAsync() const {
+        return this->isAsync;
+      }
+
+      /**
+      * Sets statement async mode.
+      */
+      void setAsync(bool value);
 
       /**
        * Adds a column binding information to a statement.

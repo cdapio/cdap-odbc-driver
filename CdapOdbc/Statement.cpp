@@ -43,9 +43,13 @@ void Cask::CdapOdbc::Statement::openQuery() {
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   : state(State::INITIAL)
   , connection(connection)
-  , handle(handle) {
+  , handle(handle)
+  , isAsync(connection->getIsAsync()) {
   assert(connection);
   assert(handle);
+}
+
+void Cask::CdapOdbc::Statement::setAsync(bool value) {
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
