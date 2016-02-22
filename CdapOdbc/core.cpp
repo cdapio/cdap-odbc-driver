@@ -620,8 +620,7 @@ SQLRETURN SQL_API SQLPrepareW(
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.prepare(*sql);
-      statement.execute();
+      statement.execute(*sql);
 
       TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
@@ -683,7 +682,8 @@ SQLRETURN SQL_API SQLExecDirectW(
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.executeDirect(*query);
+      statement.execute(*query);
+
       TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {

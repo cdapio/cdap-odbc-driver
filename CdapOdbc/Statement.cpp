@@ -183,20 +183,7 @@ void Cask::CdapOdbc::Statement::resetParameters() {
   }
 }
 
-void Cask::CdapOdbc::Statement::prepare(const std::wstring& query) {
-  if (this->state != State::INITIAL) {
-    this->throwStateError();
-  }
-
-  this->command = std::make_unique<QueryCommand>(this->connection, query);
-  this->state = State::PREPARE;
-}
-
-void Cask::CdapOdbc::Statement::execute() {
-  this->openQuery();
-}
-
-void Cask::CdapOdbc::Statement::executeDirect(const std::wstring& query) {
+void Cask::CdapOdbc::Statement::execute(const std::wstring& query) {
   if (this->state != State::INITIAL && this->state != State::PREPARE) {
     this->throwStateError();
   }
@@ -205,7 +192,7 @@ void Cask::CdapOdbc::Statement::executeDirect(const std::wstring& query) {
     this->command = std::make_unique<QueryCommand>(this->connection, query);
     this->state = State::PREPARE;
   }
-  
+
   if (this->state == State::PREPARE) {
     this->openQuery();
   }

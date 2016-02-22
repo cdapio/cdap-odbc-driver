@@ -163,14 +163,9 @@ namespace Cask {
       void resetParameters();
 
       /**
-       * Prepares SQL query statement for execution.
+       * Executes SQL query statement.
        */
-      void prepare(const std::wstring& query);
-
-      /**
-       * Executes SQL query.
-       */
-      void execute();
+      void execute(const std::wstring& query);
 
       /**
        * Directly executes SQL query (without prepare first).
