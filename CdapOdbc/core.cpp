@@ -779,6 +779,7 @@ SQLRETURN SQL_API SQLColAttributeW(
       statement.getSqlStatus().clear();
       auto& columnInfo = statement.getColumnInfo(ColumnNumber);
       switch (FieldIdentifier) {
+
         /* Column attributes */
         case SQL_COLUMN_TYPE:
         case SQL_DESC_TYPE: /*SQL_DESC_CONCISE_TYPE in ODBC 2.x */
@@ -790,10 +791,17 @@ SQLRETURN SQL_API SQLColAttributeW(
 
           break;
         case SQL_COLUMN_DISPLAY_SIZE:
-          // TODO: double check the applicability of display size as precision!
-        case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
           if (NumericAttributePtr) {
             *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_PRECISION:  /* ODBC 3.x*/
+        case SQL_COLUMN_PRECISION: /* ODBC 2.x*/
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getPrecision();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }
@@ -811,6 +819,14 @@ SQLRETURN SQL_API SQLColAttributeW(
         case SQL_COLUMN_UNSIGNED:
           if (NumericAttributePtr) {
             *NumericAttributePtr = columnInfo->getDataType().getUnsigned();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_COLUMN_SEARCHABLE:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getSearchable();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }
@@ -863,18 +879,20 @@ SQLRETURN SQL_API SQLColAttributeW(
         /* Not implemented column attributes*/
         case SQL_COLUMN_UPDATABLE:
         case SQL_COLUMN_AUTO_INCREMENT:
-        case SQL_COLUMN_SEARCHABLE:
         case SQL_COLUMN_TABLE_NAME:
         case SQL_COLUMN_OWNER_NAME:
         case SQL_COLUMN_QUALIFIER_NAME:
           break;
 
-          /* Column description attributes */
-        case SQL_COLUMN_SCALE:
-        case SQL_DESC_SCALE:
-          break;
+        case SQL_COLUMN_SCALE: /* ODBC 2.x */
+        case SQL_DESC_SCALE: /* ODBC 3.x */
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getScale();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-          /* Column extended descriptor fields */
+          break;
         case SQL_DESC_BASE_COLUMN_NAME:
           if (CharacterAttributePtr) {
             Argument::fromStdString(
@@ -889,9 +907,10 @@ SQLRETURN SQL_API SQLColAttributeW(
           }
 
           break;
-        case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
+        case SQL_COLUMN_LENGTH: /* ODBC 2.x */
+        case SQL_DESC_LENGTH:   /* ODBC 3.x */
           if (NumericAttributePtr) {
-            *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            *NumericAttributePtr = columnInfo->getDataType().getSize();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }

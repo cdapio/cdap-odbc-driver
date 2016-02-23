@@ -29,7 +29,10 @@ Cask::CdapOdbc::DataType::DataType(
   SQLSMALLINT fixedPrecScale /* = SQL_FALSE */,
   SQLINTEGER precRadix /* = 0 */,
   SQLSMALLINT unsignedAttr /* = SQL_FALSE */,
-  SQLSMALLINT caseSensitive /* = SQL_FALSE*/)
+  SQLSMALLINT caseSensitive /* = SQL_FALSE*/,
+  SQLINTEGER precision /* = */,
+  SQLSMALLINT scale /* = */
+  )
   : name(name)
   , size(size)
   , displaySize(displaySize)
@@ -41,5 +44,7 @@ Cask::CdapOdbc::DataType::DataType(
   , fixedPrecScale(fixedPrecScale)
   , precRadix(precRadix)
   , unsignedAttr(unsignedAttr)
-  , caseSensitive(caseSensitive) {
+  , caseSensitive(caseSensitive)
+  , precision(precision)
+  , scale(scale) {
 }

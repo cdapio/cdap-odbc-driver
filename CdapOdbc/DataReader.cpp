@@ -133,6 +133,12 @@ void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnB
   }
 }
 
+void Cask::CdapOdbc::DataReader::fetchTinyint(SQLCHAR value, const ColumnBinding& binding) {
+  assert(binding.getTargetType() == SQL_TINYINT || binding.getTargetType() == SQL_C_STINYINT
+    || binding.getTargetType() == SQL_DEFAULT);
+  *(reinterpret_cast<SQLCHAR*>(binding.getTargetValuePtr())) = value;
+}
+
 void Cask::CdapOdbc::DataReader::fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding) {
   assert(binding.getTargetType() == SQL_C_SSHORT || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLSMALLINT*>(binding.getTargetValuePtr())) = value;
@@ -158,7 +164,18 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   SQLDOUBLE dblValue = NAN;
   SQLUBIGINT ubintValue = 0ULL;
   SQLBIGINT sbintValue = 0LL;
+  SQLCHAR sintValue = 0;
+
   switch (binding.getTargetType()) {
+    case SQL_BIT:
+    case SQL_TINYINT:
+      if (value.is_boolean()) {
+        sintValue = value.as_bool() ? 1 : 0;
+      } else if (value.is_integer()) {
+        sintValue = value.as_integer();
+      }
+      this->fetchTinyint(sintValue, binding);
+      break;
     case SQL_C_CHAR: /* SQL_CHAR */
       strValue = toWString(value, binding);
       this->fetchVarchar(strValue.c_str(), binding);
