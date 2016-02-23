@@ -48,6 +48,7 @@ namespace Cask {
       SQLStatus sqlStatus;
       std::map<std::wstring, std::wstring> tableNames;
       bool isAsync;
+      std::unique_ptr<pplx::task<void>> executeTask;
 
       void throwStateError() const;
       void openQuery();
@@ -168,9 +169,9 @@ namespace Cask {
       void execute(const std::wstring& query);
 
       /**
-       * Directly executes SQL query (without prepare first).
+       * Executes SQL query statement.
        */
-      void executeDirect(const std::wstring& query);
+      bool executeAsync(const std::wstring& query);
 
       /**
        * Returns number of columns for a statement. 

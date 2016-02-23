@@ -198,6 +198,24 @@ void Cask::CdapOdbc::Statement::execute(const std::wstring& query) {
   }
 }
 
+bool Cask::CdapOdbc::Statement::executeAsync(const std::wstring& query) {
+  assert(this->isAsync);
+  if (this->executeTask) {
+    if (this->executeTask->is_done()) {
+      this->executeTask.reset();
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    this->executeTask = std::make_unique<pplx::task<void>>([this, query]() { 
+      std::lock_guard<Connection> lock(*this->getConnection());
+      this->execute(query);
+    });
+    return false;
+  }
+}
+
 SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
   if (this->state != State::OPEN) {
     this->throwStateError();

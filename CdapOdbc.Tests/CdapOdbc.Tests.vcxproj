@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
+    <ClCompile Include="SQLAsyncTests.cpp" />
     <ClCompile Include="SQLDriverConnectDisconnectTests.cpp" />
     <ClCompile Include="SQLTablesTests.cpp" />
     <ClCompile Include="stdafx.cpp">

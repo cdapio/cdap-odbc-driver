@@ -69,5 +69,6 @@
 #include <cpprest/http_client.h>
 #include <cpprest/http_headers.h>
 #include <cpprest/json.h>
+#include <pplx/pplxtasks.h>
 
 #include "debug.h"

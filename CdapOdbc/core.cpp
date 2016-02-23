@@ -402,8 +402,8 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_DBC_CAPABLE\n");
           return SQL_SUCCESS;
         case SQL_ASYNC_NOTIFICATION:
-          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_ASYNC_NOTIFICATION_CAPABLE;
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_NOTIFICATION_CAPABLE\n");
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE\n");
           return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
@@ -517,12 +517,12 @@ SQLRETURN SQL_API SQLSetConnectAttrW(
       SQLULEN value = 0;
       switch (Attribute) {
         case SQL_ATTR_ASYNC_ENABLE:
-          value = *reinterpret_cast<SQLULEN*>(ValuePtr);
+          value = reinterpret_cast<SQLULEN>(ValuePtr);
           connection.setAsync(value == SQL_ASYNC_ENABLE_ON);
           TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
           return SQL_SUCCESS;
         case SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE:
-          value = *reinterpret_cast<SQLULEN*>(ValuePtr);
+          value = reinterpret_cast<SQLULEN>(ValuePtr);
           connection.setFunctionsAsync(value == SQL_ASYNC_DBC_ENABLE_ON);
           TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
           return SQL_SUCCESS;
@@ -615,12 +615,19 @@ SQLRETURN SQL_API SQLPrepareW(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
-      if (!sql) {
+      auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      if (!query) {
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.execute(*sql);
+      if (statement.getIsAsync()) {
+        if (!statement.executeAsync(*query)) {
+          TRACE(L"SQLPrepareW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.execute(*query);
+      }
 
       TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
@@ -682,7 +689,14 @@ SQLRETURN SQL_API SQLExecDirectW(
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.execute(*query);
+      if (statement.getIsAsync()) {
+        if (!statement.executeAsync(*query)) {
+          TRACE(L"SQLExecDirectW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.execute(*query);
+      }
 
       TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
@@ -1731,7 +1745,7 @@ SQLRETURN SQL_API SQLSetStmtAttrW(
       SQLULEN value = 0;
       switch (Attribute) {
         case SQL_ATTR_ASYNC_ENABLE:
-          value = *reinterpret_cast<SQLULEN*>(Value);
+          value = reinterpret_cast<SQLULEN>(Value);
           statement.setAsync(value == SQL_ASYNC_ENABLE_ON);
           TRACE(L"SQLSetStmtAttrW returns SQL_SUCCESS\n");
           return SQL_SUCCESS;
