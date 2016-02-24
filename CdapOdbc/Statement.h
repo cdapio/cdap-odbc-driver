@@ -51,6 +51,7 @@ namespace Cask {
       std::unique_ptr<pplx::task<void>> executeTask;
       std::unique_ptr<pplx::task<void>> columnsTask;
       std::unique_ptr<pplx::task<void>> tablesTask;
+      std::unique_ptr<pplx::task<bool>> fetchTask;
 
       void throwStateError() const;
       void openQuery();
@@ -63,6 +64,7 @@ namespace Cask {
         const std::wstring* schemaPattern,
         const std::wstring* tableNamePattern,
         const std::wstring* tableTypes);
+      bool fetchInternal();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -180,7 +182,7 @@ namespace Cask {
        * Retrieves the next row for the current statement
        * and updates column bindings.
        */
-      bool fetchAsync();
+      bool fetchAsync(bool& hasData);
 
       /**
        * Resets statement to initial state.

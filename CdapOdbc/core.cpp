@@ -1154,7 +1154,15 @@ SQLRETURN SQL_API SQLColumnsW(
         throw CdapException(L"Table name cannot be empty.");
       }
 
-      statement.getColumns(*streamName);
+      if (statement.getIsAsync()) {
+        if (!statement.getColumnsAsync(*streamName)) {
+          TRACE(L"SQLColumnsW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.getColumns(*streamName);
+      }
+
       TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {
@@ -1220,7 +1228,15 @@ SQLRETURN SQL_API SQLTablesW(
         TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       } else if (tableTypes) {
-        statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
+        if (statement.getIsAsync()) {
+          if (!statement.getTablesAsync(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get())) {
+            TRACE(L"SQLTablesW returns SQL_STILL_EXECUTING\n");
+            return SQL_STILL_EXECUTING;
+          }
+        } else {
+          statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
+        }
+
         TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       }

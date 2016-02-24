@@ -46,6 +46,9 @@ namespace Cask {
 
       // Inherited via DataReader
       virtual std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const override;
+
+      // Inherited via DataReader
+      virtual bool canReadFast() const override;
     };
   }
 }

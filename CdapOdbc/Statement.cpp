@@ -81,6 +81,24 @@ void Cask::CdapOdbc::Statement::getTablesInternal(
   this->openQuery();
 }
 
+bool Cask::CdapOdbc::Statement::fetchInternal() {
+  if (this->state != State::OPEN && this->state != State::FETCH) {
+    this->throwStateError();
+  }
+
+  this->state = State::FETCH;
+  if (this->dataReader->read()) {
+    for (auto& binding : this->columnBindings) {
+      this->dataReader->getColumnValue(binding);
+    }
+
+    return true;
+  } else {
+    this->state = State::CLOSED;
+    return false;
+  }
+}
+
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   : state(State::INITIAL)
   , connection(connection)
@@ -137,6 +155,7 @@ void Cask::CdapOdbc::Statement::getTables(
   const std::wstring* schemaPattern,
   const std::wstring* tableNamePattern,
   const std::wstring* tableTypes) {
+  assert(!this->isAsync);
   this->getTablesInternal(catalog, schemaPattern, tableNamePattern, tableTypes);
 }
 
@@ -145,6 +164,7 @@ bool Cask::CdapOdbc::Statement::getTablesAsync(
   const std::wstring* schemaPattern, 
   const std::wstring* tableNamePattern, 
   const std::wstring* tableTypes) {
+  assert(this->isAsync);
   return this->runAsync(this->tablesTask, [this, catalog, schemaPattern, tableNamePattern, tableTypes]() {
     std::lock_guard<Connection> lock(*this->getConnection());
     this->getTablesInternal(catalog, schemaPattern, tableNamePattern, tableTypes);
@@ -163,10 +183,12 @@ void Cask::CdapOdbc::Statement::getDataTypes() {
 }
 
 void Cask::CdapOdbc::Statement::getColumns(const std::wstring& streamName) {
+  assert(!this->isAsync);
   this->getColumnsInternal(streamName);
 }
 
 bool Cask::CdapOdbc::Statement::getColumnsAsync(const std::wstring& streamName) {
+  assert(this->isAsync);
   return this->runAsync(this->columnsTask, [this, streamName]() {
     std::lock_guard<Connection> lock(*this->getConnection());
     this->getColumnsInternal(streamName);
@@ -185,25 +207,38 @@ void Cask::CdapOdbc::Statement::getSpecialColumns() {
 }
 
 bool Cask::CdapOdbc::Statement::fetch() {
+  assert(!this->isAsync);
+  return this->fetchInternal();
+}
+
+bool Cask::CdapOdbc::Statement::fetchAsync(bool& hasData) {
+  assert(this->isAsync);
+
   if (this->state != State::OPEN && this->state != State::FETCH) {
     this->throwStateError();
   }
 
-  this->state = State::FETCH;
-  if (this->dataReader->read()) {
-    for (auto& binding : this->columnBindings) {
-      this->dataReader->getColumnValue(binding);
-    }
-
+  if (this->dataReader->canReadFast()) {
+    hasData = this->fetchInternal();
     return true;
   } else {
-    this->state = State::CLOSED;
-    return false;
+    if (this->fetchTask) {
+      if (this->fetchTask->is_done()) {
+        hasData = this->fetchTask->get();
+        this->fetchTask.reset();
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      this->fetchTask = std::make_unique<pplx::task<bool>>([this]() {
+        std::lock_guard<Connection> lock(*this->getConnection());
+        return this->fetchInternal();
+      });
+    
+      return false;
+    }
   }
-}
-
-bool Cask::CdapOdbc::Statement::fetchAsync() {
-  return false;
 }
 
 void Cask::CdapOdbc::Statement::reset() {
