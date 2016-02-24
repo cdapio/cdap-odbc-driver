@@ -45,6 +45,10 @@ Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
 
 void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
   assert(!this->isOpen);
+  if (connectionString.size() == 0) {
+    throw CdapException(L"Connection string cannot be empty.");
+  }
+
   this->params = std::make_unique<ConnectionParams>(connectionString);
   auto baseUri = this->resolveUri();
   this->exploreClient = std::make_unique<ExploreClient>(baseUri, this->params->getNamespace());

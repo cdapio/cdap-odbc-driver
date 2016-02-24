@@ -163,6 +163,7 @@
     <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
     <ClCompile Include="SQLAsyncTests.cpp" />
     <ClCompile Include="SQLDriverConnectDisconnectTests.cpp" />
+    <ClCompile Include="SQLSyncTests.cpp" />
     <ClCompile Include="SQLTablesTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -25,8 +25,7 @@ namespace Cask {
       /**
        * Tests for SQLTables/SQLFetch/SQLBindCol functions.
        */
-      TEST_CLASS(SQLAsyncTests) {
-
+      TEST_CLASS(SQLSyncTests) {
         auto createConnection() {
           int result = SQL_SUCCESS;
           SQLHANDLE env = 0;
@@ -39,7 +38,7 @@ namespace Cask {
           result = SQLAllocHandle(SQL_HANDLE_DBC, env, &con);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
+          result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_OFF), 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
@@ -57,20 +56,20 @@ namespace Cask {
           SQLFreeHandle(SQL_HANDLE_DBC, std::get<1>(handles));
           SQLFreeHandle(SQL_HANDLE_ENV, std::get<0>(handles));
         }
+
       public:
 
         /**
          * Checks Statement.executeAsync().
          */
-        TEST_METHOD(PrepareAndFetchAsyncSucceeds) {
+        TEST_METHOD(PrepareAndFetchSyncSucceeds) {
           int result = SQL_SUCCESS;
+
           auto handles = this->createConnection();
+
           SQLHANDLE stmt = std::get<2>(handles);
 
           result = SQLPrepareW(stmt, L"SELECT * FROM stream_items", SQL_NTS);
-          do {
-            result = SQLPrepareW(stmt, L"SELECT * FROM stream_items", SQL_NTS);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           double value = -100.0;
@@ -79,9 +78,6 @@ namespace Cask {
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLFetch(stmt);
-          do {
-            result = SQLFetch(stmt);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           Assert::IsTrue(value >= 0.0);
@@ -90,17 +86,14 @@ namespace Cask {
         }
 
         /**
-         * Checks Statement.getColumnsAsync().
+         * Checks Statement.getColumns().
          */
-        TEST_METHOD(ColumnsAndFetchAsyncSucceeds) {
+        TEST_METHOD(ColumnsAndFetchSyncSucceeds) {
           int result = SQL_SUCCESS;
           auto handles = this->createConnection();
           SQLHANDLE stmt = std::get<2>(handles);
 
           result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, L"stream_items", SQL_NTS, nullptr, SQL_NTS);
-          do {
-            result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, L"stream_items", SQL_NTS, nullptr, SQL_NTS);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           char value[128];
@@ -109,9 +102,6 @@ namespace Cask {
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLFetch(stmt);
-          do {
-            result = SQLFetch(stmt);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           Assert::IsTrue(std::strlen(value) > 0);
@@ -120,17 +110,14 @@ namespace Cask {
         }
 
         /**
-         * Checks Statement.getTablesAsync().
+         * Checks Statement.getTables().
          */
-        TEST_METHOD(TablesAndFetchAsyncSucceeds) {
+        TEST_METHOD(TablesAndFetchSyncSucceeds) {
           int result = SQL_SUCCESS;
           auto handles = this->createConnection();
           SQLHANDLE stmt = std::get<2>(handles);
 
           result = SQLTablesW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS, L"TABLE", SQL_NTS);
-          do {
-            result = SQLTablesW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS, L"TABLE", SQL_NTS);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           char value[128];
@@ -139,9 +126,6 @@ namespace Cask {
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLFetch(stmt);
-          do {
-            result = SQLFetch(stmt);
-          } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           Assert::IsTrue(std::strlen(value) > 0);

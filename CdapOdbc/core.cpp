@@ -187,6 +187,10 @@ SQLRETURN SQL_API SQLDriverConnectW(
         case SQL_DRIVER_NOPROMPT:
           // DRIVER 2
           connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          if (!connectionString || connectionString->size() == 0) {
+            throw CdapException(L"Connection string cannot be empty.");
+          }
+
           connection.open(*connectionString);
           Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
@@ -1075,13 +1079,27 @@ SQLRETURN SQL_API SQLFetch(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      if (statement.fetch()) {
-        TRACE(L"SQLFetch returns SQL_SUCCESS\n");
-        return SQL_SUCCESS;
+
+      if (statement.getIsAsync()) {
+        bool hasData = false;
+        if (!statement.fetchAsync(hasData)) {
+          TRACE(L"SQLColumnsW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+
+        if (!hasData) {
+          TRACE(L"SQLFetch returns SQL_NO_DATA\n");
+          return SQL_NO_DATA;
+        }
       } else {
-        TRACE(L"SQLFetch returns SQL_NO_DATA\n");
-        return SQL_NO_DATA;
+        if (!statement.fetch()) {
+          TRACE(L"SQLFetch returns SQL_NO_DATA\n");
+          return SQL_NO_DATA;
+        }
       }
+
+      TRACE(L"SQLFetch returns SQL_SUCCESS\n");
+      return SQL_SUCCESS;
     } catch (CdapException& cex) {
       TRACE(L"SQLFetch returns %d\n", cex.getErrorCode());
       statement.getSqlStatus().addError(cex);
