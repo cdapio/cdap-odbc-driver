@@ -49,9 +49,20 @@ namespace Cask {
       std::map<std::wstring, std::wstring> tableNames;
       bool isAsync;
       std::unique_ptr<pplx::task<void>> executeTask;
+      std::unique_ptr<pplx::task<void>> columnsTask;
+      std::unique_ptr<pplx::task<void>> tablesTask;
 
       void throwStateError() const;
       void openQuery();
+      template <typename F>
+      bool runAsync(std::unique_ptr<pplx::task<void>>& task, F& function);
+      void executeInternal(const std::wstring& query);
+      void getColumnsInternal(const std::wstring& streamName);
+      void getTablesInternal(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -92,7 +103,9 @@ namespace Cask {
       /**
       * Sets statement async mode.
       */
-      void setAsync(bool value);
+      void setAsync(bool value) {
+        this->isAsync = value;
+      }
 
       /**
        * Adds a column binding information to a statement.
@@ -121,6 +134,16 @@ namespace Cask {
         const std::wstring* tableTypes);
 
       /**
+       * Retrieves tables from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
+       */
+      bool getTablesAsync(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
+
+      /**
        * Retrieves data type information.
        */
       void getDataTypes();
@@ -131,22 +154,33 @@ namespace Cask {
       void getColumns(const std::wstring& streamName);
 
       /**
+       * Retrieves column information for a table.
+       */
+      bool getColumnsAsync(const std::wstring& streamName);
+
+      /**
        * Retrieves information about special columns for a table.
        */
       void getSpecialColumns();
 
-    /**
-    * Gets SqlStatus storage
-    */
-    SQLStatus& getSqlStatus() {
-      return this->sqlStatus;
-    }
+      /**
+       * Gets SqlStatus storage
+       */
+      SQLStatus& getSqlStatus() {
+        return this->sqlStatus;
+      }
 
       /**
        * Retrieves the next row for the current statement 
        * and updates column bindings.
        */
-      void fetch();
+      bool fetch();
+
+      /**
+       * Retrieves the next row for the current statement
+       * and updates column bindings.
+       */
+      bool fetchAsync();
 
       /**
        * Resets statement to initial state.

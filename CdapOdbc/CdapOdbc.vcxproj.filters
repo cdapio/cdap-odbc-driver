@@ -75,9 +75,6 @@
     <ClInclude Include="InvalidHandleException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="NoDataException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
     <ClInclude Include="String.h">
       <Filter>Driver</Filter>
     </ClInclude>
@@ -219,9 +216,6 @@
       <Filter>Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="InvalidHandleException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="NoDataException.cpp">
       <Filter>Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="String.cpp">

@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "Statement.h"
 #include "Connection.h"
-#include "NoDataException.h"
 #include "String.h"
 #include "Encoding.h"
 #include "SchemasCommand.h"
@@ -40,6 +39,48 @@ void Cask::CdapOdbc::Statement::openQuery() {
   this->state = State::OPEN;
 }
 
+void Cask::CdapOdbc::Statement::executeInternal(const std::wstring& query) {
+  if (this->state != State::INITIAL && this->state != State::PREPARE) {
+    this->throwStateError();
+  }
+
+  if (this->state == State::INITIAL) {
+    this->command = std::make_unique<QueryCommand>(this->connection, query);
+    this->state = State::PREPARE;
+  }
+
+  if (this->state == State::PREPARE) {
+    this->openQuery();
+  }
+}
+
+void Cask::CdapOdbc::Statement::getColumnsInternal(const std::wstring& streamName) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  auto& realName = this->tableNames.at(streamName);
+  this->command = std::make_unique<ColumnsCommand>(this->connection, realName, streamName);
+  this->state = State::PREPARE;
+
+  this->openQuery();
+}
+
+void Cask::CdapOdbc::Statement::getTablesInternal(
+  const std::wstring* catalog, 
+  const std::wstring* schemaPattern, 
+  const std::wstring* tableNamePattern, 
+  const std::wstring* tableTypes) {
+  if (this->state != State::INITIAL) {
+    this->throwStateError();
+  }
+
+  this->command = std::make_unique<TablesCommand>(this->connection, this->tableNames);
+  this->state = State::PREPARE;
+
+  this->openQuery();
+}
+
 Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   : state(State::INITIAL)
   , connection(connection)
@@ -47,9 +88,6 @@ Cask::CdapOdbc::Statement::Statement(Connection* connection, SQLHSTMT handle)
   , isAsync(connection->getIsAsync()) {
   assert(connection);
   assert(handle);
-}
-
-void Cask::CdapOdbc::Statement::setAsync(bool value) {
 }
 
 void Cask::CdapOdbc::Statement::addColumnBinding(const ColumnBinding& binding) {
@@ -99,14 +137,18 @@ void Cask::CdapOdbc::Statement::getTables(
   const std::wstring* schemaPattern,
   const std::wstring* tableNamePattern,
   const std::wstring* tableTypes) {
-  if (this->state != State::INITIAL) {
-    this->throwStateError();
-  }
+  this->getTablesInternal(catalog, schemaPattern, tableNamePattern, tableTypes);
+}
 
-  this->command = std::make_unique<TablesCommand>(this->connection, this->tableNames);
-  this->state = State::PREPARE;
-
-  this->openQuery();
+bool Cask::CdapOdbc::Statement::getTablesAsync(
+  const std::wstring* catalog, 
+  const std::wstring* schemaPattern, 
+  const std::wstring* tableNamePattern, 
+  const std::wstring* tableTypes) {
+  return this->runAsync(this->tablesTask, [this, catalog, schemaPattern, tableNamePattern, tableTypes]() {
+    std::lock_guard<Connection> lock(*this->getConnection());
+    this->getTablesInternal(catalog, schemaPattern, tableNamePattern, tableTypes);
+  });
 }
 
 void Cask::CdapOdbc::Statement::getDataTypes() {
@@ -121,15 +163,14 @@ void Cask::CdapOdbc::Statement::getDataTypes() {
 }
 
 void Cask::CdapOdbc::Statement::getColumns(const std::wstring& streamName) {
-  if (this->state != State::INITIAL) {
-    this->throwStateError();
-  }
+  this->getColumnsInternal(streamName);
+}
 
-  auto& realName = this->tableNames.at(streamName);
-  this->command = std::make_unique<ColumnsCommand>(this->connection, realName, streamName);
-  this->state = State::PREPARE;
-
-  this->openQuery();
+bool Cask::CdapOdbc::Statement::getColumnsAsync(const std::wstring& streamName) {
+  return this->runAsync(this->columnsTask, [this, streamName]() {
+    std::lock_guard<Connection> lock(*this->getConnection());
+    this->getColumnsInternal(streamName);
+  });
 }
 
 void Cask::CdapOdbc::Statement::getSpecialColumns() {
@@ -143,7 +184,7 @@ void Cask::CdapOdbc::Statement::getSpecialColumns() {
   this->openQuery();
 }
 
-void Cask::CdapOdbc::Statement::fetch() {
+bool Cask::CdapOdbc::Statement::fetch() {
   if (this->state != State::OPEN && this->state != State::FETCH) {
     this->throwStateError();
   }
@@ -153,10 +194,16 @@ void Cask::CdapOdbc::Statement::fetch() {
     for (auto& binding : this->columnBindings) {
       this->dataReader->getColumnValue(binding);
     }
+
+    return true;
   } else {
     this->state = State::CLOSED;
-    throw NoDataException(L"No more data in the query.");
+    return false;
   }
+}
+
+bool Cask::CdapOdbc::Statement::fetchAsync() {
+  return false;
 }
 
 void Cask::CdapOdbc::Statement::reset() {
@@ -184,36 +231,15 @@ void Cask::CdapOdbc::Statement::resetParameters() {
 }
 
 void Cask::CdapOdbc::Statement::execute(const std::wstring& query) {
-  if (this->state != State::INITIAL && this->state != State::PREPARE) {
-    this->throwStateError();
-  }
-
-  if (this->state == State::INITIAL) {
-    this->command = std::make_unique<QueryCommand>(this->connection, query);
-    this->state = State::PREPARE;
-  }
-
-  if (this->state == State::PREPARE) {
-    this->openQuery();
-  }
+  assert(!this->isAsync);
+  this->executeInternal(query);
 }
 
 bool Cask::CdapOdbc::Statement::executeAsync(const std::wstring& query) {
-  assert(this->isAsync);
-  if (this->executeTask) {
-    if (this->executeTask->is_done()) {
-      this->executeTask.reset();
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    this->executeTask = std::make_unique<pplx::task<void>>([this, query]() { 
-      std::lock_guard<Connection> lock(*this->getConnection());
-      this->execute(query);
-    });
-    return false;
-  }
+  return this->runAsync(this->executeTask, [this, query]() {
+    std::lock_guard<Connection> lock(*this->getConnection());
+    this->executeInternal(query);
+  });
 }
 
 SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
@@ -226,4 +252,20 @@ SQLSMALLINT Cask::CdapOdbc::Statement::getColumnCount() const {
 
 std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::Statement::getColumnInfo(short columnNumber) const {
   return this->dataReader->getColumnInfo(columnNumber);
+}
+
+template<typename F>
+bool Cask::CdapOdbc::Statement::runAsync(std::unique_ptr<pplx::task<void>>& task, F& function) {
+  assert(this->isAsync);
+  if (task) {
+    if (task->is_done()) {
+      task.reset();
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    task = std::make_unique<pplx::task<void>>(function);
+    return false;
+  }
 }

@@ -1075,9 +1075,13 @@ SQLRETURN SQL_API SQLFetch(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      statement.fetch();
-      TRACE(L"SQLFetch returns SQL_SUCCESS\n");
-      return SQL_SUCCESS;
+      if (statement.fetch()) {
+        TRACE(L"SQLFetch returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+      } else {
+        TRACE(L"SQLFetch returns SQL_NO_DATA\n");
+        return SQL_NO_DATA;
+      }
     } catch (CdapException& cex) {
       TRACE(L"SQLFetch returns %d\n", cex.getErrorCode());
       statement.getSqlStatus().addError(cex);
