@@ -263,6 +263,10 @@ SQLRETURN SQL_API SQLGetInfoW(
       }
 
       switch (InfoType) {
+        case SQL_ODBC_VER:
+          Argument::fromStdString(L"03.80.0000", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
         case SQL_DRIVER_ODBC_VER:
           Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
@@ -298,6 +302,11 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+		    // TODO: Retrieve version from resource!
+        case SQL_DRIVER_VER:
+          Argument::fromStdString(L"1.0.0.1", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
         case SQL_CORRELATION_NAME:
           assert(BufferLength == sizeof(SQLUSMALLINT));
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
@@ -308,10 +317,14 @@ SQLRETURN SQL_API SQLGetInfoW(
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_NNC_NON_NULL\n");
           return SQL_SUCCESS;
-        case SQL_QUALIFIER_NAME_SEPARATOR:
-          Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        case SQL_COLUMN_ALIAS:
+          Argument::fromStdString(L"Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_QUALIFIER_NAME_SEPARATOR:
+          Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+            TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+            return SQL_SUCCESS;
         case SQL_IDENTIFIER_QUOTE_CHAR:
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
@@ -335,17 +348,27 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
           return SQL_SUCCESS;
         case SQL_NUMERIC_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
             | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG | SQL_FN_NUM_PI
             | SQL_FN_NUM_POWER | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_RADIANS
             | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD;
           return SQL_SUCCESS;
         case SQL_AGGREGATE_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
             | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
           return SQL_SUCCESS;
         case SQL_STRING_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+          return SQL_SUCCESS;
+        case SQL_SQL92_DATETIME_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0UL;
+          return SQL_SUCCESS;
+        case SQL_SQL92_STRING_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER
+            | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH;
+          return SQL_SUCCESS;
+        case SQL_SQL92_VALUE_EXPRESSIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE;
           return SQL_SUCCESS;
         case SQL_CONVERT_BIGINT:
         case SQL_CONVERT_BINARY:
