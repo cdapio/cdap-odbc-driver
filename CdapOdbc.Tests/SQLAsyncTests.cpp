@@ -148,6 +148,34 @@ namespace Cask {
 
           this->freeConnection(handles);
         }
+
+        /**
+         * Checks Connection.openAsync().
+         */
+        TEST_METHOD(ConnectionOpenAsyncSucceeds) {
+          int result = SQL_SUCCESS;
+          SQLHANDLE env = 0;
+          SQLHANDLE con = 0;
+
+          result = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &env);
+          Assert::AreEqual(SQL_SUCCESS, result);
+
+          result = SQLAllocHandle(SQL_HANDLE_DBC, env, &con);
+          Assert::AreEqual(SQL_SUCCESS, result);
+
+          result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
+          Assert::AreEqual(SQL_SUCCESS, result);
+
+          result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          do {
+            result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          } while (result == SQL_STILL_EXECUTING);
+          Assert::AreEqual(SQL_SUCCESS, result);
+          
+          SQLDisconnect(con);
+          SQLFreeHandle(SQL_HANDLE_DBC, con);
+          SQLFreeHandle(SQL_HANDLE_ENV, env);
+        }
       };
     }
   }

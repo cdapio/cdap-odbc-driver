@@ -158,8 +158,17 @@ SQLRETURN SQL_API SQLDriverConnectW(
           }
 
           newConnectionString = dialog->getParams().getFullConnectionString();
-          connection.open(newConnectionString);
           Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(newConnectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            } 
+          } else {
+            connection.open(newConnectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         case SQL_DRIVER_COMPLETE:
@@ -180,8 +189,17 @@ SQLRETURN SQL_API SQLDriverConnectW(
             newConnectionString = *connectionString;
           }
 
-          connection.open(newConnectionString);
           Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(newConnectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            }
+          } else {
+            connection.open(newConnectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         case SQL_DRIVER_NOPROMPT:
@@ -191,8 +209,16 @@ SQLRETURN SQL_API SQLDriverConnectW(
             throw CdapException(L"Connection string cannot be empty.");
           }
 
-          connection.open(*connectionString);
           Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(*connectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            }
+          } else {
+            connection.open(*connectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         default:

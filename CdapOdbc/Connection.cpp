@@ -34,16 +34,7 @@ web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
   return uri.to_uri();
 }
 
-Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
-  : environment(environment)
-  , handle(handle)
-  , isOpen(false)
-  , isAsync(false) {
-  assert(environment);
-  assert(handle);
-}
-
-void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
+void Cask::CdapOdbc::Connection::internalOpen(const std::wstring& connectionString) {
   assert(!this->isOpen);
   if (connectionString.size() == 0) {
     throw CdapException(L"Connection string cannot be empty.");
@@ -56,6 +47,40 @@ void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
     this->isOpen = true;
   } else {
     throw CommunicationLinkFailure();
+  }
+}
+
+Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
+  : environment(environment)
+  , handle(handle)
+  , isOpen(false)
+  , isAsync(false) {
+  assert(environment);
+  assert(handle);
+}
+
+void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
+  assert(!this->isFunctionsAsync);
+  this->internalOpen(connectionString);
+}
+
+bool Cask::CdapOdbc::Connection::openAsync(const std::wstring& connectionString) {
+  assert(this->isFunctionsAsync);
+  if (this->openTask) {
+    if (this->openTask->is_done()) {
+      // Throws all unhandled exceptions raised inside task body.
+      this->openTask->get();
+      this->openTask.reset();
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    this->openTask = std::make_unique<pplx::task<void>>([this, connectionString]() {
+      std::lock_guard<Connection> lock(*this);
+      this->internalOpen(connectionString);
+    });
+    return false;
   }
 }
 
