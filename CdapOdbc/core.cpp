@@ -27,6 +27,7 @@
 #include "Encoding.h"
 #include "SQLStatus.h"
 #include "CdapException.h"
+#include "VersionInfo.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -262,6 +263,8 @@ SQLRETURN SQL_API SQLGetInfoW(
         return SQL_ERROR;
       }
 
+      std::wstring temp;
+
       switch (InfoType) {
         case SQL_DRIVER_ODBC_VER:
           Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
@@ -389,6 +392,11 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_SQL_CONFORMANCE:
           *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          return SQL_SUCCESS;
+        case SQL_DRIVER_VER:
+          temp = VersionInfo::getProductVersion();
+          Argument::fromStdString(temp, static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
