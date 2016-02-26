@@ -422,7 +422,7 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(
             L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SSF_CONVERT \n"
             L"| SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH"
-            L"| SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING");
+            L"| SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING\n");
           return SQL_SUCCESS;
         case SQL_SQL92_VALUE_EXPRESSIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE;
@@ -494,11 +494,11 @@ SQLRETURN SQL_API SQLGetInfoW(
           throw CdapException(L"Unknown info type.");
       }
     } catch (CdapException& cex) {
-      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
       connection.getSqlStatus().addError(cex);
       return cex.getErrorCode();
     } catch (std::exception& ex) {
-      TRACE(L"SQLGetFunctions returns SQL_ERROR\n");
+      TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
       connection.getSqlStatus().addError(ex);
       return SQL_ERROR;
     }
