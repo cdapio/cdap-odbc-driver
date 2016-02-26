@@ -27,6 +27,7 @@
 #include "Encoding.h"
 #include "SQLStatus.h"
 #include "CdapException.h"
+#include "VersionInfo.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -262,6 +263,8 @@ SQLRETURN SQL_API SQLGetInfoW(
         return SQL_ERROR;
       }
 
+      std::wstring temp;
+
       switch (InfoType) {
         case SQL_ODBC_VER:
           Argument::fromStdString(L"03.80.0000", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
@@ -302,11 +305,6 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
-		    // TODO: Retrieve version from resource!
-        case SQL_DRIVER_VER:
-          Argument::fromStdString(L"1.0.0.1", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-          return SQL_SUCCESS;
         case SQL_CORRELATION_NAME:
           assert(BufferLength == sizeof(SQLUSMALLINT));
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
@@ -342,7 +340,10 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_SERVER_NAME:
         case SQL_DATABASE_NAME:
+        case SQL_SCHEMA_TERM:
+        case SQL_USER_NAME:
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
@@ -433,6 +434,56 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_SQL_CONFORMANCE:
           *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          return SQL_SUCCESS;
+        case SQL_DRIVER_VER:
+          temp = VersionInfo::getProductVersion();
+          Argument::fromStdString(temp, static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_TABLE_TERM:
+          Argument::fromStdString(L"TABLE", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_CATALOG_USAGE:
+        case SQL_SCHEMA_USAGE:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_OJ_CAPABILITIES:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED\n");
+          return SQL_SUCCESS;
+        case SQL_QUOTED_IDENTIFIER_CASE:
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_IC_LOWER;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_IC_LOWER\n");
+          return SQL_SUCCESS;
+        case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 
+            SQL_SRJO_CORRESPONDING_CLAUSE |
+            SQL_SRJO_CROSS_JOIN |
+            SQL_SRJO_FULL_OUTER_JOIN |
+            SQL_SRJO_INNER_JOIN |
+            SQL_SRJO_LEFT_OUTER_JOIN |
+            SQL_SRJO_NATURAL_JOIN |
+            SQL_SRJO_RIGHT_OUTER_JOIN |
+            SQL_SRJO_UNION_JOIN;
+          TRACE(
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SRJO_CORRESPONDING_CLAUSE | "
+            L"SQL_SRJO_CROSS_JOIN | SQL_SRJO_FULL_OUTER_JOIN | SQL_SRJO_INNER_JOIN | SQL_SRJO_LEFT_OUTER_JOIN | "
+            L"SQL_SRJO_NATURAL_JOIN | SQL_SRJO_RIGHT_OUTER_JOIN | SQL_SRJO_UNION_JOIN\n");
+          return SQL_SUCCESS;
+        case SQL_SQL92_PREDICATES:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) =
+            SQL_SP_BETWEEN |
+            SQL_SP_COMPARISON |
+            SQL_SP_EXISTS |
+            SQL_SP_IN |
+            SQL_SP_ISNOTNULL |
+            SQL_SP_ISNULL |
+            SQL_SP_LIKE;
+          TRACE(
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SP_BETWEEN | SQL_SP_COMPARISON | "
+            L"SQL_SP_EXISTS | SQL_SP_IN | SQL_SP_ISNOTNULL | SQL_SP_ISNULL | SQL_SP_LIKE\n");
           return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
