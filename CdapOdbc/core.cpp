@@ -406,6 +406,7 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
         case SQL_CATALOG_USAGE:
+        case SQL_SCHEMA_USAGE:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
