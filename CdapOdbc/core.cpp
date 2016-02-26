@@ -409,6 +409,10 @@ SQLRETURN SQL_API SQLGetInfoW(
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
+        case SQL_OJ_CAPABILITIES:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
       }
