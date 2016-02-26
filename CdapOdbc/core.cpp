@@ -331,6 +331,7 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_SERVER_NAME:
         case SQL_DATABASE_NAME:
         case SQL_SCHEMA_TERM:
+        case SQL_USER_NAME:
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
