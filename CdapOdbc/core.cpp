@@ -305,11 +305,6 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"CdapOdbc.dll", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
-		    // TODO: Retrieve version from resource!
-        case SQL_DRIVER_VER:
-          Argument::fromStdString(L"1.0.0.1", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
-          return SQL_SUCCESS;
         case SQL_CORRELATION_NAME:
           assert(BufferLength == sizeof(SQLUSMALLINT));
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_CN_DIFFERENT;
