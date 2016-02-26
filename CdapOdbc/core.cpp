@@ -27,6 +27,7 @@
 #include "Encoding.h"
 #include "SQLStatus.h"
 #include "CdapException.h"
+#include "VersionInfo.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -295,7 +296,13 @@ SQLRETURN SQL_API SQLGetInfoW(
         return SQL_ERROR;
       }
 
+      std::wstring temp;
+
       switch (InfoType) {
+        case SQL_ODBC_VER:
+          Argument::fromStdString(L"03.80.0000", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
         case SQL_DRIVER_ODBC_VER:
           Argument::fromStdString(L"03.80", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
@@ -341,11 +348,19 @@ SQLRETURN SQL_API SQLGetInfoW(
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_NNC_NON_NULL;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_NNC_NON_NULL\n");
           return SQL_SUCCESS;
-        case SQL_QUALIFIER_NAME_SEPARATOR:
-          Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+        case SQL_COLUMN_ALIAS:
+          Argument::fromStdString(L"Y", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_QUALIFIER_NAME_SEPARATOR:
+          Argument::fromStdString(L".", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+            TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+            return SQL_SUCCESS;
         case SQL_IDENTIFIER_QUOTE_CHAR:
+          Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_SPECIAL_CHARACTERS:
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
@@ -358,7 +373,10 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"CATALOG", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_SERVER_NAME:
         case SQL_DATABASE_NAME:
+        case SQL_SCHEMA_TERM:
+        case SQL_USER_NAME:
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
@@ -368,17 +386,41 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 128\n");
           return SQL_SUCCESS;
         case SQL_NUMERIC_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN
             | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG | SQL_FN_NUM_PI
             | SQL_FN_NUM_POWER | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_RADIANS
             | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD;
           return SQL_SUCCESS;
         case SQL_AGGREGATE_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT
             | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
           return SQL_SUCCESS;
         case SQL_STRING_FUNCTIONS:
-          *(reinterpret_cast<SQLINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII | SQL_FN_STR_CONCAT
+            | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH | SQL_FN_STR_LOCATE | SQL_FN_STR_LTRIM
+            | SQL_FN_STR_REPEAT | SQL_FN_STR_RTRIM | SQL_FN_STR_SPACE | SQL_FN_STR_SUBSTRING
+            | SQL_FN_STR_UCASE;
+          return SQL_SUCCESS;
+        case SQL_SQL92_DATETIME_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
+          return SQL_SUCCESS;
+        case SQL_SQL92_STRING_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER
+            | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING;
+          return SQL_SUCCESS;
+        case SQL_SQL92_VALUE_EXPRESSIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE;
+          return SQL_SUCCESS;
+        case SQL_SQL92_NUMERIC_VALUE_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
+          return SQL_SUCCESS;
+        case SQL_TIMEDATE_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND
+            | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH;
+          return SQL_SUCCESS;
+        case SQL_TIMEDATE_ADD_INTERVALS:
+        case SQL_TIMEDATE_DIFF_INTERVALS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
           return SQL_SUCCESS;
         case SQL_CONVERT_BIGINT:
         case SQL_CONVERT_BINARY:
@@ -399,8 +441,11 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_CONVERT_VARBINARY:
         case SQL_CONVERT_VARCHAR:
         case SQL_CONVERT_LONGVARBINARY:
-          assert(BufferLength == sizeof(SQLUINTEGER));
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_CONVERT_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_CVT_CAST | SQL_FN_CVT_CONVERT;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
         case SQL_TXN_CAPABLE:
@@ -434,6 +479,56 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_ASYNC_NOTIFICATION:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE\n");
+          return SQL_SUCCESS;
+        case SQL_DRIVER_VER:
+          temp = VersionInfo::getProductVersion();
+          Argument::fromStdString(temp, static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_TABLE_TERM:
+          Argument::fromStdString(L"TABLE", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
+        case SQL_CATALOG_USAGE:
+        case SQL_SCHEMA_USAGE:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_OJ_CAPABILITIES:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED\n");
+          return SQL_SUCCESS;
+        case SQL_QUOTED_IDENTIFIER_CASE:
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_IC_LOWER;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_IC_LOWER\n");
+          return SQL_SUCCESS;
+        case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 
+            SQL_SRJO_CORRESPONDING_CLAUSE |
+            SQL_SRJO_CROSS_JOIN |
+            SQL_SRJO_FULL_OUTER_JOIN |
+            SQL_SRJO_INNER_JOIN |
+            SQL_SRJO_LEFT_OUTER_JOIN |
+            SQL_SRJO_NATURAL_JOIN |
+            SQL_SRJO_RIGHT_OUTER_JOIN |
+            SQL_SRJO_UNION_JOIN;
+          TRACE(
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SRJO_CORRESPONDING_CLAUSE | "
+            L"SQL_SRJO_CROSS_JOIN | SQL_SRJO_FULL_OUTER_JOIN | SQL_SRJO_INNER_JOIN | SQL_SRJO_LEFT_OUTER_JOIN | "
+            L"SQL_SRJO_NATURAL_JOIN | SQL_SRJO_RIGHT_OUTER_JOIN | SQL_SRJO_UNION_JOIN\n");
+          return SQL_SUCCESS;
+        case SQL_SQL92_PREDICATES:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) =
+            SQL_SP_BETWEEN |
+            SQL_SP_COMPARISON |
+            SQL_SP_EXISTS |
+            SQL_SP_IN |
+            SQL_SP_ISNOTNULL |
+            SQL_SP_ISNULL |
+            SQL_SP_LIKE;
+          TRACE(
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SP_BETWEEN | SQL_SP_COMPARISON | "
+            L"SQL_SP_EXISTS | SQL_SP_IN | SQL_SP_ISNOTNULL | SQL_SP_ISNULL | SQL_SP_LIKE\n");
           return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
@@ -873,6 +968,7 @@ SQLRETURN SQL_API SQLColAttributeW(
       statement.getSqlStatus().clear();
       auto& columnInfo = statement.getColumnInfo(ColumnNumber);
       switch (FieldIdentifier) {
+
         /* Column attributes */
         case SQL_COLUMN_TYPE:
         case SQL_DESC_TYPE: /*SQL_DESC_CONCISE_TYPE in ODBC 2.x */
@@ -884,10 +980,17 @@ SQLRETURN SQL_API SQLColAttributeW(
 
           break;
         case SQL_COLUMN_DISPLAY_SIZE:
-          // TODO: double check the applicability of display size as precision!
-        case SQL_DESC_PRECISION:  /* SQL_COLUMN_PRECISION in ODBC 2.x*/
           if (NumericAttributePtr) {
             *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_DESC_PRECISION:  /* ODBC 3.x*/
+        case SQL_COLUMN_PRECISION: /* ODBC 2.x*/
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getPrecision();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }
@@ -905,6 +1008,14 @@ SQLRETURN SQL_API SQLColAttributeW(
         case SQL_COLUMN_UNSIGNED:
           if (NumericAttributePtr) {
             *NumericAttributePtr = columnInfo->getDataType().getUnsigned();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
+
+          break;
+        case SQL_COLUMN_SEARCHABLE:
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getSearchable();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }
@@ -957,18 +1068,20 @@ SQLRETURN SQL_API SQLColAttributeW(
         /* Not implemented column attributes*/
         case SQL_COLUMN_UPDATABLE:
         case SQL_COLUMN_AUTO_INCREMENT:
-        case SQL_COLUMN_SEARCHABLE:
         case SQL_COLUMN_TABLE_NAME:
         case SQL_COLUMN_OWNER_NAME:
         case SQL_COLUMN_QUALIFIER_NAME:
           break;
 
-          /* Column description attributes */
-        case SQL_COLUMN_SCALE:
-        case SQL_DESC_SCALE:
-          break;
+        case SQL_COLUMN_SCALE: /* ODBC 2.x */
+        case SQL_DESC_SCALE: /* ODBC 3.x */
+          if (NumericAttributePtr) {
+            *NumericAttributePtr = columnInfo->getDataType().getScale();
+            TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
+            return SQL_SUCCESS;
+          }
 
-          /* Column extended descriptor fields */
+          break;
         case SQL_DESC_BASE_COLUMN_NAME:
           if (CharacterAttributePtr) {
             Argument::fromStdString(
@@ -983,9 +1096,10 @@ SQLRETURN SQL_API SQLColAttributeW(
           }
 
           break;
-        case SQL_DESC_LENGTH:/* SQL_COLUMN_LENGTH in ODBC 2.x*/
+        case SQL_COLUMN_LENGTH: /* ODBC 2.x */
+        case SQL_DESC_LENGTH:   /* ODBC 3.x */
           if (NumericAttributePtr) {
-            *NumericAttributePtr = columnInfo->getDataType().getDisplaySize();
+            *NumericAttributePtr = columnInfo->getDataType().getSize();
             TRACE(L"SQLColAttributeW returns SQL_SUCCESS, *NumericAttributePtr = %d\n", *NumericAttributePtr);
             return SQL_SUCCESS;
           }

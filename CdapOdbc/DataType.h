@@ -36,6 +36,8 @@ namespace Cask {
       SQLINTEGER precRadix;
       SQLSMALLINT unsignedAttr;
       SQLSMALLINT caseSensitive;
+      SQLINTEGER precision;
+      SQLSMALLINT scale;
       ////case 4: // LITERAL_PREFIX 
       ////case 5: // LITERAL_SUFFIX
       ////case 12: // AUTO_UNIQUE_VALUE 
@@ -63,7 +65,10 @@ namespace Cask {
         SQLSMALLINT fixedPrecScale = SQL_FALSE,
         SQLINTEGER precRadix = 0,
         SQLSMALLINT unsignedAttr = SQL_FALSE,
-        SQLSMALLINT caseSensitive = SQL_FALSE);
+        SQLSMALLINT caseSensitive = SQL_FALSE,
+        SQLINTEGER precision = 0,
+        SQLSMALLINT scale = 0
+      );
 
       /**
        * Gets type name.
@@ -95,6 +100,10 @@ namespace Cask {
         return this->decimalDigits;
       }
 
+      /**
+       * Gets the octet length of the column type. Actual (for fixed-length) or maximal (for variable-length)
+       * length in bytes. This value does not include the null terminator.
+       */
       SQLLEN getOctetLength() const {
         return this->octetLength;
       }
@@ -120,8 +129,29 @@ namespace Cask {
         return this->fixedPrecScale;
       }
 
+      /*
+       * Gets a scale value of the column type
+       */
+      SQLSMALLINT getScale() const {
+        return this->scale;
+      }
+
+      /*
+       * Gets searchable status of the column type.
+       */
+      SQLSMALLINT getSearchable() const {
+        return this->searchable;
+      }
+
+      /*
+      * Gets a precision value of the column type.
+      */
+      SQLINTEGER getPrecision() const {
+        return this->precision;
+      }
+
       /**
-       * Gets a radix value (0 for non-numerics, 2 for approximate numerics, 10 for exact numerics)
+       * Gets a radix value (0 for non-numerics, 2 for approximate numerics, 10 for exact numerics).
        */
       SQLINTEGER getPrecRadix() const {
         return this->precRadix;

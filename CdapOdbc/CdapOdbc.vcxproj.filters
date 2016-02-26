@@ -171,6 +171,9 @@
     <ClInclude Include="setup.h">
       <Filter>Library</Filter>
     </ClInclude>
+    <ClInclude Include="VersionInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="setup.cpp">
       <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="VersionInfo.cpp">
+      <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
