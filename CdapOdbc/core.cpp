@@ -411,7 +411,11 @@ SQLRETURN SQL_API SQLGetInfoW(
           return SQL_SUCCESS;
         case SQL_OJ_CAPABILITIES:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED;
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED\n");
+          return SQL_SUCCESS;
+        case SQL_QUOTED_IDENTIFIER_CASE:
+          *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_IC_LOWER;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_IC_LOWER\n");
           return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
