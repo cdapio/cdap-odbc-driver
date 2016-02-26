@@ -400,6 +400,10 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(temp, static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_TABLE_TERM:
+          Argument::fromStdString(L"TABLE", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
       }
