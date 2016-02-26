@@ -134,8 +134,9 @@ void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnB
 }
 
 void Cask::CdapOdbc::DataReader::fetchTinyint(SQLCHAR value, const ColumnBinding& binding) {
-  assert(binding.getTargetType() == SQL_TINYINT || binding.getTargetType() == SQL_C_STINYINT
-    || binding.getTargetType() == SQL_DEFAULT);
+  assert(binding.getTargetType() == SQL_TINYINT ||
+         binding.getTargetType() == SQL_C_STINYINT ||
+         binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLCHAR*>(binding.getTargetValuePtr())) = value;
 }
 
@@ -170,9 +171,9 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
     case SQL_BIT:
     case SQL_TINYINT:
       if (value.is_boolean()) {
-        sintValue = value.as_bool() ? 1 : 0;
+        sintValue = static_cast<SQLCHAR>(value.as_bool() ? 1 : 0);
       } else if (value.is_integer()) {
-        sintValue = value.as_integer();
+        sintValue = static_cast<SQLCHAR>(value.as_integer());
       }
       this->fetchTinyint(sintValue, binding);
       break;
