@@ -371,8 +371,8 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_FN_NUM_SIGN |
             SQL_FN_NUM_MOD;
           TRACE(
-            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS\n"
-            L"| SQL_FN_NUM_ASIN | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG\n"
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS "
+            L"| SQL_FN_NUM_ASIN | SQL_FN_NUM_ATAN | SQL_FN_NUM_COS | SQL_FN_NUM_EXP | SQL_FN_NUM_LOG "
             L"| SQL_FN_NUM_PI | SQL_FN_NUM_TAN | SQL_FN_NUM_SIGN | SQL_FN_NUM_MOD\n");
           return SQL_SUCCESS;
         case SQL_AGGREGATE_FUNCTIONS:
@@ -385,7 +385,7 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_AF_SUM |
             SQL_AF_ALL;
           TRACE(
-            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_AF_AVG | SQL_AF_COUNT\n"
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_AF_AVG | SQL_AF_COUNT "
             L"| SQL_AF_DISTINCT | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL\n");
           return SQL_SUCCESS;
         case SQL_STRING_FUNCTIONS:
@@ -402,12 +402,16 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_FN_STR_SUBSTRING |
             SQL_FN_STR_UCASE;
           TRACE(
-            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_STR_ASCII \n"
-            L"| SQL_FN_STR_CONCAT | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH | SQL_FN_STR_LOCATE \n"
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_STR_ASCII "
+            L"| SQL_FN_STR_CONCAT | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH | SQL_FN_STR_LOCATE "
             L"| SQL_FN_STR_LTRIM | SQL_FN_STR_REPEAT | SQL_FN_STR_RTRIM | SQL_FN_STR_SPACE \n"
             L"| SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE \n");
           return SQL_SUCCESS;
         case SQL_SQL92_DATETIME_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0L \n");
+          return SQL_SUCCESS;
+        case SQL_SYSTEM_FUNCTIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0L \n");
           return SQL_SUCCESS;
@@ -421,8 +425,8 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_SSF_TRIM_LEADING |
             SQL_SSF_TRIM_TRAILING;
           TRACE(
-            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SSF_CONVERT \n"
-            L"| SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH"
+            L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SSF_CONVERT "
+            L"| SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH "
             L"| SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING\n");
           return SQL_SUCCESS;
         case SQL_SQL92_VALUE_EXPRESSIONS:
@@ -437,7 +441,7 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_TIMEDATE_FUNCTIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND
             | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH;
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE\n"
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE "
             L"| SQL_FN_TD_SECOND | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH\n");
           return SQL_SUCCESS;
         case SQL_TIMEDATE_ADD_INTERVALS:
@@ -453,7 +457,10 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_CONVERT_DECIMAL:
         case SQL_CONVERT_DOUBLE:
         case SQL_CONVERT_FLOAT:
+        case SQL_CONVERT_GUID:
         case SQL_CONVERT_INTEGER:
+        case SQL_CONVERT_INTERVAL_DAY_TIME:
+        case SQL_CONVERT_INTERVAL_YEAR_MONTH:
         case SQL_CONVERT_LONGVARCHAR:
         case SQL_CONVERT_NUMERIC:
         case SQL_CONVERT_REAL:
