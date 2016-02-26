@@ -329,6 +329,10 @@ SQLRETURN SQL_API SQLGetInfoW(
           Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
+        case SQL_SPECIAL_CHARACTERS:
+          Argument::fromStdString(L"", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
+          return SQL_SUCCESS;
         case SQL_FILE_USAGE:
           assert(BufferLength == sizeof(SQLUSMALLINT));
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_FILE_CATALOG;
@@ -358,17 +362,31 @@ SQLRETURN SQL_API SQLGetInfoW(
             | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_ALL;
           return SQL_SUCCESS;
         case SQL_STRING_FUNCTIONS:
-          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_STR_ASCII | SQL_FN_STR_CONCAT
+            | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH | SQL_FN_STR_LOCATE | SQL_FN_STR_LTRIM
+            | SQL_FN_STR_REPEAT | SQL_FN_STR_RTRIM | SQL_FN_STR_SPACE | SQL_FN_STR_SUBSTRING
+            | SQL_FN_STR_UCASE;
           return SQL_SUCCESS;
         case SQL_SQL92_DATETIME_FUNCTIONS:
-          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0UL;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
           return SQL_SUCCESS;
         case SQL_SQL92_STRING_FUNCTIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER
-            | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH;
+            | SQL_SSF_SUBSTRING | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING;
           return SQL_SUCCESS;
         case SQL_SQL92_VALUE_EXPRESSIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE;
+          return SQL_SUCCESS;
+        case SQL_SQL92_NUMERIC_VALUE_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
+          return SQL_SUCCESS;
+        case SQL_TIMEDATE_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND
+            | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH;
+          return SQL_SUCCESS;
+        case SQL_TIMEDATE_ADD_INTERVALS:
+        case SQL_TIMEDATE_DIFF_INTERVALS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
           return SQL_SUCCESS;
         case SQL_CONVERT_BIGINT:
         case SQL_CONVERT_BINARY:
@@ -389,8 +407,11 @@ SQLRETURN SQL_API SQLGetInfoW(
         case SQL_CONVERT_VARBINARY:
         case SQL_CONVERT_VARCHAR:
         case SQL_CONVERT_LONGVARBINARY:
-          assert(BufferLength == sizeof(SQLUINTEGER));
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
+          return SQL_SUCCESS;
+        case SQL_CONVERT_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_CVT_CAST | SQL_FN_CVT_CONVERT;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
         case SQL_TXN_CAPABLE:
