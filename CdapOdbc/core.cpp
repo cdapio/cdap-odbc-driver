@@ -457,6 +457,18 @@ SQLRETURN SQL_API SQLGetInfoW(
           *(reinterpret_cast<SQLUSMALLINT*>(InfoValuePtr)) = SQL_IC_LOWER;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_IC_LOWER\n");
           return SQL_SUCCESS;
+        case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 
+            SQL_SRJO_CORRESPONDING_CLAUSE |
+            SQL_SRJO_CROSS_JOIN |
+            SQL_SRJO_FULL_OUTER_JOIN |
+            SQL_SRJO_INNER_JOIN |
+            SQL_SRJO_LEFT_OUTER_JOIN |
+            SQL_SRJO_NATURAL_JOIN |
+            SQL_SRJO_RIGHT_OUTER_JOIN |
+            SQL_SRJO_UNION_JOIN;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL | SQL_OJ_INNER | SQL_OJ_NOT_ORDERED | SQL_OJ_NESTED\n");
+          return SQL_SUCCESS;
         default:
           throw CdapException(L"Unknown info type.");
       }
