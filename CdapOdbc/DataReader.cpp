@@ -61,6 +61,10 @@ namespace {
       return std::wstring();
     }
   }
+
+  void parseTimestamp(const std::wstring& value, SQL_TIMESTAMP_STRUCT& ts) {
+          
+  }
 }
 
 void Cask::CdapOdbc::DataReader::fetchNull(const ColumnBinding& binding) {
@@ -150,6 +154,13 @@ void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBindin
   *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
 }
 
+void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding & binding) {
+  assert(binding.getTargetType() == SQL_C_TIMESTAMP ||
+         binding.getTargetType() == SQL_C_TYPE_TIMESTAMP ||
+         binding.getTargetType() == SQL_C_DEFAULT);
+  *(reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(binding.getTargetValuePtr())) = value;
+}
+
 void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
   assert(binding.getTargetType() == SQL_C_ULONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLUBIGINT*>(binding.getTargetValuePtr())) = value;
@@ -166,6 +177,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   SQLUBIGINT ubintValue = 0ULL;
   SQLBIGINT sbintValue = 0LL;
   SQLCHAR sintValue = 0;
+  SQL_TIMESTAMP_STRUCT ts = { 0 };
 
   switch (binding.getTargetType()) {
     case SQL_BIT:
@@ -222,6 +234,14 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       }
 
       this->fetchSignedLong(sbintValue, binding);
+      break;
+    case SQL_C_TYPE_TIMESTAMP:
+    case SQL_C_TIMESTAMP:
+      if (value.is_string()) {
+        
+      }
+
+      this->fetchTimestamp(ts, binding);
       break;
   }
 }
