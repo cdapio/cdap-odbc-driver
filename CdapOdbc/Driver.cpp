@@ -212,7 +212,7 @@ void Cask::CdapOdbc::Driver::initializeDataTypes() {
       L"string"       /* name */,
       SQL_CHAR        /* sqlType */,
       0               /* size */,
-      0               /* displaySize */,
+      std::numeric_limits<std::int32_t>::max() /* displaySize */,
       0               /* decimalDigits*/,
       0               /* octetLength */,
       1               /* nullable */,
