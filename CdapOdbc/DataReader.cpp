@@ -18,6 +18,7 @@
 #include "DataReader.h"
 #include "Encoding.h"
 #include "String.h"
+#include "CdapException.h"
 
 namespace {
 
@@ -62,8 +63,36 @@ namespace {
     }
   }
 
+  double intToFrac(int value) {
+    double temp = value;
+    while (temp >= 1.0) {
+      temp /= 10;
+    }
+
+    return temp;
+  }
+
   void parseTimestamp(const std::wstring& value, SQL_TIMESTAMP_STRUCT& ts) {
-          
+    const wchar_t* formatString = L"%4d-%2d-%2d %2d:%2d:%2d.%3d";
+    ts = { 0 };
+    int fraction = 0;
+    auto n = swscanf_s(
+      value.c_str(), 
+      formatString,
+      &ts.year,
+      &ts.month,
+      &ts.day,
+      &ts.hour,
+      &ts.minute,
+      &ts.second,
+      &fraction);
+    if (!(n == 3 || n == 7)) {
+      throw Cask::CdapOdbc::CdapException(L"Cannot convert string to timestamp.");
+    }
+
+    if (fraction > 0) {
+      ts.fraction = static_cast<SQLUINTEGER>(1000000000 * intToFrac(fraction));
+    }
   }
 }
 
@@ -238,10 +267,12 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
     case SQL_C_TYPE_TIMESTAMP:
     case SQL_C_TIMESTAMP:
       if (value.is_string()) {
-        
+        parseTimestamp(value.as_string(), ts);
+        this->fetchTimestamp(ts, binding);
+      } else {
+        throw CdapException(L"Cannot convert string to timestamp.");
       }
 
-      this->fetchTimestamp(ts, binding);
       break;
   }
 }
