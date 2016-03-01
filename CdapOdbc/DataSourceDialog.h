@@ -17,21 +17,20 @@
 
 #pragma once
 
+#include "Dialog.h"
+
 namespace Cask {
   namespace CdapOdbc {
  
-    class DataSourceDialog {
+    class DataSourceDialog : public Dialog {
 
-      HWND parent;
-      bool result;
       std::wstring name;
 
-      static INT_PTR CALLBACK dialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
-      void init(HWND window);
-      void readFromDialog(HWND window);
+    protected:
 
-      DataSourceDialog(const DataSourceDialog&) = delete;
-      void operator=(const DataSourceDialog&) = delete;
+      virtual INT_PTR proc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+      virtual void init() override;
+      virtual void readFromDialog() override;
 
     public:
 
@@ -39,11 +38,6 @@ namespace Cask {
        * Creates an instance of DataSourceDialog.
        */
       DataSourceDialog(HWND parent);
-
-      /**
-       * Destructor.
-       */
-      ~DataSourceDialog();
 
       /**
        * Gets data source name.
@@ -58,11 +52,6 @@ namespace Cask {
       void setName(const std::wstring& value) {
         this->name = value;
       }
-
-      /**
-       * Shows data source dialog.
-       */
-      bool show();
     };
   }
 }
