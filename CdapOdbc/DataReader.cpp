@@ -202,6 +202,7 @@ void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBi
 
 void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
   std::wstring strValue;
+  std::wstring message;
   SQLDOUBLE dblValue = NAN;
   SQLUBIGINT ubintValue = 0ULL;
   SQLBIGINT sbintValue = 0LL;
@@ -215,7 +216,10 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         sintValue = static_cast<SQLCHAR>(value.as_bool() ? 1 : 0);
       } else if (value.is_integer()) {
         sintValue = static_cast<SQLCHAR>(value.as_integer());
+      } else {
+        throw CdapException(L"Cannot convert value to BIT/TINYINT.");
       }
+
       this->fetchTinyint(sintValue, binding);
       break;
     case SQL_C_CHAR: /* SQL_CHAR */
@@ -237,6 +241,8 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         dblValue = value.as_number().to_double();
       } else if (value.is_boolean()) {
         dblValue = value.as_bool() ? 1.0 : 0.0;
+      } else {
+        throw CdapException(L"Cannot convert value to DOUBLE.");
       }
 
       this->fetchDouble(dblValue, binding);
@@ -248,6 +254,8 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         ubintValue = value.as_number().to_uint64();
       } else if (value.is_boolean()) {
         ubintValue = value.as_bool() ? 1UL : 0UL;
+      } else {
+        throw CdapException(L"Cannot convert value to ULONG.");
       }
 
       this->fetchUnsignedLong(ubintValue, binding);
@@ -260,6 +268,8 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         sbintValue = value.as_number().to_int64();
       } else if (value.is_boolean()) {
         sbintValue = value.as_bool() ? 1L : 0L;
+      } else {
+        throw CdapException(L"Cannot convert value to SBIGINT.");
       }
 
       this->fetchSignedLong(sbintValue, binding);
@@ -267,13 +277,16 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
     case SQL_C_TYPE_TIMESTAMP:
     case SQL_C_TIMESTAMP:
       if (value.is_string()) {
-        parseTimestamp(value.as_string(), ts);
+        strValue = value.as_string();
+        parseTimestamp(strValue, ts);
         this->fetchTimestamp(ts, binding);
       } else {
-        throw CdapException(L"Cannot convert string to timestamp.");
+        throw CdapException(L"Cannot convert value '" + strValue + L"' to TIMESTAMP.");
       }
 
       break;
+    default:
+      throw CdapException(L"Target type is not supported.");
   }
 }
 
