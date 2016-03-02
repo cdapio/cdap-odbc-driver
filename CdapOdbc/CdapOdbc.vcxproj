@@ -168,6 +168,7 @@
     <ClInclude Include="DataType.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="Descriptor.h" />
+    <ClInclude Include="Dialog.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="DataSourceDialog.cpp" />
     <ClCompile Include="DataType.cpp" />
     <ClCompile Include="Descriptor.cpp" />
+    <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />

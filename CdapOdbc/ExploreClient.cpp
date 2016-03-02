@@ -36,8 +36,10 @@ namespace {
 }
 
 web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_request& request) {
+  TRACE(L"REQUEST: %s\n", request.to_string().c_str());
   auto task = this->httpClient->request(request)
     .then([](web::http::http_response response) {
+    TRACE(L"RESPONSE: %s\n", response.to_string().c_str());
     if (response.status_code() == web::http::status_codes::OK) {
       return response.extract_json();
     } else if (response.status_code() == web::http::status_codes::BadRequest) {

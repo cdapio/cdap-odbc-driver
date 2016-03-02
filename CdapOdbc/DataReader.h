@@ -42,6 +42,7 @@ namespace Cask {
       void fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding);
       void fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding);
       void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding);
+      void fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding& binding);
       void fetchValue(const web::json::value& value, const ColumnBinding& binding);
 
     public:

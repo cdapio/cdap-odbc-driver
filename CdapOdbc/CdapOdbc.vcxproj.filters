@@ -174,6 +174,9 @@
     <ClInclude Include="VersionInfo.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="Dialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="VersionInfo.cpp">
       <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
