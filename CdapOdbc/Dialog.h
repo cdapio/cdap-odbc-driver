@@ -18,43 +18,52 @@
 #pragma once
 
 #include "ConnectionParams.h"
-#include "Dialog.h"
 
 namespace Cask {
   namespace CdapOdbc {
  
-    class ConnectionDialog : public Dialog {
+    class Dialog {
     
-      ConnectionParams params;
-    
-      void updateOKButton();
+      HWND handle;
+      UINT id;
+      HWND parent;
+      bool result;
+      HFONT boldFont;
+
+      static INT_PTR CALLBACK dialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+
+      void initBoldFont();
+
+      Dialog(const Dialog&) = delete;
+      void operator=(const Dialog&) = delete;
 
     protected:
 
-      virtual INT_PTR proc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-      virtual void init() override;
-      virtual void readFromDialog() override;
+      HWND getHandle() const {
+        return this->handle;
+      }
+
+      HFONT getBoldFont() const {
+        return this->boldFont;
+      }
+
+      virtual INT_PTR proc(UINT uMsg, WPARAM wParam, LPARAM lParam);
+      virtual void init();
+      virtual void readFromDialog();
+
+      Dialog(HWND parent, UINT id);
 
     public:
       
       /**
-       * Creates an instance of ConnectionDialog.
+       * Destructor.
        */
-      ConnectionDialog(HWND parent);
+      virtual ~Dialog();
 
       /**
-       * Gets connection params.
+       * Shows dialog.
        */
-      const ConnectionParams& getParams() const {
-        return this->params;
-      }
-
-      /**
-       * Sets connection params.
-       */
-      void setParams(const ConnectionParams& value) {
-        this->params = value;
-      }
+      bool show();
     };
   }
 }

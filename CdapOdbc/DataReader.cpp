@@ -18,6 +18,7 @@
 #include "DataReader.h"
 #include "Encoding.h"
 #include "String.h"
+#include "CdapException.h"
 
 namespace {
 
@@ -59,6 +60,38 @@ namespace {
       return result;
     } else {
       return std::wstring();
+    }
+  }
+
+  double intToFrac(int value) {
+    double temp = value;
+    while (temp >= 1.0) {
+      temp /= 10;
+    }
+
+    return temp;
+  }
+
+  void parseTimestamp(const std::wstring& value, SQL_TIMESTAMP_STRUCT& ts) {
+    const wchar_t* formatString = L"%4d-%2d-%2d %2d:%2d:%2d.%3d";
+    ts = { 0 };
+    int fraction = 0;
+    auto n = swscanf_s(
+      value.c_str(), 
+      formatString,
+      &ts.year,
+      &ts.month,
+      &ts.day,
+      &ts.hour,
+      &ts.minute,
+      &ts.second,
+      &fraction);
+    if (!(n == 3 || n == 7)) {
+      throw Cask::CdapOdbc::CdapException(L"Cannot convert string to timestamp.");
+    }
+
+    if (fraction > 0) {
+      ts.fraction = static_cast<SQLUINTEGER>(1000000000 * intToFrac(fraction));
     }
   }
 }
@@ -150,6 +183,13 @@ void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBindin
   *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
 }
 
+void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding & binding) {
+  assert(binding.getTargetType() == SQL_C_TIMESTAMP ||
+         binding.getTargetType() == SQL_C_TYPE_TIMESTAMP ||
+         binding.getTargetType() == SQL_C_DEFAULT);
+  *(reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(binding.getTargetValuePtr())) = value;
+}
+
 void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
   assert(binding.getTargetType() == SQL_C_ULONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLUBIGINT*>(binding.getTargetValuePtr())) = value;
@@ -162,10 +202,12 @@ void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBi
 
 void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
   std::wstring strValue;
+  std::wstring message;
   SQLDOUBLE dblValue = NAN;
   SQLUBIGINT ubintValue = 0ULL;
   SQLBIGINT sbintValue = 0LL;
   SQLCHAR sintValue = 0;
+  SQL_TIMESTAMP_STRUCT ts = { 0 };
 
   switch (binding.getTargetType()) {
     case SQL_BIT:
@@ -174,7 +216,10 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         sintValue = static_cast<SQLCHAR>(value.as_bool() ? 1 : 0);
       } else if (value.is_integer()) {
         sintValue = static_cast<SQLCHAR>(value.as_integer());
+      } else {
+        throw CdapException(L"Cannot convert value to BIT/TINYINT.");
       }
+
       this->fetchTinyint(sintValue, binding);
       break;
     case SQL_C_CHAR: /* SQL_CHAR */
@@ -188,14 +233,12 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
     case SQL_C_DOUBLE: /* SQL_DOUBLE*/
       if (value.is_string()) {
         dblValue = std::wcstod(value.as_string().c_str(), nullptr);
-      } else if (value.is_integer()) {
-        dblValue = value.as_integer();
-      } else if (value.is_double()) {
-        dblValue = value.as_double();
       } else if (value.is_number()) {
         dblValue = value.as_number().to_double();
       } else if (value.is_boolean()) {
         dblValue = value.as_bool() ? 1.0 : 0.0;
+      } else {
+        throw CdapException(L"Cannot convert value to DOUBLE.");
       }
 
       this->fetchDouble(dblValue, binding);
@@ -207,6 +250,8 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         ubintValue = value.as_number().to_uint64();
       } else if (value.is_boolean()) {
         ubintValue = value.as_bool() ? 1UL : 0UL;
+      } else {
+        throw CdapException(L"Cannot convert value to ULONG.");
       }
 
       this->fetchUnsignedLong(ubintValue, binding);
@@ -219,10 +264,25 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         sbintValue = value.as_number().to_int64();
       } else if (value.is_boolean()) {
         sbintValue = value.as_bool() ? 1L : 0L;
+      } else {
+        throw CdapException(L"Cannot convert value to SBIGINT.");
       }
 
       this->fetchSignedLong(sbintValue, binding);
       break;
+    case SQL_C_TYPE_TIMESTAMP:
+    case SQL_C_TIMESTAMP:
+      if (value.is_string()) {
+        strValue = value.as_string();
+        parseTimestamp(strValue, ts);
+        this->fetchTimestamp(ts, binding);
+      } else {
+        throw CdapException(L"Cannot convert value '" + strValue + L"' to TIMESTAMP.");
+      }
+
+      break;
+    default:
+      throw CdapException(L"Target type is not supported.");
   }
 }
 
