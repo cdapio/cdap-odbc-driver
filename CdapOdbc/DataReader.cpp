@@ -233,10 +233,6 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
     case SQL_C_DOUBLE: /* SQL_DOUBLE*/
       if (value.is_string()) {
         dblValue = std::wcstod(value.as_string().c_str(), nullptr);
-      } else if (value.is_integer()) {
-        dblValue = value.as_integer();
-      } else if (value.is_double()) {
-        dblValue = value.as_double();
       } else if (value.is_number()) {
         dblValue = value.as_number().to_double();
       } else if (value.is_boolean()) {
