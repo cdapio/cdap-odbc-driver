@@ -10,7 +10,7 @@ execute 'select col_id, col_boolean, col_expected from stream_test_boolean'
 create stream test_binary
 truncate stream test_binary
 load stream test_binary test_binary.csv
-set stream format test_binary csv 'col_bytes bytes'
+set stream format test_binary csv 'col_value bytes'
 execute 'select col_value from stream_test_binary'
 
 create stream test_double
@@ -83,3 +83,15 @@ set stream format waiters csv "id int not null, name string not null, department
 
 execute 'select * from stream_waiters'
 execute 'select stream_orders.order_id as order_id, stream_items.name as name, stream_orders.quantity as quantity from stream_items, stream_orders where stream_items.id=stream_orders.item_id order by order_id'
+
+create stream test_date
+truncate stream test_date
+load stream test_date test_date.csv
+set stream format test_date csv 'col_id int, col_date string'
+execute 'select col_id, CAST(col_date as DATE), col_date from stream_test_date'
+
+create stream test_timestamp
+truncate stream test_timestamp
+load stream test_timestamp test_timestamp.csv
+set stream format test_timestamp csv 'col_id int, col_ts string'
+execute 'select col_id, CAST(col_ts as TIMESTAMP), col_ts from stream_test_timestamp'
