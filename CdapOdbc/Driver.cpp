@@ -502,11 +502,3 @@ void Cask::CdapOdbc::Driver::deleteDataSource(const std::wstring& driver, const 
   auto params = ConnectionParams(attrs);
   ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
 }
-
-void Cask::CdapOdbc::Driver::startPerformanceTimer() {
-  this->startTime = startTimePoint();
-}
-
-void Cask::CdapOdbc::Driver::stopPerformanceTimer() {
-  endTimePoint(this->startTime);
-}

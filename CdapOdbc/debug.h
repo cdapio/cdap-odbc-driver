@@ -35,18 +35,14 @@ inline void debugFPrint(const wchar_t* fmtString, ...) {
 #define TRACE(msg, ...)
 #endif
 
-#ifdef _DEBUG
-
-using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
-
-inline auto startTimePoint() {
-  return std::chrono::high_resolution_clock::now();
-}
-
-inline void endTimePoint(TimePoint startTime) {
-  auto endTime = std::chrono::high_resolution_clock::now();
-  auto duration = endTime - startTime;
-  TRACE(L"Duration: %g seconds\n", duration.count() / 1000000000.0);
-}
-
+#ifdef ENABLE_PROFILING
+#include "Timer.h"
+#include "Profiler.h"
+#define DECLARE_TIMER(timer) Profiler::getInstance().addTimer(timer)
+#define START_TIMER(timer) Profiler::getInstance().startTimer(timer)
+#define STOP_TIMER(timer) Profiler::getInstance().stopTimer(timer)
+#else
+#define DECLARE_TIMER(timer)
+#define START_TIMER(timer)
+#define STOP_TIMER(timer)
 #endif

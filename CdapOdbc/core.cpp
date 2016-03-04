@@ -803,11 +803,7 @@ SQLRETURN SQL_API SQLPrepareW(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      
-#ifdef _DEBUG
-      Driver::getInstance().startPerformanceTimer();
-#endif
-      
+
       auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
       if (!query) {
         throw CdapException(L"Statement text cannot be empty.");
@@ -1296,25 +1292,16 @@ SQLRETURN SQL_API SQLFetch(
         }
 
         if (!hasData) {
-#ifdef _DEBUG
-          Driver::getInstance().stopPerformanceTimer();
-#endif
           TRACE(L"SQLFetch returns SQL_NO_DATA\n");
           return SQL_NO_DATA;
         }
       } else {
         if (!statement.fetch()) {
-#ifdef _DEBUG
-          Driver::getInstance().stopPerformanceTimer();
-#endif
           TRACE(L"SQLFetch returns SQL_NO_DATA\n");
           return SQL_NO_DATA;
         }
       }
 
-#ifdef _DEBUG
-      Driver::getInstance().stopPerformanceTimer();
-#endif
       TRACE(L"SQLFetch returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {

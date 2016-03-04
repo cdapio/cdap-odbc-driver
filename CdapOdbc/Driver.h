@@ -42,10 +42,6 @@ namespace Cask {
 
       std::map<std::wstring, DataType> dataTypes;
 
-#ifdef _DEBUG
-      TimePoint startTime;
-#endif
-
       static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);
       Connection* findConnection(SQLHDBC dbc);
@@ -160,19 +156,6 @@ namespace Cask {
        * Removes DSN.
        */
       void deleteDataSource(const std::wstring& driver, const std::wstring& attrs);
-
-#ifdef _DEBUG
-
-      /**
-       * Starts performance timer.
-       */
-      void startPerformanceTimer();
-
-      /**
-       * Stops performance timer.
-       */
-      void stopPerformanceTimer();
-#endif
     };
   }
 }

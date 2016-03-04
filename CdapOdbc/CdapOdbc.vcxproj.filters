@@ -32,7 +32,7 @@
       <UniqueIdentifier>{af964c4e-82ca-4913-8299-69fc18b66ed7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debug">
-      <UniqueIdentifier>{b61d1eef-3d45-420c-9b7f-30eb20ea3bd0}</UniqueIdentifier>
+      <UniqueIdentifier>{916ebbec-037a-47a2-bae0-961de2c4961a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,9 +82,6 @@
       <Filter>Library</Filter>
     </ClInclude>
     <ClInclude Include="core.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="debug.h">
       <Filter>Library</Filter>
     </ClInclude>
     <ClInclude Include="DataReader.h">
@@ -183,11 +180,17 @@
     <ClInclude Include="ConcurrentQueue.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Argument.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Argument.h">
-      <Filter>Utils</Filter>
+    <ClInclude Include="debug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -329,18 +332,21 @@
     <ClCompile Include="ConcurrentQueue.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
     <ClCompile Include="Argument.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="CdapOdbc.def">
       <Filter>Library</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
