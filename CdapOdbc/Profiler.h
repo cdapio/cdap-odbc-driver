@@ -38,6 +38,11 @@ namespace Cask {
       Profiler() = default;
 
       /**
+       * Destructor.
+       */
+      ~Profiler();
+
+      /**
        * Gets a profiler instance.
        */
       static Profiler& getInstance();

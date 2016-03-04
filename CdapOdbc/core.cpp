@@ -869,6 +869,9 @@ SQLRETURN SQL_API SQLExecDirectW(
   SQLINTEGER   TextLength) {
   TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
+    DECLARE_TIMER(L"Execute");
+    DECLARE_TIMER(L"Fetch");
+    PROFILE_FUNCTION(L"Execute");
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
@@ -1279,6 +1282,7 @@ SQLRETURN SQL_API SQLFetch(
   SQLHSTMT     StatementHandle) {
   TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
+    PROFILE_FUNCTION(L"Fetch");
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {

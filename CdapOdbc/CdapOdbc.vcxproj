@@ -197,6 +197,7 @@
     <ClInclude Include="TablesDataReader.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TimerProxy.h" />
     <ClInclude Include="TypesCommand.h" />
     <ClInclude Include="TypesDataReader.h" />
     <ClInclude Include="VersionInfo.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="TablesCommand.cpp" />
     <ClCompile Include="TablesDataReader.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TimerProxy.cpp" />
     <ClCompile Include="TypesCommand.cpp" />
     <ClCompile Include="TypesDataReader.cpp" />
     <ClCompile Include="VersionInfo.cpp" />

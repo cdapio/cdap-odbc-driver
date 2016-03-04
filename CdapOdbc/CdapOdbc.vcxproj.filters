@@ -192,6 +192,9 @@
     <ClInclude Include="Profiler.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="TimerProxy.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -339,6 +342,9 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="Profiler.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerProxy.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
   </ItemGroup>

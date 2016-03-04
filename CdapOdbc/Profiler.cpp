@@ -20,12 +20,16 @@
 
 std::unique_ptr<Cask::CdapOdbc::Profiler> Cask::CdapOdbc::Profiler::instance(std::make_unique<Cask::CdapOdbc::Profiler>());
 
+Cask::CdapOdbc::Profiler::~Profiler() {
+  this->reportTimers();
+}
+
 Cask::CdapOdbc::Profiler& Cask::CdapOdbc::Profiler::getInstance() {
   return *instance;
 }
 
 void Cask::CdapOdbc::Profiler::addTimer(const std::wstring& name) {
-  this->timers.insert({ name, std::make_unique<Timer>() });
+  this->timers.insert_or_assign(name, std::make_unique<Timer>());
 }
 
 void Cask::CdapOdbc::Profiler::startTimer(const std::wstring& name) {
@@ -38,6 +42,6 @@ void Cask::CdapOdbc::Profiler::stopTimer(const std::wstring& name) {
 
 void Cask::CdapOdbc::Profiler::reportTimers() {
   for (auto& item : this->timers) {
-    TRACE(L"Timer %s - %g seconds.", item.first.c_str(), item.second->getTime() / 1000000000.0);
+    TRACE(L"Timer %s - %g seconds\n", item.first.c_str(), item.second->getTime() / 1000000000.0);
   }
 }

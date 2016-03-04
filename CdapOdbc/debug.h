@@ -38,11 +38,14 @@ inline void debugFPrint(const wchar_t* fmtString, ...) {
 #ifdef ENABLE_PROFILING
 #include "Timer.h"
 #include "Profiler.h"
+#include "TimerProxy.h"
 #define DECLARE_TIMER(timer) Profiler::getInstance().addTimer(timer)
 #define START_TIMER(timer) Profiler::getInstance().startTimer(timer)
 #define STOP_TIMER(timer) Profiler::getInstance().stopTimer(timer)
+#define PROFILE_FUNCTION(timer) TimerProxy timerProxy(timer)
 #else
 #define DECLARE_TIMER(timer)
 #define START_TIMER(timer)
 #define STOP_TIMER(timer)
+#define PROFILE_FUNCTION(timer)
 #endif
