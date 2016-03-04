@@ -31,6 +31,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{af964c4e-82ca-4913-8299-69fc18b66ed7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{b61d1eef-3d45-420c-9b7f-30eb20ea3bd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Driver.h">
@@ -46,9 +49,6 @@
       <Filter>Driver</Filter>
     </ClInclude>
     <ClInclude Include="Descriptor.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Argument.h">
       <Filter>Driver</Filter>
     </ClInclude>
     <ClInclude Include="ConnectionParams.h">
@@ -183,6 +183,12 @@
     <ClInclude Include="ConcurrentQueue.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Argument.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -198,9 +204,6 @@
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="Descriptor.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Argument.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionParams.cpp">
@@ -324,6 +327,12 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="ConcurrentQueue.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Argument.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
