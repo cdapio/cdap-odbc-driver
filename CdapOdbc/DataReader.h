@@ -33,17 +33,17 @@ namespace Cask {
 
     protected:
 
-      void fetchNull(const ColumnBinding& binding);
-      void fetchVarchar(const wchar_t* str, const ColumnBinding& binding);
-      void fetchWVarchar(const wchar_t* str, const ColumnBinding& binding);
-      void fetchInt(SQLINTEGER value, const ColumnBinding& binding);
-      void fetchTinyint(SQLCHAR value, const ColumnBinding& binding);
-      void fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding);
-      void fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding);
-      void fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding);
-      void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding);
-      void fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding& binding);
-      void fetchValue(const web::json::value& value, const ColumnBinding& binding);
+      void fetchNull(const ColumnBinding& binding) const;
+      void fetchVarchar(const wchar_t* str, const ColumnBinding& binding) const;
+      void fetchWVarchar(const wchar_t* str, const ColumnBinding& binding) const;
+      void fetchInt(SQLINTEGER value, const ColumnBinding& binding) const;
+      void fetchTinyint(SQLCHAR value, const ColumnBinding& binding) const;
+      void fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding) const;
+      void fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) const;
+      void fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding) const;
+      void fetchDouble(SQLDOUBLE value, const ColumnBinding& binding) const;
+      void fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding& binding) const;
+      void fetchValue(const web::json::value& value, const ColumnBinding& binding) const;
 
     public:
 
@@ -65,7 +65,7 @@ namespace Cask {
       /**
        * Gets the value of the specified column.
        */
-      virtual void getColumnValue(const ColumnBinding& binding) = 0;
+      virtual void getColumnValue(const ColumnBinding& binding) const = 0;
 
       /**
        * Gets number of columns in a result set.

@@ -40,7 +40,7 @@ namespace Cask {
       /**
        * Gets a query data.
        */
-      const web::json::array& getRows() {
+      const web::json::array& getRows() const {
         return this->rows.as_array();
       }
 

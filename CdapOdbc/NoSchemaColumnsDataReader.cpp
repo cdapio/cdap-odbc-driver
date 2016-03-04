@@ -28,7 +28,7 @@ bool Cask::CdapOdbc::NoSchemaColumnsDataReader::read() {
   return this->currentRowIndex < 3;
 }
 
-void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBinding& binding) {
+void Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnValue(const ColumnBinding& binding) const {
   static std::array<const wchar_t*, 3> names = { L"ts", L"headers", L"body" };
 
   switch (binding.getColumnNumber()) {

@@ -159,6 +159,7 @@
     <ClInclude Include="ColumnsDataReader.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommunicationLinkFailure.h" />
+    <ClInclude Include="ConcurrentQueue.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionDialog.h" />
     <ClInclude Include="ConnectionParams.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="ColumnsDataReader.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommunicationLinkFailure.cpp" />
+    <ClCompile Include="ConcurrentQueue.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionDialog.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />

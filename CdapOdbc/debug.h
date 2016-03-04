@@ -18,7 +18,7 @@
 
 #ifdef _DEBUG
 
-void inline debugFPrint(const wchar_t* fmtString, ...) {
+inline void debugFPrint(const wchar_t* fmtString, ...) {
   va_list argList;
   va_start(argList, fmtString);
   wchar_t buf[4096];
@@ -27,7 +27,26 @@ void inline debugFPrint(const wchar_t* fmtString, ...) {
   va_end(argList);
 }
 
+#endif
+
+#ifdef _DEBUG
 #define TRACE(msg, ...) debugFPrint(msg, __VA_ARGS__)
 #else
 #define TRACE(msg, ...)
+#endif
+
+#ifdef _DEBUG
+
+using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
+
+inline auto startTimePoint() {
+  return std::chrono::high_resolution_clock::now();
+}
+
+inline void endTimePoint(TimePoint startTime) {
+  auto endTime = std::chrono::high_resolution_clock::now();
+  auto duration = endTime - startTime;
+  TRACE(L"Duration: %g seconds\n", duration.count() / 1000000000.0);
+}
+
 #endif

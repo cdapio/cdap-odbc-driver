@@ -19,6 +19,7 @@
 #include "DataReader.h"
 #include "QueryResult.h"
 #include "ColumnDesc.h"
+#include "ConcurrentQueue.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -29,16 +30,28 @@ namespace Cask {
      */
     class QueryDataReader : public DataReader {
 
-      static const int FETCH_SIZE = 100;
+      static const int FETCH_SIZE = 50;
 
       QueryCommand* queryCommand;
       std::vector<ColumnDesc> schema;
-      QueryResult queryResult;
-      int fetchCount;
       int currentRowIndex;
-      bool moreData;
+      std::atomic_bool moreFrames;
+      ConcurrentQueue<QueryResult> frameCache;
+      bool firstLoad;
    
-      bool loadData();
+      bool loadDataContinue();
+      bool loadDataBegin();
+      bool loadFrame();
+      void tryLoadFrameAsync();
+      pplx::task<bool> loadFrameAsync();
+
+      const QueryResult& getFrame() const {
+        return this->frameCache.front();
+      }
+
+      bool isFrameFetched() const {
+        return (this->currentRowIndex == this->getFrame().getSize());
+      }
 
     public:
 
@@ -51,7 +64,7 @@ namespace Cask {
       virtual bool read() override;
 
       // Inherited via DataReader
-      virtual void getColumnValue(const ColumnBinding& binding) override;
+      virtual void getColumnValue(const ColumnBinding& binding) const override;
 
       // Inherited via DataReader
       virtual short getColumnCount() const override;

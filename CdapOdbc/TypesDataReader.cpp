@@ -26,7 +26,7 @@ bool Cask::CdapOdbc::TypesDataReader::read() {
   return this->currentRowIndex < 1;
 }
 
-void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& binding) {
+void Cask::CdapOdbc::TypesDataReader::getColumnValue(const ColumnBinding& binding) const {
   switch (binding.getColumnNumber()) {
     case 1: // TYPE_NAME
       this->fetchVarchar(L"string", binding);

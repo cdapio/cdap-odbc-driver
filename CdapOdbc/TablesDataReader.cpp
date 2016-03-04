@@ -30,7 +30,7 @@ void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
   this->datasets = QueryResult(web::json::value::array(newRows));
 }
 
-std::wstring Cask::CdapOdbc::TablesDataReader::getTableName() {
+std::wstring Cask::CdapOdbc::TablesDataReader::getTableName() const {
   std::wstring originalName;
   std::wstring hiveName;
 
@@ -63,7 +63,7 @@ bool Cask::CdapOdbc::TablesDataReader::read() {
   return this->currentRowIndex < (streams.getSize() + datasets.getSize());
 }
 
-void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& binding) {
+void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& binding) const {
   std::wstring name;
   switch (binding.getColumnNumber()) {
     case 1: // TABLE_CAT 
