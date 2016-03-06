@@ -311,7 +311,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
         this->fetchDate(dt, binding);
       }
       else {
-        throw CdapException(L"Cannot convert value '" + strValue + L"' to TIMESTAMP.");
+        throw CdapException(L"Cannot convert value '" + strValue + L"' to DATE.");
       }
 
       break;
