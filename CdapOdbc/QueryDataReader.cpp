@@ -78,3 +78,22 @@ std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::QueryDataReader::get
   auto& columnDesc = this->schema[columnNumber - 1];
   return std::make_unique<ColumnInfo>(columnDesc);
 }
+
+bool Cask::CdapOdbc::QueryDataReader::canReadFast() const {
+  if (this->queryCommand->getHasData()) {
+    if (this->fetchCount == 0) {
+      // For the first call of fetch no data yet
+      // Needs roundtrip to server
+      return false;
+    } else {
+      if (this->currentRowIndex + 1 == this->queryResult.getSize()) {
+        // End of batch - needs the next one
+        return false;
+      } else {
+        return true;
+      }
+    }
+  } else {
+    return true;
+  }
+}

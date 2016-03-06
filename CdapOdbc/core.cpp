@@ -159,8 +159,17 @@ SQLRETURN SQL_API SQLDriverConnectW(
           }
 
           newConnectionString = dialog->getParams().getFullConnectionString();
-          connection.open(newConnectionString);
           Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(newConnectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            } 
+          } else {
+            connection.open(newConnectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         case SQL_DRIVER_COMPLETE:
@@ -181,15 +190,36 @@ SQLRETURN SQL_API SQLDriverConnectW(
             newConnectionString = *connectionString;
           }
 
-          connection.open(newConnectionString);
           Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(newConnectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            }
+          } else {
+            connection.open(newConnectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         case SQL_DRIVER_NOPROMPT:
           // DRIVER 2
           connectionString = Argument::toStdString(InConnectionString, StringLength1);
-          connection.open(*connectionString);
+          if (!connectionString || connectionString->size() == 0) {
+            throw CdapException(L"Connection string cannot be empty.");
+          }
+
           Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          if (connection.getIsFunctionsAsync()) {
+            if (!connection.openAsync(*connectionString)) {
+              TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
+              return SQL_STILL_EXECUTING;
+            }
+          } else {
+            connection.open(*connectionString);
+          }
+
           TRACE(L"SQLDriverConnectW returns SQL_SUCCESS, OutConnectionString = %s\n", OutConnectionString);
           return SQL_SUCCESS;
         default:
@@ -258,6 +288,9 @@ SQLRETURN SQL_API SQLGetInfoW(
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
     try {
+
+      connection.getSqlStatus().clear();
+
       if (InfoValuePtr == nullptr) {
         TRACE(L"SQLGetInfoW returns SQL_ERROR\n");
         return SQL_ERROR;
@@ -271,7 +304,7 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
         case SQL_DRIVER_ODBC_VER:
-          Argument::fromStdString(L"03.00", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          Argument::fromStdString(L"03.80", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
         case SQL_DATA_SOURCE_NAME:
@@ -492,11 +525,23 @@ SQLRETURN SQL_API SQLGetInfoW(
           return SQL_SUCCESS;
         case SQL_ODBC_INTERFACE_CONFORMANCE:
           *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_OIC_CORE;
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_OIC_CORE\n");
           return SQL_SUCCESS;
         case SQL_SQL_CONFORMANCE:
           *(reinterpret_cast<SQLUBIGINT*>(InfoValuePtr)) = SQL_SC_SQL92_ENTRY;
-          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1UL\n");
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_SC_SQL92_ENTRY\n");
+          return SQL_SUCCESS;
+        case SQL_ASYNC_MODE:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_AM_CONNECTION;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_AM_CONNECTION\n");
+          return SQL_SUCCESS;
+        case SQL_ASYNC_DBC_FUNCTIONS:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_ASYNC_DBC_CAPABLE;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_DBC_CAPABLE\n");
+          return SQL_SUCCESS;
+        case SQL_ASYNC_NOTIFICATION:
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE;
+          TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_ASYNC_NOTIFICATION_NOT_CAPABLE\n");
           return SQL_SUCCESS;
         case SQL_DRIVER_VER:
           temp = VersionInfo::getProductVersion();
@@ -591,6 +636,8 @@ SQLRETURN SQL_API SQLGetFunctions(
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
     try {
+      connection.getSqlStatus().clear();
+
       if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
         Driver::getInstance().setupSupportedFunctions(SupportedPtr);
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
@@ -650,10 +697,43 @@ SQLRETURN SQL_API SQLSetConnectAttrW(
   SQLPOINTER    ValuePtr,
   SQLINTEGER    StringLength) {
   TRACE(L"SQLSetConnectAttrW(ConnectionHandle = %X, Attribute = %d)\n", ConnectionHandle, Attribute);
-  // Attrs not supported 
-  // Always report success 
-  TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
-  return SQL_SUCCESS;
+  try {
+    auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
+    std::lock_guard<Connection> lock(connection);
+    try {
+      connection.getSqlStatus().clear();
+      SQLULEN value = 0;
+      switch (Attribute) {
+        case SQL_ATTR_ASYNC_ENABLE:
+          value = reinterpret_cast<SQLULEN>(ValuePtr);
+          connection.setAsync(value == SQL_ASYNC_ENABLE_ON);
+          TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        case SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE:
+          value = reinterpret_cast<SQLULEN>(ValuePtr);
+          connection.setFunctionsAsync(value == SQL_ASYNC_DBC_ENABLE_ON);
+          TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        default:
+          TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLSetConnectAttrW returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLSetConnectAttrW returns SQL_ERROR\n");
+      connection.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLSetConnectAttrW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLSetConnectAttrW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLGetConnectAttrW(
@@ -723,13 +803,19 @@ SQLRETURN SQL_API SQLPrepareW(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      auto sql = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
-      if (!sql) {
+      auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      if (!query) {
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.prepare(*sql);
-      statement.execute();
+      if (statement.getIsAsync()) {
+        if (!statement.executeAsync(*query)) {
+          TRACE(L"SQLPrepareW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.execute(*query);
+      }
 
       TRACE(L"SQLPrepareW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
@@ -791,7 +877,15 @@ SQLRETURN SQL_API SQLExecDirectW(
         throw CdapException(L"Statement text cannot be empty.");
       }
 
-      statement.executeDirect(*query);
+      if (statement.getIsAsync()) {
+        if (!statement.executeAsync(*query)) {
+          TRACE(L"SQLExecDirectW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.execute(*query);
+      }
+
       TRACE(L"SQLExecDirectW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {
@@ -1188,7 +1282,25 @@ SQLRETURN SQL_API SQLFetch(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      statement.fetch();
+
+      if (statement.getIsAsync()) {
+        bool hasData = false;
+        if (!statement.fetchAsync(hasData)) {
+          TRACE(L"SQLColumnsW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+
+        if (!hasData) {
+          TRACE(L"SQLFetch returns SQL_NO_DATA\n");
+          return SQL_NO_DATA;
+        }
+      } else {
+        if (!statement.fetch()) {
+          TRACE(L"SQLFetch returns SQL_NO_DATA\n");
+          return SQL_NO_DATA;
+        }
+      }
+
       TRACE(L"SQLFetch returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {
@@ -1263,7 +1375,15 @@ SQLRETURN SQL_API SQLColumnsW(
         throw CdapException(L"Table name cannot be empty.");
       }
 
-      statement.getColumns(*streamName);
+      if (statement.getIsAsync()) {
+        if (!statement.getColumnsAsync(*streamName)) {
+          TRACE(L"SQLColumnsW returns SQL_STILL_EXECUTING\n");
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        statement.getColumns(*streamName);
+      }
+
       TRACE(L"SQLColumnsW returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
     } catch (CdapException& cex) {
@@ -1329,7 +1449,15 @@ SQLRETURN SQL_API SQLTablesW(
         TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       } else if (tableTypes) {
-        statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
+        if (statement.getIsAsync()) {
+          if (!statement.getTablesAsync(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get())) {
+            TRACE(L"SQLTablesW returns SQL_STILL_EXECUTING\n");
+            return SQL_STILL_EXECUTING;
+          }
+        } else {
+          statement.getTables(catalogName.get(), schemaName.get(), streamName.get(), tableTypes.get());
+        }
+
         TRACE(L"SQLTablesW returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
       }
@@ -1461,6 +1589,7 @@ SQLRETURN SQL_API SQLDisconnect(
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
     try {
+      connection.getSqlStatus().clear();
       connection.close();
       TRACE(L"SQLDisconnect returns SQL_SUCCESS\n");
       return SQL_SUCCESS;
@@ -1849,8 +1978,38 @@ SQLRETURN SQL_API SQLSetStmtAttrW(
   SQLPOINTER Value,
   SQLINTEGER StringLength) {
   TRACE(L"SQLSetStmtAttrW(StatementHandle = %X, Attribute = %d)\n", StatementHandle, Attribute);
-  TRACE(L"SQLSetStmtAttrW returns SQL_SUCCESS\n");
-  return SQL_SUCCESS;
+  try {
+    auto& statement = Driver::getInstance().getStatement(StatementHandle);
+    std::lock_guard<Connection> lock(*statement.getConnection());
+    try {
+      statement.getSqlStatus().clear();
+      SQLULEN value = 0;
+      switch (Attribute) {
+        case SQL_ATTR_ASYNC_ENABLE:
+          value = reinterpret_cast<SQLULEN>(Value);
+          statement.setAsync(value == SQL_ASYNC_ENABLE_ON);
+          TRACE(L"SQLSetStmtAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+        default:
+          TRACE(L"SQLSetStmtAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
+      }
+    } catch (CdapException& cex) {
+      TRACE(L"SQLSetStmtAttrW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLSetStmtAttrW returns SQL_ERROR\n");
+      statement.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLSetStmtAttrW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLSetStmtAttrW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLStatisticsW(

@@ -47,9 +47,24 @@ namespace Cask {
       std::unique_ptr<DataReader> dataReader;
       SQLStatus sqlStatus;
       std::map<std::wstring, std::wstring> tableNames;
+      bool isAsync;
+      std::unique_ptr<pplx::task<void>> executeTask;
+      std::unique_ptr<pplx::task<void>> columnsTask;
+      std::unique_ptr<pplx::task<void>> tablesTask;
+      std::unique_ptr<pplx::task<bool>> fetchTask;
 
       void throwStateError() const;
       void openQuery();
+      template <typename F>
+      bool runAsync(std::unique_ptr<pplx::task<void>>& task, F& function);
+      void executeInternal(const std::wstring& query);
+      void getColumnsInternal(const std::wstring& streamName);
+      void getTablesInternal(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
+      bool fetchInternal();
 
       Statement(const Statement&) = delete;
       void operator=(const Statement&) = delete;
@@ -81,6 +96,20 @@ namespace Cask {
       }
 
       /**
+      * Gets statement async mode.
+      */
+      bool getIsAsync() const {
+        return this->isAsync;
+      }
+
+      /**
+      * Sets statement async mode.
+      */
+      void setAsync(bool value) {
+        this->isAsync = value;
+      }
+
+      /**
        * Adds a column binding information to a statement.
        */
       void addColumnBinding(const ColumnBinding& binding);
@@ -107,6 +136,16 @@ namespace Cask {
         const std::wstring* tableTypes);
 
       /**
+       * Retrieves tables from a database.
+       * Empty string means "" catalog or schema, NULL means all available.
+       */
+      bool getTablesAsync(
+        const std::wstring* catalog,
+        const std::wstring* schemaPattern,
+        const std::wstring* tableNamePattern,
+        const std::wstring* tableTypes);
+
+      /**
        * Retrieves data type information.
        */
       void getDataTypes();
@@ -117,22 +156,33 @@ namespace Cask {
       void getColumns(const std::wstring& streamName);
 
       /**
+       * Retrieves column information for a table.
+       */
+      bool getColumnsAsync(const std::wstring& streamName);
+
+      /**
        * Retrieves information about special columns for a table.
        */
       void getSpecialColumns();
 
-    /**
-    * Gets SqlStatus storage
-    */
-    SQLStatus& getSqlStatus() {
-      return this->sqlStatus;
-    }
+      /**
+       * Gets SqlStatus storage
+       */
+      SQLStatus& getSqlStatus() {
+        return this->sqlStatus;
+      }
 
       /**
        * Retrieves the next row for the current statement 
        * and updates column bindings.
        */
-      void fetch();
+      bool fetch();
+
+      /**
+       * Retrieves the next row for the current statement
+       * and updates column bindings.
+       */
+      bool fetchAsync(bool& hasData);
 
       /**
        * Resets statement to initial state.
@@ -150,19 +200,14 @@ namespace Cask {
       void resetParameters();
 
       /**
-       * Prepares SQL query statement for execution.
+       * Executes SQL query statement.
        */
-      void prepare(const std::wstring& query);
+      void execute(const std::wstring& query);
 
       /**
-       * Executes SQL query.
+       * Executes SQL query statement.
        */
-      void execute();
-
-      /**
-       * Directly executes SQL query (without prepare first).
-       */
-      void executeDirect(const std::wstring& query);
+      bool executeAsync(const std::wstring& query);
 
       /**
        * Returns number of columns for a statement. 

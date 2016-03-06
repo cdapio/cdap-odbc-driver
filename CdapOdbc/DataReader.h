@@ -77,6 +77,11 @@ namespace Cask {
        * Gets column information.
        */
       virtual std::unique_ptr<ColumnInfo> getColumnInfo(short columnNumber) const = 0;
+
+      /**
+       * Gets information if DataReader can read data fast from cache or need to pull data from server
+       */
+      virtual bool canReadFast() const = 0;
     };
   }
 }

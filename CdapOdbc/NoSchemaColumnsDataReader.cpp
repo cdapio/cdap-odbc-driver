@@ -99,3 +99,7 @@ short Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnCount() const {
 std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::NoSchemaColumnsDataReader::getColumnInfo(short columnNumber) const {
   return std::unique_ptr<ColumnInfo>();
 }
+
+bool Cask::CdapOdbc::NoSchemaColumnsDataReader::canReadFast() const {
+  return true;
+}

@@ -73,11 +73,11 @@ void Cask::CdapOdbc::TablesDataReader::getColumnValue(const ColumnBinding& bindi
       break;
     case 3: // TABLE_NAME 
       name = this->getTableName();
-			if (binding.getTargetType() == SQL_WCHAR) {
-				this->fetchWVarchar(name.c_str(), binding);
-			} else {
-				this->fetchVarchar(name.c_str(), binding);
-			}
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(name.c_str(), binding);
+      } else {
+        this->fetchVarchar(name.c_str(), binding);
+      }
       break;
     case 4: // TABLE_TYPE
       if (binding.getTargetType() == SQL_WCHAR) {
@@ -95,4 +95,8 @@ short Cask::CdapOdbc::TablesDataReader::getColumnCount() const {
 
 std::unique_ptr<Cask::CdapOdbc::ColumnInfo> Cask::CdapOdbc::TablesDataReader::getColumnInfo(short columnNumber) const {
   return std::unique_ptr<ColumnInfo>();
+}
+
+bool Cask::CdapOdbc::TablesDataReader::canReadFast() const {
+  return true;
 }

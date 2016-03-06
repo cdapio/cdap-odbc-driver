@@ -36,8 +36,12 @@ namespace Cask {
       std::unique_ptr<ConnectionParams> params;
       std::unique_ptr<ExploreClient> exploreClient;
       SQLStatus sqlStatus;
+      bool isAsync;
+      bool isFunctionsAsync;
+      std::unique_ptr<pplx::task<void>> openTask;
 
       web::http::uri resolveUri() const;
+      void internalOpen(const std::wstring& connectionString);
 
       Connection(const Connection&) = delete;
       void operator=(const Connection&) = delete;
@@ -76,10 +80,38 @@ namespace Cask {
       }
 
       /**
-       * Gets SqlStatus storage
+       * Gets SqlStatus storage.
        */
       SQLStatus& getSqlStatus() {
         return this->sqlStatus;
+      }
+
+      /**
+       * Gets connection async mode. 
+       */
+      bool getIsAsync() const {
+        return this->isAsync;
+      }
+
+      /**
+       * Gets connection functions async mode.
+       */
+      bool getIsFunctionsAsync() const {
+        return this->isFunctionsAsync;
+      }
+
+      /**
+       * Sets connection async mode. 
+       */
+      void setAsync(bool value) {
+        this->isAsync = value;
+      }
+
+      /**
+       * Sets connection async mode.
+       */
+      void setFunctionsAsync(bool value) {
+        this->isFunctionsAsync = value;
       }
 
       /**
@@ -109,6 +141,11 @@ namespace Cask {
        *   VERIFY_SSL_CERT - server certificate verification (default true)
        */
       void open(const std::wstring& connectionString);
+
+      /**
+      * Opens a connection to explore REST service.
+      */
+      bool openAsync(const std::wstring& connectionString);
 
       /*
        * Closes a connection.
