@@ -87,11 +87,25 @@ namespace {
       &ts.second,
       &fraction);
     if (!(n == 3 || n == 7)) {
-      throw Cask::CdapOdbc::CdapException(L"Cannot convert string to timestamp.");
+      throw Cask::CdapOdbc::CdapException(L"Cannot convert string '" + value + L"'to TIMESTAMP.");
     }
 
     if (fraction > 0) {
       ts.fraction = static_cast<SQLUINTEGER>(1000000000 * intToFrac(fraction));
+    }
+  }
+
+  void parseDate(const std::wstring& value, SQL_DATE_STRUCT& ts) {
+    const wchar_t* formatString = L"%4d-%2d-%2d";
+    ts = { 0 };
+    auto n = swscanf_s(
+      value.c_str(),
+      formatString,
+      &ts.year,
+      &ts.month,
+      &ts.day);
+    if (!(n == 3)) {
+      throw Cask::CdapOdbc::CdapException(L"Cannot convert string '" + value + L"' to DATE.");
     }
   }
 }
@@ -185,9 +199,16 @@ void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBindin
 
 void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding & binding) {
   assert(binding.getTargetType() == SQL_C_TIMESTAMP ||
-         binding.getTargetType() == SQL_C_TYPE_TIMESTAMP ||
+         binding.getTargetType() == SQL_C_TYPE_TIMESTAMP || /* == SQL_TYPE_TIMESTAMP */
          binding.getTargetType() == SQL_C_DEFAULT);
   *(reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(binding.getTargetValuePtr())) = value;
+}
+
+void Cask::CdapOdbc::DataReader::fetchDate(const SQL_DATE_STRUCT& value, const ColumnBinding& binding) {
+  assert(binding.getTargetType() == SQL_C_DATE ||
+    binding.getTargetType() == SQL_C_TYPE_DATE || /* == SQL_TYPE_DATA */
+    binding.getTargetType() == SQL_C_DEFAULT);
+  *(reinterpret_cast<SQL_DATE_STRUCT*>(binding.getTargetValuePtr())) = value;
 }
 
 void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
@@ -208,6 +229,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   SQLBIGINT sbintValue = 0LL;
   SQLCHAR sintValue = 0;
   SQL_TIMESTAMP_STRUCT ts = { 0 };
+  SQL_DATE_STRUCT dt = { 0 };
 
   switch (binding.getTargetType()) {
     case SQL_BIT:
@@ -217,7 +239,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       } else if (value.is_integer()) {
         sintValue = static_cast<SQLCHAR>(value.as_integer());
       } else {
-        throw CdapException(L"Cannot convert value to BIT/TINYINT.");
+        throw CdapException(L"Cannot convert value '" + value.as_string() + L"'to BIT/TINYINT.");
       }
 
       this->fetchTinyint(sintValue, binding);
@@ -238,7 +260,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       } else if (value.is_boolean()) {
         dblValue = value.as_bool() ? 1.0 : 0.0;
       } else {
-        throw CdapException(L"Cannot convert value to DOUBLE.");
+        throw CdapException(L"Cannot convert value '" + value.as_string() + L"'to DOUBLE.");
       }
 
       this->fetchDouble(dblValue, binding);
@@ -251,7 +273,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       } else if (value.is_boolean()) {
         ubintValue = value.as_bool() ? 1UL : 0UL;
       } else {
-        throw CdapException(L"Cannot convert value to ULONG.");
+        throw CdapException(L"Cannot convert value '" + value.as_string() + L"'to ULONG.");
       }
 
       this->fetchUnsignedLong(ubintValue, binding);
@@ -265,7 +287,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       } else if (value.is_boolean()) {
         sbintValue = value.as_bool() ? 1L : 0L;
       } else {
-        throw CdapException(L"Cannot convert value to SBIGINT.");
+        throw CdapException(L"Cannot convert value '" + value.as_string() + L"'to SBIGINT.");
       }
 
       this->fetchSignedLong(sbintValue, binding);
@@ -281,8 +303,20 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
       }
 
       break;
+    case SQL_C_TYPE_DATE:
+    case SQL_C_DATE:
+      if (value.is_string()) {
+        strValue = value.as_string();
+        parseDate(strValue, dt);
+        this->fetchDate(dt, binding);
+      }
+      else {
+        throw CdapException(L"Cannot convert value '" + strValue + L"' to TIMESTAMP.");
+      }
+
+      break;
     default:
-      throw CdapException(L"Target type is not supported.");
+      throw CdapException(L"Target type '" + std::to_wstring(binding.getTargetType()) + L"' is not supported.");
   }
 }
 
