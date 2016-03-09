@@ -92,6 +92,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,13 +100,13 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;CDAPODBC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ENABLE_PROFILING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,6 +125,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,74 +144,122 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Argument.h" />
+    <ClInclude Include="BadRequestException.h" />
+    <ClInclude Include="CancelException.h" />
+    <ClInclude Include="CdapException.h" />
     <ClInclude Include="ColumnBinding.h" />
     <ClInclude Include="ColumnDesc.h" />
-    <ClInclude Include="ColumnMapper.h" />
+    <ClInclude Include="ColumnInfo.h" />
+    <ClInclude Include="ColumnsCommand.h" />
+    <ClInclude Include="ColumnsDataReader.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="CommunicationLinkFailure.h" />
+    <ClInclude Include="ConcurrentQueue.h" />
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="ConnectionDialog.h" />
     <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="DataReader.h" />
+    <ClInclude Include="DataSourceDialog.h" />
+    <ClInclude Include="DataType.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="Descriptor.h" />
+    <ClInclude Include="Dialog.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="Profiler.h" />
+    <ClInclude Include="setup.h" />
+    <ClInclude Include="SQLStatus.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
-    <ClInclude Include="MetadataColumnMapper.h" />
-    <ClInclude Include="NoDataException.h" />
+    <ClInclude Include="Library.h" />
+    <ClInclude Include="NoSchemaColumnsDataReader.h" />
+    <ClInclude Include="QueryCommand.h" />
+    <ClInclude Include="QueryDataReader.h" />
     <ClInclude Include="QueryResult.h" />
     <ClInclude Include="QueryStatus.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SchemasDataReader.h" />
+    <ClInclude Include="SchemasCommand.h" />
+    <ClInclude Include="SpecialColumnsCommand.h" />
+    <ClInclude Include="SpecialColumnsDataReader.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StillExecutingException.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="TablesCommand.h" />
+    <ClInclude Include="TablesDataReader.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="TimerProxy.h" />
+    <ClInclude Include="TypesCommand.h" />
+    <ClInclude Include="TypesDataReader.h" />
+    <ClInclude Include="VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="BadRequestException.cpp" />
+    <ClCompile Include="CancelException.cpp" />
+    <ClCompile Include="CdapException.cpp" />
     <ClCompile Include="ColumnBinding.cpp" />
     <ClCompile Include="ColumnDesc.cpp" />
-    <ClCompile Include="ColumnMapper.cpp" />
+    <ClCompile Include="ColumnInfo.cpp" />
+    <ClCompile Include="ColumnsCommand.cpp" />
+    <ClCompile Include="ColumnsDataReader.cpp" />
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CommunicationLinkFailure.cpp" />
+    <ClCompile Include="ConcurrentQueue.cpp" />
     <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="ConnectionDialog.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="DataReader.cpp" />
+    <ClCompile Include="DataSourceDialog.cpp" />
+    <ClCompile Include="DataType.cpp" />
     <ClCompile Include="Descriptor.cpp" />
-    <ClCompile Include="dllmain.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="SQLStatus.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />
-    <ClCompile Include="MetadataColumnMapper.cpp" />
-    <ClCompile Include="NoDataException.cpp" />
+    <ClCompile Include="Library.cpp" />
+    <ClCompile Include="NoSchemaColumnsDataReader.cpp" />
+    <ClCompile Include="QueryCommand.cpp" />
+    <ClCompile Include="QueryDataReader.cpp" />
     <ClCompile Include="QueryResult.cpp" />
     <ClCompile Include="QueryStatus.cpp" />
+    <ClCompile Include="SchemasDataReader.cpp" />
+    <ClCompile Include="SchemasCommand.cpp" />
+    <ClCompile Include="SpecialColumnsCommand.cpp" />
+    <ClCompile Include="SpecialColumnsDataReader.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profiling|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StillExecutingException.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="TablesCommand.cpp" />
+    <ClCompile Include="TablesDataReader.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TimerProxy.cpp" />
+    <ClCompile Include="TypesCommand.cpp" />
+    <ClCompile Include="TypesDataReader.cpp" />
+    <ClCompile Include="VersionInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
@@ -217,14 +267,17 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.7.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.7.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" />
+    <Import Project="..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.8.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.8.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.7.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.7.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
+    <Error Condition="!Exists('..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.8.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.2.8.0\build\native\cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
   </Target>
 </Project>

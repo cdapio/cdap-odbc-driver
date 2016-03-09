@@ -24,13 +24,14 @@ namespace Cask {
      */
     class QueryResult {
       web::json::value rows;
+      std::int64_t sizeInBytes;
     
     public:
 
       /**
        * Creates an instance of QueryResult.
        */
-      QueryResult() = default;
+      QueryResult();
 
       /**
       * Creates an instance of QueryResult from JSON.
@@ -38,18 +39,33 @@ namespace Cask {
       QueryResult(const web::json::value& value);
 
       /**
+       * Creates an instance of QueryResult from JSON.
+       */
+      QueryResult(const web::json::value& value, std::int64_t sizeInBytes);
+
+      /**
        * Gets a query data.
        */
-      const web::json::array& getRows() {
+      const web::json::array& getRows() const {
         return this->rows.as_array();
       }
 
-      size_t getSize() const {
+      /**
+       * Gets a number of rows.
+       */
+      int getSize() const {
         if (this->rows.is_array()) {
-          return this->rows.as_array().size();
+          return static_cast<int>(this->rows.as_array().size());
         } else {
           return 0;
         }
+      }
+
+      /**
+       * Gets size in bytes of REST request with results.
+       */
+      std::int64_t getSizeInBytes() const {
+        return this->sizeInBytes;
       }
     };
   }

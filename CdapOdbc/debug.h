@@ -18,7 +18,7 @@
 
 #ifdef _DEBUG
 
-void inline debugFPrint(const wchar_t* fmtString, ...) {
+inline void debugFPrint(const wchar_t* fmtString, ...) {
   va_list argList;
   va_start(argList, fmtString);
   wchar_t buf[4096];
@@ -27,7 +27,25 @@ void inline debugFPrint(const wchar_t* fmtString, ...) {
   va_end(argList);
 }
 
+#endif
+
+#ifdef _DEBUG
 #define TRACE(msg, ...) debugFPrint(msg, __VA_ARGS__)
 #else
-#define TRACE(msg)
+#define TRACE(msg, ...)
+#endif
+
+#ifdef ENABLE_PROFILING
+#include "Timer.h"
+#include "Profiler.h"
+#include "TimerProxy.h"
+#define DECLARE_TIMER(timer) Profiler::getInstance().addTimer(timer)
+#define START_TIMER(timer) Profiler::getInstance().startTimer(timer)
+#define STOP_TIMER(timer) Profiler::getInstance().stopTimer(timer)
+#define PROFILE_FUNCTION(timer) TimerProxy timerProxy(timer)
+#else
+#define DECLARE_TIMER(timer)
+#define START_TIMER(timer)
+#define STOP_TIMER(timer)
+#define PROFILE_FUNCTION(timer)
 #endif

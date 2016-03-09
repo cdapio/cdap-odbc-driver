@@ -42,3 +42,9 @@ std::wstring Cask::CdapOdbc::String::trim(const std::wstring & str) {
 
   return result;
 }
+
+std::wstring Cask::CdapOdbc::String::fromDouble(double value, int width) {
+  std::wstringstream s;
+  s << std::setw(width) << value;
+  return s.str();
+}

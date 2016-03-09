@@ -1,5 +1,6 @@
 LIBRARY CdapOdbc
 EXPORTS
+    ConfigDSN
     SQLAllocHandle
     SQLBindCol
     SQLBindParameter

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "DataType.h"
+
 namespace Cask {
   namespace CdapOdbc {
     class Environment;
@@ -31,12 +33,14 @@ namespace Cask {
       static std::unique_ptr<Driver> instance;
       static std::atomic_int lastHandleIndex;
 
-      std::unordered_map<SQLHENV, std::unique_ptr<Environment>> environments;
-      std::unordered_map<SQLHDBC, std::unique_ptr<Connection>> connections;
-      std::unordered_map<SQLHSTMT, std::unique_ptr<Statement>> statements;
-      std::unordered_map<SQLHDESC, std::unique_ptr<Descriptor>> descriptors;
+      std::map<SQLHENV, std::unique_ptr<Environment>> environments;
+      std::map<SQLHDBC, std::unique_ptr<Connection>> connections;
+      std::map<SQLHSTMT, std::unique_ptr<Statement>> statements;
+      std::map<SQLHDESC, std::unique_ptr<Descriptor>> descriptors;
 
       std::mutex mutex;
+
+      std::map<std::wstring, DataType> dataTypes;
 
       static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);
@@ -44,6 +48,7 @@ namespace Cask {
       void freeConnections(const Environment& env);
       void freeStatements(const Connection& dbc);
       void freeDescriptors(const Connection& dbc);
+      void initializeDataTypes();
 
       Driver(const Driver&) = delete;
       void operator=(const Driver&) = delete;
@@ -58,7 +63,7 @@ namespace Cask {
       /**
        * Destructor.
        */
-      ~Driver() = default;
+      ~Driver();
 
       /**
        * Gets a driver instance.
@@ -86,6 +91,13 @@ namespace Cask {
       Descriptor& getDescriptor(SQLHDESC desc);
 
       /**
+      * Gets a data type by name.
+      */
+      const DataType& getDataType(const std::wstring& name) const {
+        return this->dataTypes.at(name);
+      }
+
+      /**
       * Allocates a new environment and returns its handle.
       */
       SQLHENV allocEnvironment();
@@ -104,7 +116,7 @@ namespace Cask {
       * Allocates a new descriptor and returns its handle.
       */
       SQLHDESC allocDescriptor(SQLHDBC dbc);
-      
+
       /**
        * Destroys an environment freeing all allocated resources.
        */
@@ -129,6 +141,21 @@ namespace Cask {
        * Setups supported functions.
        */
       void setupSupportedFunctions(SQLUSMALLINT* bitset);
+
+      /**
+       * Adds new DSN.
+       */
+      void addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs);
+
+      /**
+       * Modifies DSN.
+       */
+      void modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs);
+
+      /**
+       * Removes DSN.
+       */
+      void deleteDataSource(const std::wstring& driver, const std::wstring& attrs);
     };
   }
 }

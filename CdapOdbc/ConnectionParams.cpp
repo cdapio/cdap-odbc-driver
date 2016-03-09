@@ -71,6 +71,8 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
 
     if (equals(key, L"driver")) {
       this->driver = String::trim(values[1]);
+    } else if (equals(key, L"dsn")) {
+      this->dsn = String::trim(values[1]);
     } else if (equals(key, L"host")) {
       this->host = String::trim(values[1]);
     } else if (equals(key, L"port")) {
@@ -85,10 +87,40 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
       this->verifySslCert = parseBool(String::trim(values[1]));
     }
   }
+}
 
-  if (this->host.size() == 0) {
-    throw std::invalid_argument("connectionString");
-  }
+Cask::CdapOdbc::ConnectionParams::ConnectionParams()
+  : driver()
+  , host()
+  , port(10000)
+  , authToken()
+  , namespace_(L"default")
+  , sslEnabled(false)
+  , verifySslCert(true) {
+}
+
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(const ConnectionParams& other) 
+  : driver(other.driver)
+  , host(other.host)
+  , port(other.port)
+  , authToken(other.authToken)
+  , namespace_(other.namespace_)
+  , sslEnabled(other.sslEnabled)
+  , verifySslCert(other.verifySslCert) {
+}
+
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(ConnectionParams&& other) 
+  : driver(std::move(other.driver))
+  , host(std::move(other.host))
+  , port(other.port)
+  , authToken(std::move(other.authToken))
+  , namespace_(std::move(other.namespace_))
+  , sslEnabled(other.sslEnabled)
+  , verifySslCert(other.verifySslCert) {
+  other.port = 10000;
+  other.namespace_ = L"default";
+  other.sslEnabled = true;
+  other.verifySslCert = false;
 }
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectionString)
@@ -102,44 +134,58 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectio
   this->parse(connectionString);
 }
 
+void Cask::CdapOdbc::ConnectionParams::operator=(const ConnectionParams& other) {
+  this->driver = other.driver;
+  this->host = other.host;
+  this->port = other.port;
+  this->authToken = other.authToken;
+  this->namespace_ = other.namespace_;
+  this->sslEnabled = other.sslEnabled;
+  this->verifySslCert = other.verifySslCert;
+}
+
+void Cask::CdapOdbc::ConnectionParams::operator=(ConnectionParams&& other) {
+  this->driver = std::move(other.driver);
+  this->host = std::move(other.host);
+  this->port = other.port;
+  this->authToken = std::move(other.authToken);
+  this->namespace_ = std::move(other.namespace_);
+  this->sslEnabled = other.sslEnabled;
+  this->verifySslCert = other.verifySslCert;
+  other.port = 10000;
+  other.namespace_ = L"default";
+  other.sslEnabled = true;
+  other.verifySslCert = false;
+}
+
 std::wstring Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
-  std::wstring result;
+  std::wstringstream result;
 
   if (this->driver.size() > 0) {
-    result += L"Driver=";
-    result += this->driver;
-    result += L";";
+    result << L"Driver=" << this->driver << L";";
   }
 
-  result += L"Host=";
-  result += this->host;
-  result += L";";
+  result << L"Host=" << this->host << L";";
 
   if (this->port > 0) {
-    result += L"Port=";
-    result += this->port;
-    result += L";";
+    result << L"Port=" << this->port << L";";
   }
 
   if (this->authToken.size() > 0) {
-    result += L"Auth_Token=";
-    result += this->authToken;
-    result += L";";
+    result << L"Auth_Token=" << this->authToken << L";";
   }
 
   if (!equals(this->namespace_, L"default")) {
-    result += L"Namespace=";
-    result += this->namespace_;
-    result += L";";
+    result << L"Namespace=" << this->namespace_ << L";";
   }
 
   if (sslEnabled) {
-    result += L"SSL_Enabled=True;";
+    result << L"SSL_Enabled=True;";
   }
 
   if (!verifySslCert) {
-    result += L"Verify_SSL_Cert=False;";
+    result << L"Verify_SSL_Cert=False;";
   }
 
-  return result;
+  return result.str();
 }

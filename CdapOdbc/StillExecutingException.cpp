@@ -17,6 +17,6 @@
 #include "stdafx.h"
 #include "StillExecutingException.h"
 
-Cask::CdapOdbc::StillExecutingException::StillExecutingException(const char* what)
-  : std::logic_error(what) {
+Cask::CdapOdbc::StillExecutingException::StillExecutingException()
+  : CdapException(SQL_STILL_EXECUTING, L"01000", L"The query is still executing.") {
 }

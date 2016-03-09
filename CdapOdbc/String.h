@@ -33,9 +33,14 @@ namespace Cask {
       static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
 
       /**
-      * Removes whitespaces from the start and the end of a string.
-      */
+       * Removes whitespaces from the start and the end of a string.
+       */
       static std::wstring trim(const std::wstring& str);
+
+      /**
+       * Converts double to string with specified width.
+       */
+      static std::wstring fromDouble(double value, int width);
     };
   }
 }
