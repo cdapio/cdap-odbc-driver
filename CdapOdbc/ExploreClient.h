@@ -34,13 +34,8 @@ namespace Cask {
       std::unique_ptr<web::http::client::http_client> httpClient;
       std::wstring namespace_;
 
-      web::json::value doRequest(web::http::http_request& request);
-      web::json::value doRequest(web::http::method mhd, const utility::string_t& path);
-      web::json::value doRequest(web::http::method mhd, const utility::string_t& path, web::json::value body);
-      web::json::value doGet(const utility::string_t& path);
-      web::json::value doPost(const utility::string_t& path);
-      web::json::value doPost(const utility::string_t& path, web::json::value body);
-      web::json::value doDelete(const utility::string_t& path);
+      web::json::value doRequest(web::http::http_request& request, std::int64_t* sizeInBytes);
+      web::json::value doRequest(web::http::method mhd, const utility::string_t& path, const web::json::value* body = nullptr, std::int64_t* sizeInBytes = nullptr);
 
       ExploreClient(const ExploreClient&) = delete;
       void operator=(const ExploreClient&) = delete;

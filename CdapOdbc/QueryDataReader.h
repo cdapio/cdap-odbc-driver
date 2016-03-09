@@ -30,7 +30,7 @@ namespace Cask {
      */
     class QueryDataReader : public DataReader {
 
-      static const int FETCH_SIZE = 12000;
+      static const int FETCH_SIZE = 100;
 
       QueryCommand* queryCommand;
       std::vector<ColumnDesc> schema;
