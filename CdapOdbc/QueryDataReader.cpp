@@ -19,6 +19,13 @@
 #include "QueryCommand.h"
 #include "Driver.h"
 
+void Cask::CdapOdbc::QueryDataReader::adjustFetchSize(std::int64_t responseSize) {
+  auto oneRow = responseSize / this->fetchSize;
+  auto newFetchSize = OPTIMAL_RESPONSE_SIZE_IN_BYTES / oneRow;
+  this->fetchSize = static_cast<int>(newFetchSize);
+  TRACE(L"FETCH SIZE adjusted to: %d\n", this->fetchSize);
+}
+
 void Cask::CdapOdbc::QueryDataReader::checkTasksForExceptions() {
   auto it = this->tasks.begin();
   while (it != this->tasks.end()) {
@@ -73,13 +80,17 @@ bool Cask::CdapOdbc::QueryDataReader::loadDataBegin() {
 }
 
 bool Cask::CdapOdbc::QueryDataReader::loadFrame() {
-  auto frame = this->queryCommand->loadRows(FETCH_SIZE);
+  auto frame = this->queryCommand->loadRows(this->fetchSize);
   if (frame.getSize() > 0) {
     this->frameCache.push(frame);
     TRACE(L"Pushed frame. Frame count: %d\n", this->frameCache.size());
     // We assume there is more data 
     // if actual frame size is equal to requested fetch size
-    this->moreFrames = (frame.getSize() == FETCH_SIZE);
+    this->moreFrames = (frame.getSize() == this->fetchSize);
+    if (this->moreFrames) {
+      this->adjustFetchSize(frame.getSizeInBytes());
+    }
+
     return true;
   } else {
     return false;
@@ -106,7 +117,8 @@ Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
   : queryCommand(command)
   , currentRowIndex(-1)
   , moreFrames(true)
-  , firstLoad(true) {
+  , firstLoad(true)
+  , fetchSize(FETCH_SIZE) {
   this->schema = this->queryCommand->loadSchema();
 }
 

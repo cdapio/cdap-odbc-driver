@@ -30,7 +30,8 @@ namespace Cask {
      */
     class QueryDataReader : public DataReader {
 
-      static const int FETCH_SIZE = 100;
+      static const int FETCH_SIZE = 1000;
+      static const int OPTIMAL_RESPONSE_SIZE_IN_BYTES = (4 * 1024 * 1024);
 
       QueryCommand* queryCommand;
       std::vector<ColumnDesc> schema;
@@ -39,7 +40,9 @@ namespace Cask {
       ConcurrentQueue<QueryResult> frameCache;
       bool firstLoad;
       std::vector<pplx::task<bool>> tasks;
+      int fetchSize;
    
+      void adjustFetchSize(std::int64_t responseSize);
       void checkTasksForExceptions();
       bool loadDataContinue();
       bool loadDataBegin();
