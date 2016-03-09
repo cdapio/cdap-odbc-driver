@@ -204,14 +204,14 @@ void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& valu
   *(reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchDate(const SQL_DATE_STRUCT& value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchDate(const SQL_DATE_STRUCT& value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_DATE ||
     binding.getTargetType() == SQL_C_TYPE_DATE || /* == SQL_TYPE_DATA */
     binding.getTargetType() == SQL_C_DEFAULT);
   *(reinterpret_cast<SQL_DATE_STRUCT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_ULONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLUBIGINT*>(binding.getTargetValuePtr())) = value;
 }
