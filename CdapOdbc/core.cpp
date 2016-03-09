@@ -508,7 +508,7 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
         case SQL_CONVERT_FUNCTIONS:
-          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_CVT_CAST | SQL_FN_CVT_CONVERT;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_CVT_CAST;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0\n");
           return SQL_SUCCESS;
         case SQL_TXN_CAPABLE:
