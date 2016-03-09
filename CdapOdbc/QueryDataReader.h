@@ -30,7 +30,7 @@ namespace Cask {
      */
     class QueryDataReader : public DataReader {
 
-      static const int FETCH_SIZE = 50;
+      static const int FETCH_SIZE = 12000;
 
       QueryCommand* queryCommand;
       std::vector<ColumnDesc> schema;
@@ -38,12 +38,14 @@ namespace Cask {
       std::atomic_bool moreFrames;
       ConcurrentQueue<QueryResult> frameCache;
       bool firstLoad;
+      std::vector<pplx::task<bool>> tasks;
    
+      void checkTasksForExceptions();
       bool loadDataContinue();
       bool loadDataBegin();
       bool loadFrame();
       void tryLoadFrameAsync();
-      pplx::task<bool> loadFrameAsync();
+      pplx::task<bool>& loadFrameAsync();
 
       const QueryResult& getFrame() const {
         return this->frameCache.front();

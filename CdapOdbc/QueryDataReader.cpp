@@ -19,6 +19,19 @@
 #include "QueryCommand.h"
 #include "Driver.h"
 
+void Cask::CdapOdbc::QueryDataReader::checkTasksForExceptions() {
+  auto it = this->tasks.begin();
+  while (it != this->tasks.end()) {
+    if (it->is_done()) {
+      // Check for exceptions
+      it->get();
+      it = this->tasks.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
 bool Cask::CdapOdbc::QueryDataReader::loadDataContinue() {
   // Discard fetched frame
   this->frameCache.pop();
@@ -28,13 +41,16 @@ bool Cask::CdapOdbc::QueryDataReader::loadDataContinue() {
 
   if (this->moreFrames) {
     // Start loading next async frame
-    auto task = this->loadFrameAsync();
+    auto& task = this->loadFrameAsync();
 
     // At this point we must know if there are more rows in query
     // If data fetched quickier than loading cache can be empty
     // In this case we have to wait for next frame
     if (this->frameCache.empty()) {
       task.wait();
+      
+      // As task done check immediately for exceptions
+      task.get();
     }
   }
 
@@ -76,11 +92,14 @@ void Cask::CdapOdbc::QueryDataReader::tryLoadFrameAsync() {
   }
 }
 
-pplx::task<bool> Cask::CdapOdbc::QueryDataReader::loadFrameAsync() {
-  return pplx::task<bool>([this]() { 
+pplx::task<bool>& Cask::CdapOdbc::QueryDataReader::loadFrameAsync() {
+  auto task = pplx::task<bool>([this]() {
     TRACE(L"Started loading new frame\n");
     return this->loadFrame();
   });
+
+  this->tasks.emplace_back(std::move(task));
+  return this->tasks.back();
 }
 
 Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
@@ -98,6 +117,7 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
       this->firstLoad = false;
       result = this->loadDataBegin();
     } else {
+      this->checkTasksForExceptions();
       ++this->currentRowIndex;
       if (this->isFrameFetched()) {
         result = this->loadDataContinue();
