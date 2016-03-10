@@ -33,7 +33,7 @@ namespace Cask {
       std::map<std::wstring, std::wstring>* tableNames;
 
       void filterDatasets();
-      std::wstring getTableName();
+      std::wstring getTableName() const;
 
     public:
 
@@ -46,7 +46,7 @@ namespace Cask {
       virtual bool read() override;
 
       // Inherited via DataReader
-      virtual void getColumnValue(const ColumnBinding& binding) override;
+      virtual void getColumnValue(const ColumnBinding& binding) const override;
 
       // Inherited via DataReader
       virtual short getColumnCount() const override;

@@ -1,5 +1,5 @@
 /*
-* Copyright © 2015 Cask Data, Inc.
+* Copyright © 2016 Cask Data, Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); you may not
 * use this file except in compliance with the License. You may obtain a copy of
@@ -15,18 +15,4 @@
 */
 
 #include "stdafx.h"
-#include "QueryResult.h"
-
-Cask::CdapOdbc::QueryResult::QueryResult()
-  : sizeInBytes(0L) {
-}
-
-Cask::CdapOdbc::QueryResult::QueryResult(const web::json::value& value)
-  : rows(value)
-  , sizeInBytes(0L) {
-}
-
-Cask::CdapOdbc::QueryResult::QueryResult(const web::json::value& value, std::int64_t sizeInBytes)
-  : rows(value)
-  , sizeInBytes(sizeInBytes) {
-}
+#include "TimerProxy.h"

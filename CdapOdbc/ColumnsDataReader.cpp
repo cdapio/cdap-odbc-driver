@@ -117,7 +117,7 @@ bool Cask::CdapOdbc::ColumnsDataReader::read() {
   return this->currentRowIndex < queryResult.getSize();
 }
 
-void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& binding) {
+void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& binding) const {
   auto& record = this->queryResult.getRows().at(this->currentRowIndex);
   std::wstring name;
   std::wstring typeName;

@@ -63,6 +63,9 @@
 #include <limits>
 #include <cwctype>
 #include <iomanip>
+#ifdef _DEBUG
+#include <chrono>
+#endif
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>

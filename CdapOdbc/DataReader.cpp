@@ -106,17 +106,17 @@ namespace {
       &ts.day);
     if (!(n == 3)) {
       throw Cask::CdapOdbc::CdapException(L"Cannot convert string '" + value + L"' to DATE.");
-    }
+}
   }
 }
 
-void Cask::CdapOdbc::DataReader::fetchNull(const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchNull(const ColumnBinding& binding) const {
   if (binding.getStrLenOrInd()) {
     *binding.getStrLenOrInd() = SQL_NULL_DATA;
   }
 }
 
-void Cask::CdapOdbc::DataReader::fetchVarchar(const wchar_t* str, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchVarchar(const wchar_t* str, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_CHAR || binding.getTargetType() == SQL_DEFAULT);
   if (str) {
     std::string ansiStr = Encoding::toUtf8(str);
@@ -148,7 +148,7 @@ void Cask::CdapOdbc::DataReader::fetchVarchar(const wchar_t* str, const ColumnBi
   }
 }
 
-void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_WCHAR || binding.getTargetType() == SQL_DEFAULT);
   if (str) {
     std::wstring uniStr = str;
@@ -180,48 +180,48 @@ void Cask::CdapOdbc::DataReader::fetchWVarchar(const wchar_t* str, const ColumnB
   }
 }
 
-void Cask::CdapOdbc::DataReader::fetchTinyint(SQLCHAR value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchTinyint(SQLCHAR value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_TINYINT ||
          binding.getTargetType() == SQL_C_STINYINT ||
          binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLCHAR*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchSmallint(SQLSMALLINT value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_SSHORT || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLSMALLINT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchDouble(SQLDOUBLE value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_DOUBLE || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLDOUBLE*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding & binding) {
+void Cask::CdapOdbc::DataReader::fetchTimestamp(const SQL_TIMESTAMP_STRUCT& value, const ColumnBinding & binding) const {
   assert(binding.getTargetType() == SQL_C_TIMESTAMP ||
          binding.getTargetType() == SQL_C_TYPE_TIMESTAMP || /* == SQL_TYPE_TIMESTAMP */
          binding.getTargetType() == SQL_C_DEFAULT);
   *(reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchDate(const SQL_DATE_STRUCT& value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchDate(const SQL_DATE_STRUCT& value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_DATE ||
     binding.getTargetType() == SQL_C_TYPE_DATE || /* == SQL_TYPE_DATA */
     binding.getTargetType() == SQL_C_DEFAULT);
   *(reinterpret_cast<SQL_DATE_STRUCT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchUnsignedLong(SQLUBIGINT value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_ULONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLUBIGINT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchSignedLong(SQLBIGINT value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_SBIGINT || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLBIGINT*>(binding.getTargetValuePtr())) = value;
 }
 
-void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const ColumnBinding& binding) const {
   std::wstring strValue;
   std::wstring message;
   SQLDOUBLE dblValue = NAN;
@@ -320,7 +320,7 @@ void Cask::CdapOdbc::DataReader::fetchValue(const web::json::value& value, const
   }
 }
 
-void Cask::CdapOdbc::DataReader::fetchInt(SQLINTEGER value, const ColumnBinding& binding) {
+void Cask::CdapOdbc::DataReader::fetchInt(SQLINTEGER value, const ColumnBinding& binding) const {
   assert(binding.getTargetType() == SQL_C_SLONG || binding.getTargetType() == SQL_DEFAULT);
   *(reinterpret_cast<SQLINTEGER*>(binding.getTargetValuePtr())) = value;
 }

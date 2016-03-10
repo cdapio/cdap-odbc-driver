@@ -21,7 +21,7 @@ bool Cask::CdapOdbc::SchemasDataReader::read() {
   return false;
 }
 
-void Cask::CdapOdbc::SchemasDataReader::getColumnValue(const ColumnBinding& binding) {
+void Cask::CdapOdbc::SchemasDataReader::getColumnValue(const ColumnBinding& binding) const {
 }
 
 short Cask::CdapOdbc::SchemasDataReader::getColumnCount() const {
