@@ -63,6 +63,7 @@
 #include <limits>
 #include <cwctype>
 #include <iomanip>
+#include <regex>
 #ifdef _DEBUG
 #include <chrono>
 #endif

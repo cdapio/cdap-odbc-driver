@@ -19,6 +19,7 @@
 #include "Connection.h"
 #include "QueryDataReader.h"
 #include "CdapException.h"
+#include "QueryBuilder.h"
 
 Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
   : Command(connection)
@@ -27,7 +28,8 @@ Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::ws
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::executeReader() {
   if (this->queryHandle.size() == 0) {
-    this->queryHandle = this->getConnection()->getExploreClient().execute(this->query);
+    QueryBuilder queryBuilder(this->query);
+    this->queryHandle = this->getConnection()->getExploreClient().execute(queryBuilder.toString());
   }
 
   auto status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);

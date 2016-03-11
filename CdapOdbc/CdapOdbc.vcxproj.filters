@@ -195,6 +195,9 @@
     <ClInclude Include="TimerProxy.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="QueryBuilder.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="TimerProxy.cpp">
       <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilder.cpp">
+      <Filter>Statements\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
