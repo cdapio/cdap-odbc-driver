@@ -31,6 +31,13 @@
 
 using namespace Cask::CdapOdbc;
 
+#define TIMER_EXECDIRECT L"ExecDirect"
+#define TIMER_TABLES L"Tables"
+#define TIMER_COLUMNS L"Columns"
+#define TIMER_FETCH L"Fetch"
+#define TIMER_EXECUTE L"Execute"
+#define TIMER_PREPARE L"Prepare"
+
 SQLRETURN SQL_API SQLAllocHandle(
   SQLSMALLINT HandleType,
   SQLHANDLE InputHandle,
@@ -77,6 +84,14 @@ SQLRETURN SQL_API SQLAllocHandle(
         }
 
         *OutputHandlePtr = Driver::getInstance().allocStatement(InputHandle);
+
+        DECLARE_TIMER(TIMER_EXECDIRECT);
+        DECLARE_TIMER(TIMER_TABLES);
+        DECLARE_TIMER(TIMER_COLUMNS);
+        DECLARE_TIMER(TIMER_FETCH);
+        DECLARE_TIMER(TIMER_EXECUTE);
+        DECLARE_TIMER(TIMER_PREPARE);
+
         TRACE(L"SQLAllocHandle returns SQL_SUCCESS, new statement = %X\n", *OutputHandlePtr);
         return SQL_SUCCESS;
 
@@ -799,6 +814,7 @@ SQLRETURN SQL_API SQLPrepareW(
   SQLINTEGER    TextLength) {
   TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
+    PROFILE_FUNCTION(TIMER_PREPARE);
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
@@ -869,9 +885,7 @@ SQLRETURN SQL_API SQLExecDirectW(
   SQLINTEGER   TextLength) {
   TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
-    DECLARE_TIMER(L"Execute");
-    DECLARE_TIMER(L"Fetch");
-    PROFILE_FUNCTION(L"Execute");
+    PROFILE_FUNCTION(TIMER_EXECUTE);
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
@@ -1282,7 +1296,7 @@ SQLRETURN SQL_API SQLFetch(
   SQLHSTMT     StatementHandle) {
   TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
-    PROFILE_FUNCTION(L"Fetch");
+    PROFILE_FUNCTION(TIMER_FETCH);
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
@@ -1371,6 +1385,7 @@ SQLRETURN SQL_API SQLColumnsW(
     ColumnName
   );
   try {
+    PROFILE_FUNCTION(TIMER_COLUMNS);
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
@@ -1439,6 +1454,7 @@ SQLRETURN SQL_API SQLTablesW(
     TableName,
     TableType);
   try {
+    PROFILE_FUNCTION(TIMER_TABLES);
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {

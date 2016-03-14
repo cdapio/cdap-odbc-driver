@@ -35,7 +35,7 @@ inline void debugFPrint(const wchar_t* fmtString, ...) {
 #define TRACE(msg, ...)
 #endif
 
-#ifdef ENABLE_PROFILING
+#if ENABLE_PROFILING
 #include "Timer.h"
 #include "Profiler.h"
 #include "TimerProxy.h"
