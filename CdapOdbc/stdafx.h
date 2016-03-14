@@ -23,6 +23,7 @@
 
 // Windows Header Files:
 #include <windows.h>
+#include <shlwapi.h>
 
 // Conflicts with query op status
 #undef ERROR

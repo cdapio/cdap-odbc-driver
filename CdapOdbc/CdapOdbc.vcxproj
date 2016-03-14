@@ -106,7 +106,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>CdapOdbc.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbccp32.lib;legacy_stdio_definitions.lib;Version.lib;Shlwapi.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -168,11 +168,15 @@
     <ClInclude Include="DataSourceDialog.h" />
     <ClInclude Include="DataType.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="DebugLogAppender.h" />
     <ClInclude Include="Descriptor.h" />
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="FileLogAppender.h" />
+    <ClInclude Include="LogAppender.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="QueryBuilder.h" />
     <ClInclude Include="setup.h" />
@@ -223,11 +227,15 @@
     <ClCompile Include="DataReader.cpp" />
     <ClCompile Include="DataSourceDialog.cpp" />
     <ClCompile Include="DataType.cpp" />
+    <ClCompile Include="DebugLogAppender.cpp" />
     <ClCompile Include="Descriptor.cpp" />
     <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="FileLogAppender.cpp" />
+    <ClCompile Include="LogAppender.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="QueryBuilder.cpp" />
     <ClCompile Include="setup.cpp" />

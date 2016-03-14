@@ -17,20 +17,8 @@
 #pragma once
 
 #ifdef _DEBUG
-
-inline void debugFPrint(const wchar_t* fmtString, ...) {
-  va_list argList;
-  va_start(argList, fmtString);
-  wchar_t buf[4096];
-  _vsnwprintf_s(buf, sizeof(buf), fmtString, argList);
-  OutputDebugStringW(buf);
-  va_end(argList);
-}
-
-#endif
-
-#ifdef _DEBUG
-#define TRACE(msg, ...) debugFPrint(msg, __VA_ARGS__)
+#include "Logger.h"
+#define TRACE(msg, ...) Cask::CdapOdbc::Logger::getInstance().write(msg, __VA_ARGS__)
 #else
 #define TRACE(msg, ...)
 #endif
