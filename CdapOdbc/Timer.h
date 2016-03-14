@@ -28,6 +28,7 @@ namespace Cask {
       
       using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
       
+      std::wstring name;
       Tick diffTime;
       TimePoint startTime;
       bool running;
@@ -37,7 +38,7 @@ namespace Cask {
       /**
        * Creates an instance of timer.
        */
-      Timer();
+      Timer(const std::wstring& name);
 
       /**
        * Starts the timer.
@@ -65,6 +66,13 @@ namespace Cask {
        * Gets time.
        */
       Tick getTime();
+
+      /**
+       * Gets name.
+       */
+      const std::wstring& getName() const {
+        return this->name;
+      }
     };
   }
 }

@@ -39,6 +39,7 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
     status.getOperationStatus() == OperationStatus::PENDING ||
     status.getOperationStatus() == OperationStatus::RUNNING) {
     status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);
+    pplx::wait(200);
   }
 
   switch (status.getOperationStatus()) {

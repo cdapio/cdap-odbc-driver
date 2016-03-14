@@ -33,9 +33,9 @@ namespace Cask {
     public:
 
       /**
-       * Creates a profiler instance.
+       * Creates an instance of profiler.
        */
-      Profiler() = default;
+      Profiler();
 
       /**
        * Destructor.

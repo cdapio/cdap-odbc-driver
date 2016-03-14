@@ -31,13 +31,6 @@
 
 using namespace Cask::CdapOdbc;
 
-#define TIMER_EXECDIRECT L"ExecDirect"
-#define TIMER_TABLES L"Tables"
-#define TIMER_COLUMNS L"Columns"
-#define TIMER_FETCH L"Fetch"
-#define TIMER_EXECUTE L"Execute"
-#define TIMER_PREPARE L"Prepare"
-
 SQLRETURN SQL_API SQLAllocHandle(
   SQLSMALLINT HandleType,
   SQLHANDLE InputHandle,
@@ -84,13 +77,6 @@ SQLRETURN SQL_API SQLAllocHandle(
         }
 
         *OutputHandlePtr = Driver::getInstance().allocStatement(InputHandle);
-
-        DECLARE_TIMER(TIMER_EXECDIRECT);
-        DECLARE_TIMER(TIMER_TABLES);
-        DECLARE_TIMER(TIMER_COLUMNS);
-        DECLARE_TIMER(TIMER_FETCH);
-        DECLARE_TIMER(TIMER_EXECUTE);
-        DECLARE_TIMER(TIMER_PREPARE);
 
         TRACE(L"SQLAllocHandle returns SQL_SUCCESS, new statement = %X\n", *OutputHandlePtr);
         return SQL_SUCCESS;

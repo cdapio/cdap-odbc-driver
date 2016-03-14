@@ -39,13 +39,22 @@ inline void debugFPrint(const wchar_t* fmtString, ...) {
 #include "Timer.h"
 #include "Profiler.h"
 #include "TimerProxy.h"
-#define DECLARE_TIMER(timer) Profiler::getInstance().addTimer(timer)
-#define START_TIMER(timer) Profiler::getInstance().startTimer(timer)
-#define STOP_TIMER(timer) Profiler::getInstance().stopTimer(timer)
-#define PROFILE_FUNCTION(timer) TimerProxy timerProxy(timer)
+#define DECLARE_TIMER(timer) Cask::CdapOdbc::Profiler::getInstance().addTimer(timer)
+#define START_TIMER(timer) Cask::CdapOdbc::Profiler::getInstance().startTimer(timer)
+#define STOP_TIMER(timer) Cask::CdapOdbc::Profiler::getInstance().stopTimer(timer)
+#define PROFILE_FUNCTION(timer) Cask::CdapOdbc::TimerProxy timerProxy(timer)
 #else
 #define DECLARE_TIMER(timer)
 #define START_TIMER(timer)
 #define STOP_TIMER(timer)
 #define PROFILE_FUNCTION(timer)
 #endif
+
+#define TIMER_EXECDIRECT L"ExecDirect"
+#define TIMER_TABLES L"Tables"
+#define TIMER_COLUMNS L"Columns"
+#define TIMER_FETCH L"Fetch"
+#define TIMER_EXECUTE L"Execute"
+#define TIMER_PREPARE L"Prepare"
+#define TIMER_QUERY L"Query"
+#define TIMER_PARSING L"Parsing"

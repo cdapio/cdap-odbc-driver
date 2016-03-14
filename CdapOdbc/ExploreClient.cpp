@@ -40,7 +40,11 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_reques
   TRACE(L"REQUEST: %s\n", request.to_string().c_str());
 #endif
   auto requestTask = this->httpClient->request(request);
-  requestTask.wait();
+  {
+    PROFILE_FUNCTION(TIMER_QUERY);
+    requestTask.wait();
+  }
+
   auto response = requestTask.get();
 #ifdef TRACE_REQUESTS
   TRACE(L"RESPONSE: %s\n", response.to_string().c_str());
@@ -48,7 +52,11 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_reques
   TRACE(L"RESPONSE SIZE: %d\n", response.headers().content_length());
   if (response.status_code() == web::http::status_codes::OK) {
     auto jsonTask = response.extract_json();
-    jsonTask.wait();
+    {
+      PROFILE_FUNCTION(TIMER_PARSING);
+      jsonTask.wait();
+    }
+
     if (sizeInBytes) {
       *sizeInBytes = response.headers().content_length();
     }
