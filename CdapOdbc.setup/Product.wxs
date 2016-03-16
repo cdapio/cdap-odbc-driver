@@ -3,9 +3,9 @@
 <?define targetArch =  $(var.CdapOdbc.Platform)  ?>
 <?define CdapOdbcDll = "CdapOdbc.dll" ?>
 <?if $(var.CdapOdbc.Configuration) = Debug ?>
-  <?define CppRestDll = "cpprest140d_2_7.dll" ?>
+  <?define CppRestDll = "cpprest140d_2_8.dll" ?>
 <?else ?>
-  <?define CppRestDll = "cpprest140_2_7.dll" ?>
+  <?define CppRestDll = "cpprest140_2_8.dll" ?>
 <?endif ?>
 <?if $(var.targetArch) = x64 ?>
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
