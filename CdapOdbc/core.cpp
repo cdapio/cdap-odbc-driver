@@ -391,17 +391,22 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_FN_NUM_ACOS |
             SQL_FN_NUM_ASIN |
             SQL_FN_NUM_ATAN |
+            SQL_FN_NUM_CEILING |
             SQL_FN_NUM_COS |
+            SQL_FN_NUM_DEGREES |
             SQL_FN_NUM_EXP |
-            SQL_FN_NUM_LOG |
+            SQL_FN_NUM_FLOOR |
+            SQL_FN_NUM_LOG10 |
             SQL_FN_NUM_PI |
             SQL_FN_NUM_POWER |
+            SQL_FN_NUM_RADIANS |
+            SQL_FN_NUM_RAND |
             SQL_FN_NUM_ROUND |
+            SQL_FN_NUM_SIGN |
             SQL_FN_NUM_SIN |
             SQL_FN_NUM_SQRT |
             SQL_FN_NUM_RADIANS |
             SQL_FN_NUM_TAN |
-            SQL_FN_NUM_SIGN |
             SQL_FN_NUM_MOD;
           TRACE(
             L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS "
@@ -472,8 +477,14 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 0L\n");
           return SQL_SUCCESS;
         case SQL_TIMEDATE_FUNCTIONS:
-          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND
-            | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH;
+          *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) =
+            SQL_FN_TD_HOUR |
+            SQL_FN_TD_MINUTE |
+            SQL_FN_TD_SECOND |
+            SQL_FN_TD_YEAR |
+            SQL_FN_TD_MONTH |
+            SQL_FN_TD_DAYOFMONTH |
+            SQL_FN_TD_NOW;
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE "
             L"| SQL_FN_TD_SECOND | SQL_FN_TD_YEAR | SQL_FN_TD_MONTH | SQL_FN_TD_DAYOFMONTH\n");
           return SQL_SUCCESS;

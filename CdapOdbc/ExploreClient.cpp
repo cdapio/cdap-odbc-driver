@@ -45,7 +45,7 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_reques
 #ifdef TRACE_REQUESTS
   TRACE(L"RESPONSE: %s\n", response.to_string().c_str());
 #endif
-  TRACE(L"RESPONSE SIZE: %d\n", response.headers().content_length());
+//  TRACE(L"RESPONSE SIZE: %d\n", response.headers().content_length());
   if (response.status_code() == web::http::status_codes::OK) {
     auto jsonTask = response.extract_json();
     jsonTask.wait();
