@@ -121,6 +121,7 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
   auto& record = this->queryResult.getRows().at(this->currentRowIndex);
   std::wstring name;
   std::wstring typeName;
+  std::wstring isNullable;
   SQLSMALLINT radix = 0;
 
   switch (binding.getColumnNumber()) {
@@ -134,11 +135,19 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
       this->fetchNull(binding);
       break;
     case 3: // TABLE_NAME 
-      this->fetchVarchar(this->tableName.c_str(), binding);
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(this->tableName.c_str(), binding);
+      } else {
+        this->fetchVarchar(this->tableName.c_str(), binding);
+      }
       break;
     case 4: // COLUMN_NAME 
       name = record.at(L"name").as_string();
-      this->fetchVarchar(name.c_str(), binding);
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(name.c_str(), binding);
+      } else {
+        this->fetchVarchar(name.c_str(), binding);
+      }
       break;
     case 5: // DATA_TYPE
     case 14: // SQL_DATA_TYPE 
@@ -146,7 +155,12 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
       break;
     case 6: // TYPE_NAME 
       typeName = getTypeName(record.at(L"type"));
-      this->fetchVarchar(typeName.c_str(), binding);
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(typeName.c_str(), binding);
+      }
+      else {
+        this->fetchVarchar(typeName.c_str(), binding);
+      }
       break;
     case 7: // COLUMN_SIZE 
       this->fetchInt(getColumnSize(record.at(L"type")), binding);
@@ -169,8 +183,14 @@ void Cask::CdapOdbc::ColumnsDataReader::getColumnValue(const ColumnBinding& bind
     case 17: // ORDINAL_POSITION 
       this->fetchInt(this->currentRowIndex + 1, binding);
       break;
-    case 18: // IS_NULLABLE 
-      this->fetchVarchar((getIsNull(record.at(L"type")) == SQL_NO_NULLS) ? L"NO" : L"YES", binding);
+    case 18: // IS_NULLABLE
+      isNullable = (getIsNull(record.at(L"type")) == SQL_NO_NULLS) ? L"NO" : L"YES";
+      if (binding.getTargetType() == SQL_WCHAR) {
+        this->fetchWVarchar(isNullable.c_str(), binding);
+      }
+      else {
+        this->fetchVarchar(isNullable.c_str(), binding);
+      }
       break;
   }
 }
