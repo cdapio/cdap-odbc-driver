@@ -29,6 +29,7 @@ namespace Cask {
 
       std::wregex functionsRegex;
       std::wregex datetimeRegex;
+      std::wregex intervalRegex;
       std::wstring query;
 
 

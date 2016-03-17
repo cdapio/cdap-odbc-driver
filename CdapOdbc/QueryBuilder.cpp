@@ -21,11 +21,13 @@
 // Matches "{fn …}"
 #define FUNCTIONS_REGEX L"\\{\\s*[Ff][Nn]\\s+([^\\(]+)([^\\{\\}]+)\\s*\\}"
 #define DATETIME_REGEX L"\\{([Tt][Ss]|[Dd]) ('[^']*')\\}"
+#define INTERVAL_REGEX L"\\{INTERVAL ([+-] )*'[^']+' ([^\\}]+)\\}"
 
 Cask::CdapOdbc::QueryBuilder::QueryBuilder(
   const std::wstring& query)
   : functionsRegex(FUNCTIONS_REGEX)
   , datetimeRegex(DATETIME_REGEX)
+  , intervalRegex(INTERVAL_REGEX)
   , query(query) {
 }
 
@@ -33,6 +35,15 @@ std::wstring Cask::CdapOdbc::QueryBuilder::toString() {
   std::wstring result = this->query;
   std::wsmatch match;
   std::wstring found;
+
+  // Verifies SQL statement for INTERVAL ODBC escape sequence.
+  // Hive does not support them
+  if (std::regex_search(result, match, this->intervalRegex)) {
+    throw CdapException(
+      L"Detected INTERVAL escape sequence: '"
+      + match[0].str()
+      + L"'. They are not supported.");
+  }
 
   // Replaces escape sequence {d ...} and {ts ...}
   while (std::regex_search(result, match, this->datetimeRegex)) {
