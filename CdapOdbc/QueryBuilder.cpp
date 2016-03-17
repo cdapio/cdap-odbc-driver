@@ -19,8 +19,8 @@
 #include "CdapException.h"
 
 // Matches "{fn …}"
-#define FUNCTIONS_REGEX L"\\{\\s*[Ff][Nn]\\s+([^\\(]+)([^\\{\\}]+)\\}"
-#define DATETIME_REGEX L"\\{\\s*([Tt][Ss]|[Dd])\\s+((['\\\"])[^\\3]*\\3)\\s*\\}"
+#define FUNCTIONS_REGEX L"\\{\\s*[Ff][Nn]\\s+([^\\(]+)([^\\{\\}]+)\\s*\\}"
+#define DATETIME_REGEX L"\\{([Tt][Ss]|[Dd]) ('[^']*')\\}"
 
 Cask::CdapOdbc::QueryBuilder::QueryBuilder(
   const std::wstring& query)
