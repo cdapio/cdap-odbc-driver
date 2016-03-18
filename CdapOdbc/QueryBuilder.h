@@ -28,6 +28,8 @@ namespace Cask {
     class QueryBuilder {
 
       std::wregex functionsRegex;
+      std::wregex datetimeRegex;
+      std::wregex intervalRegex;
       std::wstring query;
 
 
