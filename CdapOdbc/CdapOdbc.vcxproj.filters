@@ -1,0 +1,401 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Driver">
+      <UniqueIdentifier>{6e3a7bb5-0c2a-47f6-8bf0-0291c776e0ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{49e0be68-730b-49dc-94c6-96ea0e0e4d58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Explore">
+      <UniqueIdentifier>{00e4425b-3718-4025-9e00-2b3fb5465c8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{4c377402-8356-4754-9efd-fd3b249fda1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{bfa9e0b2-0ea5-4bc5-bcfe-433249ecdef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements">
+      <UniqueIdentifier>{dc1858ad-49f0-4883-8768-0504563b636c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\Commands">
+      <UniqueIdentifier>{2eea4c72-2c03-4efb-9998-7cd272d3c3ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\DataReaders">
+      <UniqueIdentifier>{a20badfa-83aa-406b-a68f-1af3300b1479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{d806b097-9fe6-4f04-b4a6-ddc6e58ec3e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{af964c4e-82ca-4913-8299-69fc18b66ed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{916ebbec-037a-47a2-bae0-961de2c4961a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Driver.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Statement.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Descriptor.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionParams.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnBinding.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryResult.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryStatus.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="ExploreClient.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnDesc.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="StillExecutingException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidHandleException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="DataReader.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="SchemasCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="TablesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="TypesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="SchemasDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TablesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TypesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="DataType.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionDialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="NoSchemaColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="DataSourceDialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLStatus.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicationLinkFailure.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="CancelException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="BadRequestException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="CdapException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="setup.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="VersionInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoding.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ConcurrentQueue.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Argument.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerProxy.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryBuilder.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+
+    <ClCompile Include="QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+   <ClInclude Include="Logger.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="LogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLogAppender.h">
+      <Filter>Debug</Filter>
+
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Driver.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Connection.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Statement.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Descriptor.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionParams.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnBinding.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryStatus.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryResult.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="ExploreClient.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnDesc.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="StillExecutingException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidHandleException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="DataReader.cpp">
+      <Filter>Statements</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Statements</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="SchemasCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="TablesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="TypesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="SchemasDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="TablesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="TypesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecialColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecialColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="DataType.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionDialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Library.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="NoSchemaColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="DataSourceDialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunicationLinkFailure.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLStatus.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="CancelException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="BadRequestException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="CdapException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="setup.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="VersionInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="String.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoding.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ConcurrentQueue.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Argument.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerProxy.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryBuilder.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClInclude Include="Logger.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="LogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLogAppender.cpp">
+      <Filter>Debug</Filter>
+
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CdapOdbc.def">
+      <Filter>Library</Filter>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
