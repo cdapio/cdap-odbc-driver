@@ -199,7 +199,10 @@
       <Filter>Statements\Commands</Filter>
     </ClInclude>
 
-    <ClInclude Include="Logger.h">
+    <ClCompile Include="QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+   <ClInclude Include="Logger.h">
       <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="LogAppender.h">
@@ -370,6 +373,19 @@
     <ClCompile Include="QuerySELECT1DataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
     </ClCompile>
+    <ClInclude Include="Logger.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="LogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLogAppender.cpp">
+      <Filter>Debug</Filter>
+
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
