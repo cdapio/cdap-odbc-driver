@@ -198,6 +198,9 @@
     <ClInclude Include="QueryBuilder.h">
       <Filter>Statements\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -352,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="QueryBuilder.cpp">
       <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

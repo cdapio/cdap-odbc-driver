@@ -175,6 +175,7 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="QueryBuilder.h" />
+    <ClInclude Include="QuerySELECT1DataReader.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="SQLStatus.h" />
     <ClInclude Include="ExploreClient.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="QueryBuilder.cpp" />
+    <ClCompile Include="QuerySELECT1DataReader.cpp" />
     <ClCompile Include="setup.cpp" />
     <ClCompile Include="SQLStatus.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
