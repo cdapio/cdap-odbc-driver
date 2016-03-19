@@ -126,6 +126,9 @@
     <ClInclude Include="QueryDataReader.h">
       <Filter>Statements\DataReaders</Filter>
     </ClInclude>
+    <ClInclude Include="QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
     <ClInclude Include="DataType.h">
       <Filter>Driver</Filter>
     </ClInclude>
@@ -198,11 +201,7 @@
     <ClInclude Include="QueryBuilder.h">
       <Filter>Statements\Commands</Filter>
     </ClInclude>
-
-    <ClCompile Include="QuerySELECT1DataReader.h">
-      <Filter>Statements\DataReaders</Filter>
-    </ClCompile>
-   <ClInclude Include="Logger.h">
+    <ClInclude Include="Logger.h">
       <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="LogAppender.h">
@@ -213,7 +212,6 @@
     </ClInclude>
     <ClInclude Include="FileLogAppender.h">
       <Filter>Debug</Filter>
-
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +302,9 @@
     <ClCompile Include="QueryDataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
     </ClCompile>
+    <ClInclude Include="QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
     <ClCompile Include="DataType.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
@@ -370,22 +371,18 @@
     <ClCompile Include="QueryBuilder.cpp">
       <Filter>Statements\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="QuerySELECT1DataReader.cpp">
-      <Filter>Statements\DataReaders</Filter>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Debug</Filter>
     </ClCompile>
-    <ClInclude Include="Logger.cpp">
+    <ClCompile Include="LogAppender.cpp">
       <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="LogAppender.cpp">
+    </ClCompile>
+    <ClCompile Include="DebugLogAppender.cpp">
       <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugLogAppender.cpp">
+    </ClCompile>
+    <ClCompile Include="FileLogAppender.cpp">
       <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="FileLogAppender.cpp">
-      <Filter>Debug</Filter>
-
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
