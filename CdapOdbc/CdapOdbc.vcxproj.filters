@@ -198,8 +198,19 @@
     <ClInclude Include="QueryBuilder.h">
       <Filter>Statements\Commands</Filter>
     </ClInclude>
-    <ClInclude Include="QuerySELECT1DataReader.h">
-      <Filter>Statements\DataReaders</Filter>
+
+    <ClInclude Include="Logger.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="LogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLogAppender.h">
+      <Filter>Debug</Filter>
+
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

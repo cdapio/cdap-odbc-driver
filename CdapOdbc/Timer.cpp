@@ -17,13 +17,15 @@
 #include "stdafx.h"
 #include "Timer.h"
 
-Cask::CdapOdbc::Timer::Timer() 
-  : diffTime(0)
+Cask::CdapOdbc::Timer::Timer(const std::wstring& name) 
+  : name(name)
+  , diffTime(0)
   , running(false) {
 }
 
 void Cask::CdapOdbc::Timer::start() {
   assert(!this->running);
+  TRACE(L"Timer %s started.\n", this->name.c_str());
   this->startTime = std::chrono::high_resolution_clock::now();
   this->running = true;
 }
@@ -31,9 +33,11 @@ void Cask::CdapOdbc::Timer::start() {
 void Cask::CdapOdbc::Timer::stop() {
   assert(this->running);
   auto now = std::chrono::high_resolution_clock::now();
-  this->diffTime += (now - this->startTime).count();
+  auto elapsed = (now - this->startTime).count();
+  this->diffTime += elapsed;
   this->startTime = TimePoint();
   this->running = false;
+  TRACE(L"Timer %s stopped - %g seconds\n", this->name.c_str(), elapsed / 1000000000.0);
 }
 
 void Cask::CdapOdbc::Timer::reset() {
