@@ -24,6 +24,7 @@ namespace Cask {
   namespace CdapOdbc {
     class Environment;
     class SQLStatus;
+    class ConnectionInfo;
 
     /**
      * Represents a connection to a database.
@@ -158,6 +159,11 @@ namespace Cask {
        * Closes a connection.
        */
       void close();
+
+      /**
+       * Sets connection info to connection.
+       */
+      void setInfo(const ConnectionInfo& info);
     };
   }
 }

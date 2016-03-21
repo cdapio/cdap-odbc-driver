@@ -25,6 +25,7 @@
 #include "CancelException.h"
 #include "DataSourceDialog.h"
 #include "Argument.h"
+#include "ConnectionPool.h"
 
 #define ODBC_INI L"ODBC.INI"
 

@@ -727,6 +727,10 @@ SQLRETURN SQL_API SQLSetConnectAttrW(
           connection.setFunctionsAsync(value == SQL_ASYNC_DBC_ENABLE_ON);
           TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
           return SQL_SUCCESS;
+        case SQL_ATTR_DBC_INFO_TOKEN:
+          connection.setInfo(Driver::getInstance().getConnectionInfo(ValuePtr));
+          TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
+          return SQL_SUCCESS;
         default:
           TRACE(L"SQLSetConnectAttrW returns SQL_SUCCESS\n");
           return SQL_SUCCESS;

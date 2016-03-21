@@ -25,6 +25,7 @@ namespace Cask {
     class Statement;
     class Descriptor;
     class ConnectionInfo;
+    class ConnectionPool;
 
     enum class ConnectionPooling {
       None = SQL_CP_OFF,
@@ -49,6 +50,7 @@ namespace Cask {
       std::mutex mutex;
       std::map<std::wstring, DataType> dataTypes;
       ConnectionPooling connectionPooling;
+      std::map<POOLID, std::unique_ptr<ConnectionPool>> pools;
 
       static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);

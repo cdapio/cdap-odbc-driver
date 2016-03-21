@@ -24,6 +24,8 @@ namespace Cask {
      */
     class ConnectionPool {
 
+      POOLID id;
+
       ConnectionPool(const ConnectionPool&) = delete;
       void operator=(const ConnectionPool&) = delete;
 
@@ -38,6 +40,8 @@ namespace Cask {
        * Destructor.
        */
       ~ConnectionPool() = default;
+
+
     };
   }
 }

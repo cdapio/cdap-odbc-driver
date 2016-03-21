@@ -81,6 +81,13 @@ namespace Cask {
       }
 
       /**
+       * Gets connection params.
+       */
+      const ConnectionParams& getParams() const {
+        return *this->params;
+      }
+
+      /**
        * Sets connection async mode.
        */
       void setAsync(bool value) {

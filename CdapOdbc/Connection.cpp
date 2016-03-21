@@ -19,6 +19,7 @@
 #include "Environment.h"
 #include "Encoding.h"
 #include "CommunicationLinkFailure.h"
+#include "ConnectionInfo.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -89,4 +90,12 @@ void Cask::CdapOdbc::Connection::close() {
   this->exploreClient.reset();
   this->params.reset();
   this->isOpen = false;
+}
+
+void Cask::CdapOdbc::Connection::setInfo(const ConnectionInfo& info) {
+  assert(_wcsicmp(info.getParams().getHost().c_str(), this->params->getHost().c_str()) == 0);
+  assert(info.getParams().getPort() == this->params->getPort());
+  *this->params = info.getParams();
+  this->isAsync = info.getIsAsync();
+  this->isFunctionsAsync = info.getIsFunctionsAsync();
 }

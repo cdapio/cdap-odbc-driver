@@ -91,6 +91,7 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams()
   : driver()
+  , dsn()
   , host()
   , port(10000)
   , authToken()
@@ -101,6 +102,7 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams()
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(const ConnectionParams& other) 
   : driver(other.driver)
+  , dsn(other.dsn)
   , host(other.host)
   , port(other.port)
   , authToken(other.authToken)
@@ -111,6 +113,7 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(const ConnectionParams& other
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(ConnectionParams&& other) 
   : driver(std::move(other.driver))
+  , dsn(std::move(other.dsn))
   , host(std::move(other.host))
   , port(other.port)
   , authToken(std::move(other.authToken))
@@ -125,6 +128,7 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(ConnectionParams&& other)
 
 Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectionString)
   : driver()
+  , dsn()
   , host()
   , port(10000)
   , authToken()
@@ -136,6 +140,7 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectio
 
 void Cask::CdapOdbc::ConnectionParams::operator=(const ConnectionParams& other) {
   this->driver = other.driver;
+  this->dsn = other.dsn;
   this->host = other.host;
   this->port = other.port;
   this->authToken = other.authToken;
@@ -146,6 +151,7 @@ void Cask::CdapOdbc::ConnectionParams::operator=(const ConnectionParams& other) 
 
 void Cask::CdapOdbc::ConnectionParams::operator=(ConnectionParams&& other) {
   this->driver = std::move(other.driver);
+  this->dsn = std::move(other.dsn);
   this->host = std::move(other.host);
   this->port = other.port;
   this->authToken = std::move(other.authToken);
