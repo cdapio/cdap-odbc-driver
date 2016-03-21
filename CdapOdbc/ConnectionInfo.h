@@ -36,6 +36,9 @@ namespace Cask {
       bool isAsync;
       bool isFunctionsAsync;
 
+      bool canReuse(const Connection&) const;
+      bool perfectlyMatch(const Connection&) const;
+
       ConnectionInfo(const ConnectionInfo&) = delete;
       void operator=(const ConnectionInfo&) = delete;
 

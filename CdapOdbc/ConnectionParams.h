@@ -187,6 +187,11 @@ namespace Cask {
       void setVerifySslCert(bool value) {
         this->verifySslCert = value;
       }
+
+      /**
+       * Checks if params are equal.
+       */
+      bool operator ==(const ConnectionParams&) const;
     };
   }
 }

@@ -18,8 +18,20 @@
 #include "ConnectionInfo.h"
 #include "Environment.h"
 #include "ConnectionParams.h"
+#include "Connection.h"
 
 using namespace Cask::CdapOdbc;
+
+bool Cask::CdapOdbc::ConnectionInfo::canReuse(const Connection& connection) const {
+  return (_wcsicmp(connection.getParams().getHost().c_str(), this->params->getHost().c_str()) == 0 &&
+          connection.getParams().getPort() == this->params->getPort());
+}
+
+bool Cask::CdapOdbc::ConnectionInfo::perfectlyMatch(const Connection& connection) const {
+  return (connection.getParams() == *this->params &&
+          connection.getIsAsync() == this->isAsync &&
+          connection.getIsFunctionsAsync() == this->isFunctionsAsync);
+}
 
 Cask::CdapOdbc::ConnectionInfo::ConnectionInfo(Environment* environment, SQLHDBC_INFO_TOKEN handle)
   : handle(handle)
@@ -30,6 +42,14 @@ void Cask::CdapOdbc::ConnectionInfo::setConnectionString(const std::wstring& con
   this->params = std::make_unique<ConnectionParams>(connectionString);
 }
 
-int Cask::CdapOdbc::ConnectionInfo::rateConnection(const Connection & connection) {
-  return 0;
+int Cask::CdapOdbc::ConnectionInfo::rateConnection(const Connection& connection) {
+  if (!this->canReuse(connection)) {
+    return 0;
+  }
+
+  if (this->perfectlyMatch(connection)) {
+    return 100;
+  }
+
+  return 50;
 }

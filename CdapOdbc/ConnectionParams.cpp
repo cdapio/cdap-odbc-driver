@@ -189,3 +189,14 @@ std::wstring Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
 
   return result.str();
 }
+
+bool Cask::CdapOdbc::ConnectionParams::operator==(const ConnectionParams& other) const {
+  return (this->driver == other.driver &&
+    this->dsn == other.dsn &&
+    equals(this->host, other.host) &&
+    this->port == other.port &&
+    this->authToken == other.authToken &&
+    equals(this->namespace_, other.namespace_) &&
+    this->sslEnabled == other.sslEnabled &&
+    this->verifySslCert == other.verifySslCert);
+}
