@@ -311,9 +311,6 @@
     <ClCompile Include="QueryDataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
     </ClCompile>
-    <ClInclude Include="QuerySELECT1DataReader.cpp">
-      <Filter>Statements\DataReaders</Filter>
-    </ClInclude>
     <ClCompile Include="DataType.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="ConnectionInfo.cpp">
       <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
