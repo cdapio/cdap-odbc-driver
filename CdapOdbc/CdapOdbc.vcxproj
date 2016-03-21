@@ -181,6 +181,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="QueryBuilder.h" />
+    <ClInclude Include="QuerySELECT1DataReader.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="spi.h" />
     <ClInclude Include="SQLStatus.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="QueryBuilder.cpp" />
+    <ClCompile Include="QuerySELECT1DataReader.cpp" />
     <ClCompile Include="setup.cpp" />
     <ClCompile Include="spi.cpp" />
     <ClCompile Include="SQLStatus.cpp" />
