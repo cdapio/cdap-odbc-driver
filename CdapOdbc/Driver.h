@@ -17,6 +17,7 @@
 #pragma once
 
 #include "DataType.h"
+#include "ConnectionPool.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -25,7 +26,6 @@ namespace Cask {
     class Statement;
     class Descriptor;
     class ConnectionInfo;
-    class ConnectionPool;
 
     enum class ConnectionPooling {
       None = SQL_CP_OFF,
@@ -39,6 +39,9 @@ namespace Cask {
      * Implemented as a singleton.
      */
     class Driver {
+
+      friend class ConnectionPool;
+
       static std::unique_ptr<Driver> instance;
       static std::atomic_int lastHandleIndex;
 
@@ -50,7 +53,7 @@ namespace Cask {
       std::mutex mutex;
       std::map<std::wstring, DataType> dataTypes;
       ConnectionPooling connectionPooling;
-      std::map<POOLID, std::unique_ptr<ConnectionPool>> pools;
+      ConnectionPool pool;
 
       static SQLHANDLE generateNewHandle();
       Environment* findEnvironment(SQLHENV env);
