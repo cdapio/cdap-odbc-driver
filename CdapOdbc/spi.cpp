@@ -21,6 +21,7 @@
 #include "CdapException.h"
 #include "InvalidHandleException.h"
 #include "Argument.h"
+#include "Connection.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -42,7 +43,40 @@ SQLRETURN SQL_SPI SQLPoolConnectW(
   _Out_writes_opt_(cchConnStrOutMax) SQLWCHAR* szConnStrOut,
   SQLSMALLINT cchConnStrOutMax,
   _Out_opt_ SQLSMALLINT* pcchConnStrOut) {
-  return SQL_ERROR;
+  TRACE(L"SQLPoolConnectW(hdbc = %X, hDbcInfoToken = %X)\n", hdbc, hDbcInfoToken);
+  try {
+    auto& connection = Driver::getInstance().getConnection(hdbc);
+    auto& info = Driver::getInstance().getConnectionInfo(hDbcInfoToken);
+    try {
+      auto connectionString = connection.getParams().getFullConnectionString();
+      if (connection.getIsFunctionsAsync()) {
+        if (!connection.openAsync(connectionString)) {
+          TRACE(L"SQLPoolConnectW returns SQL_STILL_EXECUTING, szConnStrOut = %s\n", szConnStrOut);
+          return SQL_STILL_EXECUTING;
+        }
+      } else {
+        connection.open(connectionString);
+      }
+
+      Argument::fromStdString(connectionString, szConnStrOut, cchConnStrOutMax, pcchConnStrOut);
+      TRACE(L"SQLPoolConnectW returns SQL_SUCCESS, szConnStrOut = %s\n", szConnStrOut);
+      return SQL_SUCCESS;
+    } catch (CdapException& cex) {
+      TRACE(L"SQLPoolConnectW returns SQL_ERROR\n");
+      info.getSqlStatus().addError(cex);
+      return cex.getErrorCode();
+    } catch (std::exception& ex) {
+      TRACE(L"SQLPoolConnectW returns SQL_ERROR\n");
+      info.getSqlStatus().addError(ex);
+      return SQL_ERROR;
+    }
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLPoolConnectW returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLPoolConnectW returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_SPI SQLRateConnection(
