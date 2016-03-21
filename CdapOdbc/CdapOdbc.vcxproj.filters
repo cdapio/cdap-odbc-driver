@@ -126,6 +126,9 @@
     <ClInclude Include="QueryDataReader.h">
       <Filter>Statements\DataReaders</Filter>
     </ClInclude>
+    <ClInclude Include="QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
     <ClInclude Include="DataType.h">
       <Filter>Driver</Filter>
     </ClInclude>
@@ -299,6 +302,9 @@
     <ClCompile Include="QueryDataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
     </ClCompile>
+    <ClInclude Include="QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
     <ClCompile Include="DataType.cpp">
       <Filter>Driver</Filter>
     </ClCompile>

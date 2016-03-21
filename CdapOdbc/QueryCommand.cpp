@@ -18,6 +18,7 @@
 #include "QueryCommand.h"
 #include "Connection.h"
 #include "QueryDataReader.h"
+#include "QuerySELECT1DataReader.h"
 #include "CdapException.h"
 #include "QueryBuilder.h"
 
@@ -27,6 +28,11 @@ Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::ws
 }
 
 std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::executeReader() {
+  /* 'SELECT 1' query is executed locally */
+  if (_wcsicmp(this->query.c_str(), L"select 1") == 0) {
+    return std::make_unique<QuerySELECT1DataReader>();
+  }
+
   if (this->queryHandle.size() == 0) {
     QueryBuilder queryBuilder(this->query);
     this->queryHandle = this->getConnection()->getExploreClient().execute(queryBuilder.toString());
