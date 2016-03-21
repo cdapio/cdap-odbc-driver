@@ -20,6 +20,7 @@
 #include "Connection.h"
 #include "Statement.h"
 #include "Descriptor.h"
+#include "ConnectionInfo.h"
 #include "InvalidHandleException.h"
 #include "CancelException.h"
 #include "DataSourceDialog.h"
@@ -281,7 +282,8 @@ void Cask::CdapOdbc::Driver::initializeDataTypes() {
   );
 }
 
-Cask::CdapOdbc::Driver::Driver() {
+Cask::CdapOdbc::Driver::Driver()
+  : connectionPooling(ConnectionPooling::None){
   this->initializeDataTypes();
 }
 
@@ -323,6 +325,16 @@ Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
   throw InvalidHandleException();
 }
 
+ConnectionInfo& Cask::CdapOdbc::Driver::getConnectionInfo(SQLHDBC_INFO_TOKEN info) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  auto it = this->connectionInfos.find(info);
+  if (it != this->connectionInfos.end()) {
+    return *(it->second);
+  }
+
+  throw InvalidHandleException();
+}
+
 SQLHENV Cask::CdapOdbc::Driver::allocEnvironment() {
   SQLHENV env = generateNewHandle();
   std::lock_guard<std::mutex> lock(this->mutex);
@@ -352,6 +364,18 @@ SQLHDESC Cask::CdapOdbc::Driver::allocDescriptor(SQLHDBC dbc) {
   Connection* connection = this->findConnection(dbc);
   this->descriptors.emplace(desc, std::make_unique<Descriptor>(connection, desc));
   return desc;
+}
+
+SQLHDBC_INFO_TOKEN Cask::CdapOdbc::Driver::allocConnectionInfo(SQLHENV env) {
+  SQLHDBC_INFO_TOKEN info = generateNewHandle();
+  Environment* environment = nullptr;
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (env != SQL_NULL_HANDLE) {
+    environment = this->findEnvironment(env);
+  }
+
+  this->connectionInfos.emplace(info, std::make_unique<ConnectionInfo>(environment, info));
+  return info;
 }
 
 void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
@@ -389,6 +413,13 @@ void Cask::CdapOdbc::Driver::freeStatement(SQLHSTMT stmt) {
 void Cask::CdapOdbc::Driver::freeDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->descriptors.erase(desc) == 0) {
+    throw InvalidHandleException();
+  }
+}
+
+void Cask::CdapOdbc::Driver::freeConnectionInfo(SQLHDBC_INFO_TOKEN info) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (this->connectionInfos.erase(info) == 0) {
     throw InvalidHandleException();
   }
 }

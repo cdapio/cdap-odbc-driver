@@ -162,7 +162,9 @@
     <ClInclude Include="ConcurrentQueue.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionDialog.h" />
+    <ClInclude Include="ConnectionInfo.h" />
     <ClInclude Include="ConnectionParams.h" />
+    <ClInclude Include="ConnectionPool.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataReader.h" />
     <ClInclude Include="DataSourceDialog.h" />
@@ -180,6 +182,7 @@
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="QueryBuilder.h" />
     <ClInclude Include="setup.h" />
+    <ClInclude Include="spi.h" />
     <ClInclude Include="SQLStatus.h" />
     <ClInclude Include="ExploreClient.h" />
     <ClInclude Include="InvalidHandleException.h" />
@@ -222,7 +225,9 @@
     <ClCompile Include="ConcurrentQueue.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionDialog.cpp" />
+    <ClCompile Include="ConnectionInfo.cpp" />
     <ClCompile Include="ConnectionParams.cpp" />
+    <ClCompile Include="ConnectionPool.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="DataReader.cpp" />
     <ClCompile Include="DataSourceDialog.cpp" />
@@ -239,6 +244,7 @@
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="QueryBuilder.cpp" />
     <ClCompile Include="setup.cpp" />
+    <ClCompile Include="spi.cpp" />
     <ClCompile Include="SQLStatus.cpp" />
     <ClCompile Include="ExploreClient.cpp" />
     <ClCompile Include="InvalidHandleException.cpp" />

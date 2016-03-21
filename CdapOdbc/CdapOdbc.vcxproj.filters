@@ -210,6 +210,15 @@
     <ClInclude Include="FileLogAppender.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="spi.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionPool.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -376,6 +385,15 @@
     </ClCompile>
     <ClCompile Include="FileLogAppender.cpp">
       <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="spi.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionPool.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionInfo.cpp">
+      <Filter>Driver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,7 @@
 #include "Connection.h"
 #include "Argument.h"
 #include "Statement.h"
+#include "ConnectionInfo.h"
 #include "ConnectionDialog.h"
 #include "Encoding.h"
 #include "SQLStatus.h"
@@ -1773,6 +1774,9 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
     case SQL_HANDLE_STMT:
       status = Driver::getInstance().getStatement(Handle).getSqlStatus();
       break;
+    case SQL_HANDLE_DBC_INFO_TOKEN:
+      status = Driver::getInstance().getConnectionInfo(Handle).getSqlStatus();
+      break;
     case SQL_HANDLE_ENV:
     case SQL_HANDLE_DESC:
     default:
@@ -1852,6 +1856,9 @@ SQLRETURN SQL_API SQLGetDiagRecW(
       break;
     case SQL_HANDLE_STMT:
       status = Driver::getInstance().getStatement(Handle).getSqlStatus();
+      break;
+    case SQL_HANDLE_DBC_INFO_TOKEN:
+      status = Driver::getInstance().getConnectionInfo(Handle).getSqlStatus();
       break;
     case SQL_HANDLE_ENV:
     case SQL_HANDLE_DESC:
@@ -1975,8 +1982,28 @@ SQLRETURN SQL_API SQLSetEnvAttr(
   SQLPOINTER Value,
   SQLINTEGER StringLength) {
   TRACE(L"SQLSetEnvAttr(EnvironmentHandle = %X, Attribute = %d)\n", EnvironmentHandle, Attribute);
-  TRACE(L"SQLSetEnvAttr returns SQL_SUCCESS\n");
-  return SQL_SUCCESS;
+  try {
+    if (EnvironmentHandle != SQL_NULL_HANDLE) {
+      // Environment-wide attributes
+      // None at the moment
+    } else {
+      // Process-wide attributes
+      switch (Attribute) {
+        case SQL_ATTR_CONNECTION_POOLING:
+          Driver::getInstance().setConnectionPooling(static_cast<ConnectionPooling>(reinterpret_cast<SQLULEN>(Value)));
+          break;
+      }
+    }
+
+    TRACE(L"SQLSetEnvAttr returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLSetEnvAttr returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLSetEnvAttr returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_API SQLSetStmtAttrW(

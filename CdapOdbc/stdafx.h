@@ -32,6 +32,7 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <sqlspi.h>
 #include <odbcinst.h>
 
 #ifdef _DEBUG
