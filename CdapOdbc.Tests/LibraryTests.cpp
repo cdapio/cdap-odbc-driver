@@ -23,7 +23,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace Cask {
   namespace CdapOdbc {
     namespace Tests {
-      std::array<LPCSTR, 55> functions =
+      std::array<LPCSTR, 62> functions =
       {
         "ConfigDSN",
         "SQLAllocHandle",
@@ -80,6 +80,13 @@ namespace Cask {
         "SQLSpecialColumnsW",
         "SQLStatisticsW",
         "SQLTablesW",
+        "SQLCleanupConnectionPoolID",
+        "SQLGetPoolID",
+        "SQLPoolConnectW",
+        "SQLRateConnection",
+        "SQLSetConnectAttrForDbcInfoW",
+        "SQLSetConnectInfoW",
+        "SQLSetDriverConnectInfoW",
       };
 
       /**

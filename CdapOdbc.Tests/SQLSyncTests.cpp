@@ -19,6 +19,9 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
+#define TEST_TABLE L"stream_contacts"
+#define TEST_QUERY L"SELECT * FROM stream_contacts"
+
 namespace Cask {
   namespace CdapOdbc {
     namespace Tests {
@@ -69,18 +72,18 @@ namespace Cask {
 
           SQLHANDLE stmt = std::get<2>(handles);
 
-          result = SQLPrepareW(stmt, L"SELECT * FROM stream_items", SQL_NTS);
+          result = SQLPrepareW(stmt, TEST_QUERY, SQL_NTS);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          double value = -100.0;
+          char value[128];
           SQLLEN ind = 0;
-          result = SQLBindCol(stmt, 3, SQL_DOUBLE, &value, 0, &ind);
+          result = SQLBindCol(stmt, 4, SQL_CHAR, value, 128, &ind);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLFetch(stmt);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          Assert::IsTrue(value >= 0.0);
+          Assert::IsTrue(std::strlen(value) > 0);
 
           this->freeConnection(handles);
         }
@@ -93,7 +96,7 @@ namespace Cask {
           auto handles = this->createConnection();
           SQLHANDLE stmt = std::get<2>(handles);
 
-          result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, L"stream_items", SQL_NTS, nullptr, SQL_NTS);
+          result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, TEST_TABLE, SQL_NTS, nullptr, SQL_NTS);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           char value[128];

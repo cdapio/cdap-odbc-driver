@@ -24,20 +24,22 @@ Cask::CdapOdbc::Timer::Timer(const std::wstring& name)
 }
 
 void Cask::CdapOdbc::Timer::start() {
-  assert(!this->running);
-  TRACE(L"Timer %s started.\n", this->name.c_str());
-  this->startTime = std::chrono::high_resolution_clock::now();
-  this->running = true;
+  if (!this->running) {
+    TRACE(L"Timer %s started.\n", this->name.c_str());
+    this->startTime = std::chrono::high_resolution_clock::now();
+    this->running = true;
+  }
 }
 
 void Cask::CdapOdbc::Timer::stop() {
-  assert(this->running);
-  auto now = std::chrono::high_resolution_clock::now();
-  auto elapsed = (now - this->startTime).count();
-  this->diffTime += elapsed;
-  this->startTime = TimePoint();
-  this->running = false;
-  TRACE(L"Timer %s stopped - %g seconds\n", this->name.c_str(), elapsed / 1000000000.0);
+  if (this->running) {
+    auto now = std::chrono::high_resolution_clock::now();
+    auto elapsed = (now - this->startTime).count();
+    this->diffTime += elapsed;
+    this->startTime = TimePoint();
+    this->running = false;
+    TRACE(L"Timer %s stopped - %g seconds\n", this->name.c_str(), elapsed / 1000000000.0);
+  }
 }
 
 void Cask::CdapOdbc::Timer::reset() {

@@ -17,6 +17,9 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
+#define TEST_TABLE L"stream_contacts"
+#define TEST_QUERY L"SELECT * FROM stream_contacts"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Cask {
@@ -67,9 +70,9 @@ namespace Cask {
           auto handles = this->createConnection();
           SQLHANDLE stmt = std::get<2>(handles);
 
-          result = SQLPrepareW(stmt, L"SELECT * FROM stream_items", SQL_NTS);
+          result = SQLPrepareW(stmt, TEST_QUERY, SQL_NTS);
           do {
-            result = SQLPrepareW(stmt, L"SELECT * FROM stream_items", SQL_NTS);
+            result = SQLPrepareW(stmt, TEST_QUERY, SQL_NTS);
           } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
@@ -97,15 +100,15 @@ namespace Cask {
           auto handles = this->createConnection();
           SQLHANDLE stmt = std::get<2>(handles);
 
-          result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, L"stream_items", SQL_NTS, nullptr, SQL_NTS);
+          result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, TEST_TABLE, SQL_NTS, nullptr, SQL_NTS);
           do {
-            result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, L"stream_items", SQL_NTS, nullptr, SQL_NTS);
+            result = SQLColumnsW(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, TEST_TABLE, SQL_NTS, nullptr, SQL_NTS);
           } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           char value[128];
           SQLLEN ind = 0;
-          result = SQLBindCol(stmt, 4, SQL_CHAR, value, 128, &ind);
+          result = SQLBindCol(stmt, 1, SQL_CHAR, value, 128, &ind);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLFetch(stmt);
@@ -166,9 +169,9 @@ namespace Cask {
           result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           do {
-            result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+            result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
           
