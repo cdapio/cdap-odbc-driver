@@ -23,6 +23,7 @@
 #include <Windows.h>
 #include <sql.h>
 #include <sqlext.h>
+#include <sqlspi.h>
 
 #include <tuple>
 

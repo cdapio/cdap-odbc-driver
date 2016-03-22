@@ -93,6 +93,11 @@ SQLRETURN SQL_API SQLAllocHandle(
         TRACE(L"SQLAllocHandle returns SQL_SUCCESS, new descriptor = %X\n", *OutputHandlePtr);
         return SQL_SUCCESS;
 
+      case SQL_HANDLE_DBC_INFO_TOKEN:
+        *OutputHandlePtr = Driver::getInstance().allocConnectionInfo(InputHandle);
+        TRACE(L"SQLAllocHandle returns SQL_SUCCESS, new descriptor = %X\n", *OutputHandlePtr);
+        return SQL_SUCCESS;
+
       default:
         TRACE(L"SQLAllocHandle returns SQL_ERROR\n");
         return SQL_ERROR;
@@ -1662,6 +1667,11 @@ SQLRETURN SQL_API SQLFreeHandle(
 
       case SQL_HANDLE_DESC:
         Driver::getInstance().freeDescriptor(Handle);
+        TRACE(L"SQLFreeHandle returns SQL_SUCCESS\n");
+        return SQL_SUCCESS;
+
+      case SQL_HANDLE_DBC_INFO_TOKEN:
+        Driver::getInstance().freeConnectionInfo(Handle);
         TRACE(L"SQLFreeHandle returns SQL_SUCCESS\n");
         return SQL_SUCCESS;
 

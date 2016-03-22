@@ -123,6 +123,13 @@ namespace Cask {
       }
 
       /**
+       * Gets connection pool.
+       */
+      ConnectionPool& getConnectionPool() {
+        return this->pool;
+      }
+
+      /**
        * Sets active connection pooling type.
        */
       void setConnectionPooling(ConnectionPooling value) {

@@ -28,13 +28,36 @@ using namespace Cask::CdapOdbc;
 SQLRETURN SQL_SPI SQLCleanupConnectionPoolID(
   SQLHENV environmentHandle,
   POOLID poolID) {
-  return SQL_ERROR;
+  TRACE(L"SQLCleanupConnectionPoolID(POOLID = %X)\n", poolID);
+  try {
+    Driver::getInstance().getConnectionPool().removePool(poolID);
+    TRACE(L"SQLCleanupConnectionPoolID returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLCleanupConnectionPoolID returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLCleanupConnectionPoolID returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_SPI SQLGetPoolID(
   SQLHDBC_INFO_TOKEN hDbcInfoToken,
   _Out_ POOLID* pPoolID) {
-  return SQL_ERROR;
+  TRACE(L"SQLGetPoolID(hDbcInfoToken = %X)\n", hDbcInfoToken);
+  try {
+    auto& info = Driver::getInstance().getConnectionInfo(hDbcInfoToken);
+    *pPoolID = Driver::getInstance().getConnectionPool().getPoolID(info);
+    TRACE(L"SQLGetPoolID returns SQL_SUCCESS\n");
+    return SQL_SUCCESS;
+  } catch (InvalidHandleException&) {
+    TRACE(L"SQLGetPoolID returns SQL_INVALID_HANDLE\n");
+    return SQL_INVALID_HANDLE;
+  } catch (std::exception&) {
+    TRACE(L"SQLGetPoolID returns SQL_ERROR\n");
+    return SQL_ERROR;
+  }
 }
 
 SQLRETURN SQL_SPI SQLPoolConnectW(
@@ -48,7 +71,7 @@ SQLRETURN SQL_SPI SQLPoolConnectW(
     auto& connection = Driver::getInstance().getConnection(hdbc);
     auto& info = Driver::getInstance().getConnectionInfo(hDbcInfoToken);
     try {
-      auto connectionString = connection.getParams().getFullConnectionString();
+      auto connectionString = info.getParams().getFullConnectionString();
       if (connection.getIsFunctionsAsync()) {
         if (!connection.openAsync(connectionString)) {
           TRACE(L"SQLPoolConnectW returns SQL_STILL_EXECUTING, szConnStrOut = %s\n", szConnStrOut);
