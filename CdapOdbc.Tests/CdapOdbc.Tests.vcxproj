@@ -229,6 +229,7 @@
   <ItemGroup>
     <ClCompile Include="SQLAllocFreeHandleTests.cpp" />
     <ClCompile Include="SQLAsyncTests.cpp" />
+    <ClCompile Include="SQLConnectionPoolTests.cpp" />
     <ClCompile Include="SQLDriverConnectDisconnectTests.cpp" />
     <ClCompile Include="SQLGetInfoTests.cpp" />
     <ClCompile Include="SQLSyncTests.cpp" />

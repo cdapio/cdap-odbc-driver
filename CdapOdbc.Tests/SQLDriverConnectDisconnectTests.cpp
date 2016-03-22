@@ -49,12 +49,8 @@ namespace Cask {
           Assert::AreEqual(static_cast<SQLRETURN>(SQL_SUCCESS), result);
         }
 
-        std::string getBaseConnectionStringA() {
-          return "Host=localhost;Port=10000";
-        }
-
         std::wstring getBaseConnectionStringW() {
-          return L"Host=localhost;Port=10000";
+          return CONNECTION_STRING;
         }
 
       public:

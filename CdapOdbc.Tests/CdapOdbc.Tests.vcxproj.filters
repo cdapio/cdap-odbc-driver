@@ -13,5 +13,6 @@
     <ClCompile Include="SQLAsyncTests.cpp" />
     <ClCompile Include="SQLSyncTests.cpp" />
     <ClCompile Include="SQLGetInfoTests.cpp" />
+    <ClCompile Include="SQLConnectionPoolTests.cpp" />
   </ItemGroup>
 </Project>

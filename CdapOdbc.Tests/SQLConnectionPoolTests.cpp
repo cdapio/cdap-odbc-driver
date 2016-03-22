@@ -14,16 +14,22 @@
 * the License.
 */
 
-#pragma once
-
-#include "targetver.h"
-
+#include "stdafx.h"
 #include "CppUnitTest.h"
 
-#include <Windows.h>
-#include <sql.h>
-#include <sqlext.h>
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-#include <tuple>
+namespace Cask {
+  namespace CdapOdbc {
+    namespace Tests {
+      /**
+       * Tests for SPI functions.
+       */
+      TEST_CLASS(SQLConnectionPoolTests) {
 
-#define CONNECTION_STRING L"Driver=CDAP ODBC;Host=104.154.22.63"
+      public:
+
+      };
+    }
+  }
+}
