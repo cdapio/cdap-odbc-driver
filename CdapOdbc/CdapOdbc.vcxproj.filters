@@ -302,9 +302,6 @@
     <ClCompile Include="QueryDataReader.cpp">
       <Filter>Statements\DataReaders</Filter>
     </ClCompile>
-    <ClInclude Include="QuerySELECT1DataReader.cpp">
-      <Filter>Statements\DataReaders</Filter>
-    </ClInclude>
     <ClCompile Include="DataType.cpp">
       <Filter>Driver</Filter>
     </ClCompile>
@@ -383,6 +380,7 @@
     <ClCompile Include="FileLogAppender.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
+    <ClCompile Include="QuerySELECT1DataReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
