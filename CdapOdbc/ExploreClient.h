@@ -19,6 +19,7 @@
 #include "ColumnDesc.h"
 #include "QueryStatus.h"
 #include "QueryResult.h"
+#include "String.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -33,6 +34,7 @@ namespace Cask {
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
       std::wstring namespace_;
+      SecureString authToken;
 
       web::json::value doRequest(web::http::http_request& request, std::int64_t* sizeInBytes);
       web::json::value doRequest(web::http::method mhd, const utility::string_t& path, const web::json::value* body = nullptr, std::int64_t* sizeInBytes = nullptr);
@@ -45,7 +47,7 @@ namespace Cask {
       /**
        * Creates an instance of explore client.
        */
-      ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_);
+      ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_, const SecureString& authToken);
       
       /**
        * Destructor.

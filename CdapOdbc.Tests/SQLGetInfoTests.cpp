@@ -49,7 +49,7 @@ namespace Cask {
           result = SQLGetInfoW(con, SQL_DRIVER_VER, ver, 100, &len);
           Assert::AreEqual(SQL_SUCCESS, result);
           Assert::AreEqual(10, static_cast<int>(len));
-          Assert::AreNotEqual(L"01.00.0000", ver);
+          Assert::AreNotEqual(L"00.00.0000", ver);
 
           SQLFreeHandle(SQL_HANDLE_DBC, con);
           SQLFreeHandle(SQL_HANDLE_ENV, env);

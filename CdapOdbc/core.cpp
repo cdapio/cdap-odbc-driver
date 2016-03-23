@@ -140,8 +140,8 @@ SQLRETURN SQL_API SQLDriverConnectW(
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
     try {
-      std::unique_ptr<std::wstring> connectionString;
-      std::wstring newConnectionString;
+      std::unique_ptr<SecureString> connectionString;
+      SecureString newConnectionString;
       std::unique_ptr<ConnectionDialog> dialog;
 
       // Clear Connection SQL Status
@@ -150,7 +150,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
       switch (DriverCompletion) {
         case SQL_DRIVER_PROMPT:
           // DRIVER
-          connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          connectionString = Argument::toStdString<SecureString>(InConnectionString, StringLength1);
           dialog = std::make_unique<ConnectionDialog>(WindowHandle);
           dialog->setParams(ConnectionParams(*connectionString));
           if (!dialog->show()) {
@@ -160,7 +160,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
           }
 
           newConnectionString = dialog->getParams().getFullConnectionString();
-          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          Argument::fromSecureString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
 
           if (connection.getIsFunctionsAsync()) {
             if (!connection.openAsync(newConnectionString)) {
@@ -176,7 +176,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
         case SQL_DRIVER_COMPLETE:
         case SQL_DRIVER_COMPLETE_REQUIRED:
           // DSN
-          connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          connectionString = Argument::toStdString<SecureString>(InConnectionString, StringLength1);
           if (connectionString->find(L"DSN") != std::wstring::npos) {
             dialog = std::make_unique<ConnectionDialog>(WindowHandle);
             dialog->setParams(ConnectionParams(*connectionString));
@@ -191,7 +191,7 @@ SQLRETURN SQL_API SQLDriverConnectW(
             newConnectionString = *connectionString;
           }
 
-          Argument::fromStdString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          Argument::fromSecureString(newConnectionString, OutConnectionString, BufferLength, StringLength2Ptr);
 
           if (connection.getIsFunctionsAsync()) {
             if (!connection.openAsync(newConnectionString)) {
@@ -206,12 +206,12 @@ SQLRETURN SQL_API SQLDriverConnectW(
           return SQL_SUCCESS;
         case SQL_DRIVER_NOPROMPT:
           // DRIVER 2
-          connectionString = Argument::toStdString(InConnectionString, StringLength1);
+          connectionString = Argument::toStdString<SecureString>(InConnectionString, StringLength1);
           if (!connectionString || connectionString->size() == 0) {
             throw CdapException(L"Connection string cannot be empty.");
           }
 
-          Argument::fromStdString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
+          Argument::fromSecureString(*connectionString, OutConnectionString, BufferLength, StringLength2Ptr);
           if (connection.getIsFunctionsAsync()) {
             if (!connection.openAsync(*connectionString)) {
               TRACE(L"SQLDriverConnectW returns SQL_STILL_EXECUTING, OutConnectionString = %s\n", OutConnectionString);
@@ -817,7 +817,7 @@ SQLRETURN SQL_API SQLPrepareW(
     try {
       statement.getSqlStatus().clear();
 
-      auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      auto query = Argument::toStdString<std::wstring>(StatementText, static_cast<SQLSMALLINT>(TextLength));
       if (!query) {
         throw CdapException(L"Statement text cannot be empty.");
       }
@@ -887,7 +887,7 @@ SQLRETURN SQL_API SQLExecDirectW(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      auto query = Argument::toStdString(StatementText, static_cast<SQLSMALLINT>(TextLength));
+      auto query = Argument::toStdString<std::wstring>(StatementText, static_cast<SQLSMALLINT>(TextLength));
       if (!query) {
         throw CdapException(L"Statement text cannot be empty.");
       }
@@ -1387,7 +1387,7 @@ SQLRETURN SQL_API SQLColumnsW(
     std::lock_guard<Connection> lock(*statement.getConnection());
     try {
       statement.getSqlStatus().clear();
-      auto streamName = Argument::toStdString(TableName, NameLength3);
+      auto streamName = Argument::toStdString<std::wstring>(TableName, NameLength3);
       if (!streamName) {
         throw CdapException(L"Table name cannot be empty.");
       }
@@ -1457,10 +1457,10 @@ SQLRETURN SQL_API SQLTablesW(
     try {
       statement.getSqlStatus().clear();
 
-      auto catalogName = Argument::toStdString(CatalogName, NameLength1);
-      auto schemaName = Argument::toStdString(SchemaName, NameLength2);
-      auto streamName = Argument::toStdString(TableName, NameLength3);
-      auto tableTypes = Argument::toStdString(TableType, NameLength4);
+      auto catalogName = Argument::toStdString<std::wstring>(CatalogName, NameLength1);
+      auto schemaName = Argument::toStdString<std::wstring>(SchemaName, NameLength2);
+      auto streamName = Argument::toStdString<std::wstring>(TableName, NameLength3);
+      auto tableTypes = Argument::toStdString<std::wstring>(TableType, NameLength4);
 
       if (schemaName && *schemaName == L"%") {
         statement.getSchemas(catalogName.get(), schemaName.get());

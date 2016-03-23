@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "String.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
@@ -27,12 +29,12 @@ namespace Cask {
       std::wstring dsn;
       std::wstring host;
       int port;
-      std::wstring authToken;
+      SecureString authToken;
       std::wstring namespace_;
       bool sslEnabled;
       bool verifySslCert;
 
-      void parse(const std::wstring& connectionString);
+      void parse(const SecureString& connectionString);
 
     public:
 
@@ -54,7 +56,7 @@ namespace Cask {
       /**
        * Creates an instance of connection params.
        */
-      ConnectionParams(const std::wstring& connectionString);
+      ConnectionParams(const SecureString& connectionString);
 
       /**
        * Destructor.
@@ -102,7 +104,7 @@ namespace Cask {
       /**
        * Gets AUTH_TOKEN connection parameter.
        */
-      const std::wstring& getAuthToken() const {
+      const SecureString& getAuthToken() const {
         return this->authToken;
       }
 
@@ -130,7 +132,7 @@ namespace Cask {
       /**
        * Gets full version of connection string.
        */
-      std::wstring getFullConnectionString() const;
+      SecureString getFullConnectionString() const;
 
       /**
        * Sets DRIVER connection parameter.
@@ -163,7 +165,7 @@ namespace Cask {
       /**
        * Sets AUTH_TOKEN connection parameter.
        */
-      void setAuthToken(const std::wstring& value) {
+      void setAuthToken(const SecureString& value) {
         this->authToken = value;
       }
 

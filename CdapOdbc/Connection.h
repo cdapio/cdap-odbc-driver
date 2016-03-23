@@ -19,6 +19,7 @@
 #include "ConnectionParams.h"
 #include "ExploreClient.h"
 #include "SQLStatus.h"
+#include "String.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -41,7 +42,7 @@ namespace Cask {
       std::unique_ptr<pplx::task<void>> openTask;
 
       web::http::uri resolveUri() const;
-      void internalOpen(const std::wstring& connectionString);
+      void internalOpen(const SecureString& connectionString);
 
       Connection(const Connection&) = delete;
       void operator=(const Connection&) = delete;
@@ -140,12 +141,12 @@ namespace Cask {
        *   SSL_ENABLED - SSL enabled/disabled (default false)
        *   VERIFY_SSL_CERT - server certificate verification (default true)
        */
-      void open(const std::wstring& connectionString);
+      void open(const SecureString& connectionString);
 
       /**
       * Opens a connection to explore REST service.
       */
-      bool openAsync(const std::wstring& connectionString);
+      bool openAsync(const SecureString& connectionString);
 
       /*
        * Closes a connection.

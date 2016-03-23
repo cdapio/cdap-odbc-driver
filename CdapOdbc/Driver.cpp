@@ -477,7 +477,7 @@ void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring
 void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  auto params = ConnectionParams(attrs);
+  auto params = ConnectionParams(attrs.c_str());
   auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
   dialog->setName(params.getDsn());
   if (dialog->show()) {
@@ -499,6 +499,6 @@ void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstr
 void Cask::CdapOdbc::Driver::deleteDataSource(const std::wstring& driver, const std::wstring& attrs) {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  auto params = ConnectionParams(attrs);
+  auto params = ConnectionParams(attrs.c_str());
   ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
 }

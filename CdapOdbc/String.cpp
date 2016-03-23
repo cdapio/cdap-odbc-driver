@@ -17,26 +17,26 @@
 #include "stdafx.h"
 #include "String.h"
 
-void Cask::CdapOdbc::String::split(const std::wstring & str, wchar_t delim, std::vector<std::wstring>& tokens) {
-  std::wstringstream stream(str);
-  std::wstring item;
+void Cask::CdapOdbc::String::split(const SecureString& str, wchar_t delim, std::vector<SecureString>& tokens) {
+  SecureStringStream stream(str.c_str());
+  SecureString item;
   while (std::getline(stream, item, delim)) {
     tokens.push_back(item);
   }
 }
 
-std::wstring Cask::CdapOdbc::String::trim(const std::wstring & str) {
-  std::wstring result = str;
+Cask::CdapOdbc::SecureString Cask::CdapOdbc::String::trim(const SecureString & str) {
+  SecureString result = str;
 
   // Trim trailing spaces
   size_t endPos = result.find_last_not_of(L" \t");
-  if (std::wstring::npos != endPos) {
+  if (SecureString::npos != endPos) {
     result = result.substr(0, endPos + 1);
   }
 
   // Trim leading spaces
   size_t startPos = result.find_first_not_of(L" \t");
-  if (std::wstring::npos != startPos) {
+  if (SecureString::npos != startPos) {
     result = result.substr(startPos);
   }
 

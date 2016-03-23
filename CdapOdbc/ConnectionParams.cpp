@@ -18,6 +18,8 @@
 #include "ConnectionParams.h"
 #include "String.h"
 
+using namespace Cask::CdapOdbc;
+
 namespace {
 
   bool equals(const std::wstring& str1, const std::wstring& str2);
@@ -51,9 +53,9 @@ namespace {
   }
 }
 
-void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionString) {
-  std::vector<std::wstring> params;
-  std::vector<std::wstring> values;
+void Cask::CdapOdbc::ConnectionParams::parse(const SecureString& connectionString) {
+  std::vector<SecureString> params;
+  std::vector<SecureString> values;
   std::wstring key;
 
   String::split(connectionString, L';', params);
@@ -64,27 +66,27 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
       throw std::invalid_argument("connectionString");
     }
 
-    key = String::trim(values[0]);
+    key = String::trim(values[0]).c_str();
     if (key.size() == 0) {
       throw std::invalid_argument("connectionString");
     }
 
     if (equals(key, L"driver")) {
-      this->driver = String::trim(values[1]);
+      this->driver = String::trim(values[1]).c_str();
     } else if (equals(key, L"dsn")) {
-      this->dsn = String::trim(values[1]);
+      this->dsn = String::trim(values[1]).c_str();
     } else if (equals(key, L"host")) {
-      this->host = String::trim(values[1]);
+      this->host = String::trim(values[1]).c_str();
     } else if (equals(key, L"port")) {
-      this->port = parseInt(String::trim(values[1]));
+      this->port = parseInt(String::trim(values[1]).c_str());
     } else if (equals(key, L"auth_token")) {
       this->authToken = String::trim(values[1]);
     } else if (equals(key, L"namespace")) {
-      this->namespace_ = String::trim(values[1]);
+      this->namespace_ = String::trim(values[1]).c_str();
     } else if (equals(key, L"ssl_enabled")) {
-      this->sslEnabled = parseBool(String::trim(values[1]));
+      this->sslEnabled = parseBool(String::trim(values[1]).c_str());
     } else if (equals(key, L"verify_ssl_cert")) {
-      this->verifySslCert = parseBool(String::trim(values[1]));
+      this->verifySslCert = parseBool(String::trim(values[1]).c_str());
     }
   }
 }
@@ -123,7 +125,7 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(ConnectionParams&& other)
   other.verifySslCert = false;
 }
 
-Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectionString)
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(const SecureString& connectionString)
   : driver()
   , host()
   , port(10000)
@@ -158,8 +160,8 @@ void Cask::CdapOdbc::ConnectionParams::operator=(ConnectionParams&& other) {
   other.verifySslCert = false;
 }
 
-std::wstring Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
-  std::wstringstream result;
+Cask::CdapOdbc::SecureString Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
+  SecureStringStream result;
 
   if (this->driver.size() > 0) {
     result << L"Driver=" << this->driver << L";";
