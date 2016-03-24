@@ -141,10 +141,6 @@ SQLRETURN SQL_API SQLDriverConnectW(
     InConnectionString,
     DriverCompletion);
   try {
-    if (StringLength2Ptr) {
-      *StringLength2Ptr = 0;
-    }
-
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
     try {
