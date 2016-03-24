@@ -24,7 +24,7 @@ namespace {
   }
 }
 
-INT_PTR Cask::CdapOdbc::Dialog::dialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR Cask::CdapOdbc::Dialog::dialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam) {
   switch (uMsg) {
     case WM_INITDIALOG:
       ::SetWindowLongPtrW(hwndDlg, GWLP_USERDATA, lParam);

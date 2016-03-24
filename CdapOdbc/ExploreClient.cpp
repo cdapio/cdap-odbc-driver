@@ -80,12 +80,16 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd,
   }
 
   request.set_request_uri(requestUri.append_path(path).to_uri());
-  //request.headers().add(header_names::authorization, L"Bearer " + this->authToken);
+  if (this->authToken.size() > 0) {
+    request.headers().add(web::http::header_names::authorization, L"Bearer " + this->authToken);
+  }
+
   return this->doRequest(request, sizeInBytes);
 }
 
-Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_)
-  : namespace_(namespace_) {
+Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_, const SecureString& authToken)
+  : namespace_(namespace_)
+  , authToken(authToken) {
   this->httpClient = std::make_unique<web::http::client::http_client>(baseUri);
 }
 

@@ -35,7 +35,7 @@ web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
   return uri.to_uri();
 }
 
-void Cask::CdapOdbc::Connection::internalOpen(const std::wstring& connectionString) {
+void Cask::CdapOdbc::Connection::internalOpen(const SecureString& connectionString) {
   assert(!this->isOpen);
   if (connectionString.size() == 0) {
     throw CdapException(L"Connection string cannot be empty.");
@@ -43,7 +43,7 @@ void Cask::CdapOdbc::Connection::internalOpen(const std::wstring& connectionStri
 
   this->params = std::make_unique<ConnectionParams>(connectionString);
   auto baseUri = this->resolveUri();
-  this->exploreClient = std::make_unique<ExploreClient>(baseUri, this->params->getNamespace());
+  this->exploreClient = std::make_unique<ExploreClient>(baseUri, this->params->getNamespace(), this->params->getAuthToken());
   if (this->exploreClient->isAvailable()) {
     this->isOpen = true;
   } else {
@@ -60,12 +60,12 @@ Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   assert(handle);
 }
 
-void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
+void Cask::CdapOdbc::Connection::open(const SecureString& connectionString) {
   assert(!this->isFunctionsAsync);
   this->internalOpen(connectionString);
 }
 
-bool Cask::CdapOdbc::Connection::openAsync(const std::wstring& connectionString) {
+bool Cask::CdapOdbc::Connection::openAsync(const SecureString& connectionString) {
   assert(this->isFunctionsAsync);
   if (this->openTask) {
     if (this->openTask->is_done()) {

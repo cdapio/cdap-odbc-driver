@@ -20,6 +20,40 @@ namespace Cask {
   namespace CdapOdbc {
 
     /**
+     * Allocator for secure string.
+     */
+    template <typename T>
+    class SecureAllocator : public std::allocator<T> {
+    public:
+
+      template<typename U>
+      struct rebind {
+        typedef SecureAllocator<U> other;
+      };
+
+      SecureAllocator() throw() {
+      }
+
+      SecureAllocator(const SecureAllocator&) throw() {
+      }
+
+      template <typename U>
+      SecureAllocator(const SecureAllocator<U>&) throw() {
+      }
+
+      void deallocate(pointer p, size_type n) {
+        SecureZeroMemory(p, n * sizeof(T));
+        std::allocator<T>::deallocate(p, n);
+      }
+    };
+
+    /**
+     * Secure string.
+     */
+    using SecureString = std::basic_string<wchar_t, std::char_traits<wchar_t>, SecureAllocator<wchar_t>>;
+    using SecureStringStream = std::basic_stringstream<wchar_t, std::char_traits<wchar_t>, SecureAllocator<wchar_t>>;
+
+    /**
      * Utility class for manipulating strings.
      */
     class String {
@@ -30,12 +64,12 @@ namespace Cask {
       /**
        * Splits a string to tokens separated by delimiter character.
        */
-      static void split(const std::wstring& str, wchar_t delim, std::vector<std::wstring>& tokens);
+      static void split(const SecureString& str, wchar_t delim, std::vector<SecureString>& tokens);
 
       /**
        * Removes whitespaces from the start and the end of a string.
        */
-      static std::wstring trim(const std::wstring& str);
+      static SecureString trim(const SecureString& str);
 
       /**
        * Converts double to string with specified width.
