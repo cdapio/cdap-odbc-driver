@@ -48,7 +48,7 @@ namespace Cask {
           result = SQLAllocHandle(SQL_HANDLE_DBC, env, &con);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           // Connection opened 
@@ -63,7 +63,7 @@ namespace Cask {
           result = SQLSetConnectAttrForDbcInfoW(infoToken, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, SQL_ASYNC_DBC_ENABLE_OFF, 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLSetDriverConnectInfoW(infoToken, CONNECTION_STRING, SQL_NTS);
+          result = SQLSetDriverConnectInfoW(infoToken, TEST_CONNECTION_STRING, SQL_NTS);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLGetPoolID(infoToken, &poolID);
@@ -107,7 +107,7 @@ namespace Cask {
           result = SQLAllocHandle(SQL_HANDLE_DBC, env, &con);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           // Connection opened 
@@ -123,7 +123,7 @@ namespace Cask {
           result = SQLSetConnectAttrForDbcInfoW(infoToken, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, SQL_ASYNC_DBC_ENABLE_OFF, 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLSetDriverConnectInfoW(infoToken, CONNECTION_STRING, SQL_NTS);
+          result = SQLSetDriverConnectInfoW(infoToken, TEST_CONNECTION_STRING, SQL_NTS);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLGetPoolID(infoToken, &poolID);
@@ -171,11 +171,11 @@ namespace Cask {
           Assert::AreEqual(SQL_SUCCESS, result);
 
           // Check even if localhost REST service missing
-          result = SQLDriverConnectW(con, HWND_DESKTOP, L"Driver=CDAP ODBC;Host=localhost", SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING2, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           // Connection opened 
-          // Lets' emulate pool-related calls
+          // Let's emulate pool-related calls
           result = SQLAllocHandle(SQL_HANDLE_DBC_INFO_TOKEN, SQL_NULL_HANDLE, &infoToken);
           Assert::AreEqual(SQL_SUCCESS, result);
           Assert::IsNotNull(infoToken);
@@ -186,7 +186,7 @@ namespace Cask {
           result = SQLSetConnectAttrForDbcInfoW(infoToken, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, SQL_ASYNC_DBC_ENABLE_OFF, 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLSetDriverConnectInfoW(infoToken, CONNECTION_STRING, SQL_NTS);
+          result = SQLSetDriverConnectInfoW(infoToken, TEST_CONNECTION_STRING, SQL_NTS);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLGetPoolID(infoToken, &poolID);

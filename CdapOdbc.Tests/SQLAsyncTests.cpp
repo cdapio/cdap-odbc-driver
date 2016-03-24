@@ -45,7 +45,7 @@ namespace Cask {
           result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           Assert::AreEqual(SQL_SUCCESS, result);
 
           result = SQLAllocHandle(SQL_HANDLE_STMT, con, &stmt);
@@ -169,9 +169,9 @@ namespace Cask {
           result = SQLSetConnectAttrW(con, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
           Assert::AreEqual(SQL_SUCCESS, result);
 
-          result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+          result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           do {
-            result = SQLDriverConnectW(con, HWND_DESKTOP, CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+            result = SQLDriverConnectW(con, HWND_DESKTOP, TEST_CONNECTION_STRING, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
           } while (result == SQL_STILL_EXECUTING);
           Assert::AreEqual(SQL_SUCCESS, result);
           

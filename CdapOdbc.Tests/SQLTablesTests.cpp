@@ -72,7 +72,7 @@ namespace Cask {
         }
 
         std::wstring getBaseConnectionStringW() {
-          return CONNECTION_STRING;
+          return TEST_CONNECTION_STRING;
         }
 
       public:
