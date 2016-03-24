@@ -38,7 +38,7 @@ Cask::CdapOdbc::ConnectionInfo::ConnectionInfo(Environment* environment, SQLHDBC
   , environment(environment) {
 }
 
-void Cask::CdapOdbc::ConnectionInfo::setConnectionString(const std::wstring& connectionString) {
+void Cask::CdapOdbc::ConnectionInfo::setConnectionString(const SecureString& connectionString) {
   this->params = std::make_unique<ConnectionParams>(connectionString);
 }
 

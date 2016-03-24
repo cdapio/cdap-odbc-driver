@@ -22,6 +22,7 @@
 #include "InvalidHandleException.h"
 #include "Argument.h"
 #include "Connection.h"
+#include "String.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -81,7 +82,7 @@ SQLRETURN SQL_SPI SQLPoolConnectW(
         connection.open(connectionString);
       }
 
-      Argument::fromStdString(connectionString, szConnStrOut, cchConnStrOutMax, pcchConnStrOut);
+      Argument::fromSecureString(connectionString, szConnStrOut, cchConnStrOutMax, pcchConnStrOut);
       TRACE(L"SQLPoolConnectW returns SQL_SUCCESS, szConnStrOut = %s\n", szConnStrOut);
       return SQL_SUCCESS;
     } catch (CdapException& cex) {
@@ -203,7 +204,7 @@ SQLRETURN SQL_SPI SQLSetDriverConnectInfoW(
     auto& info = Driver::getInstance().getConnectionInfo(hDbcInfoToken);
     try {
       info.getSqlStatus().clear();
-      auto connectionString = Argument::toStdString(szConnStrIn, cchConnStrIn);
+      auto connectionString = Argument::toStdString<SecureString>(szConnStrIn, cchConnStrIn);
       if (connectionString) {
         info.setConnectionString(*connectionString);
         TRACE(L"SQLSetDriverConnectInfoW returns SQL_SUCCESS\n");

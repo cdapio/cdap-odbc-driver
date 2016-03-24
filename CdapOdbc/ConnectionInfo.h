@@ -17,6 +17,7 @@
 #pragma once
 
 #include "SQLStatus.h"
+#include "String.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -64,7 +65,7 @@ namespace Cask {
       /**
        * Sets connection string to info.
        */
-      void setConnectionString(const std::wstring& connectionString);
+      void setConnectionString(const SecureString& connectionString);
 
       /**
        * Gets connection async mode.
