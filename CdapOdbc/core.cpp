@@ -29,6 +29,8 @@
 #include "CdapException.h"
 #include "VersionInfo.h"
 
+#pragma warning(disable : 6101)
+
 using namespace Cask::CdapOdbc;
 
 SQLRETURN SQL_API SQLAllocHandle(
@@ -106,26 +108,26 @@ SQLRETURN SQL_API SQLAllocHandle(
 }
 
 SQLRETURN SQL_API SQLConnectW(
-  SQLHDBC        ConnectionHandle,
-  SQLWCHAR *     ServerName,
-  SQLSMALLINT    NameLength1,
-  SQLWCHAR *     UserName,
-  SQLSMALLINT    NameLength2,
-  SQLWCHAR *     Authentication,
-  SQLSMALLINT    NameLength3) {
+  SQLHDBC ConnectionHandle,
+  _In_reads_(NameLength1) SQLWCHAR* ServerName,
+  SQLSMALLINT NameLength1,
+  _In_reads_(NameLength2) SQLWCHAR* UserName,
+  SQLSMALLINT NameLength2,
+  _In_reads_(NameLength3) SQLWCHAR* Authentication,
+  SQLSMALLINT NameLength3) {
   TRACE(L"SQLConnectW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLDriverConnectW(
-  SQLHDBC         ConnectionHandle,
-  SQLHWND         WindowHandle,
-  SQLWCHAR *      InConnectionString,
-  SQLSMALLINT     StringLength1,
-  SQLWCHAR *      OutConnectionString,
-  SQLSMALLINT     BufferLength,
-  SQLSMALLINT *   StringLength2Ptr,
-  SQLUSMALLINT    DriverCompletion) {
+  SQLHDBC ConnectionHandle,
+  SQLHWND WindowHandle,
+  _In_reads_(StringLength1) SQLWCHAR* InConnectionString,
+  SQLSMALLINT StringLength1,
+  _Out_writes_opt_(BufferLength) SQLWCHAR* OutConnectionString,
+  SQLSMALLINT BufferLength,
+  _Out_opt_ SQLSMALLINT* StringLength2Ptr,
+  SQLUSMALLINT DriverCompletion) {
   TRACE(
     L"SQLDriverConnectW(ConnectionHandle = %X, WindowHandle = %X, InConnectionString = %s, DriverCompletion = %d)\n",
     ConnectionHandle,
@@ -245,8 +247,8 @@ SQLRETURN SQL_API SQLDriverConnectW(
 }
 
 SQLRETURN SQL_API SQLGetTypeInfoW(
-  SQLHSTMT      StatementHandle,
-  SQLSMALLINT   DataType) {
+  SQLHSTMT StatementHandle,
+  SQLSMALLINT DataType) {
   TRACE(L"SQLGetTypeInfoW(StatementHandle = %X, DataType = %d)\n", StatementHandle, DataType);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
@@ -275,11 +277,11 @@ SQLRETURN SQL_API SQLGetTypeInfoW(
 }
 
 SQLRETURN SQL_API SQLGetInfoW(
-  SQLHDBC         ConnectionHandle,
-  SQLUSMALLINT    InfoType,
-  SQLPOINTER      InfoValuePtr,
-  SQLSMALLINT     BufferLength,
-  SQLSMALLINT *   StringLengthPtr) {
+  SQLHDBC ConnectionHandle,
+  SQLUSMALLINT InfoType,
+  _Out_writes_bytes_opt_(BufferLength) SQLPOINTER InfoValuePtr,
+  SQLSMALLINT BufferLength,
+  _Out_opt_ SQLSMALLINT* StringLengthPtr) {
   TRACE(L"SQLGetInfoW(ConnectionHandle = %X, InfoType = %d, BufferLength = %d)\n", ConnectionHandle, InfoType, BufferLength);
   try {
     if (StringLengthPtr) {
@@ -627,23 +629,36 @@ SQLRETURN SQL_API SQLGetInfoW(
 }
 
 SQLRETURN SQL_API SQLDriversW(
-  SQLHENV         EnvironmentHandle,
-  SQLUSMALLINT    Direction,
-  SQLWCHAR *       DriverDescription,
-  SQLSMALLINT     BufferLength1,
-  SQLSMALLINT *   DescriptionLengthPtr,
-  SQLWCHAR *       DriverAttributes,
-  SQLSMALLINT     BufferLength2,
-  SQLSMALLINT *   AttributesLengthPtr) {
+  SQLHENV EnvironmentHandle,
+  SQLUSMALLINT Direction,
+  _Out_writes_opt_(BufferLength1) SQLWCHAR* DriverDescription,
+  SQLSMALLINT BufferLength1,
+  _Out_opt_ SQLSMALLINT* DescriptionLengthPtr,
+  _Out_writes_opt_(BufferLength2) SQLWCHAR* DriverAttributes,
+  SQLSMALLINT BufferLength2,
+  _Out_opt_ SQLSMALLINT* AttributesLengthPtr) {
   TRACE(L"SQLDriversW\n");
+  if (DescriptionLengthPtr) {
+    *DescriptionLengthPtr = 0;
+  }
+
+  if (AttributesLengthPtr) {
+    *AttributesLengthPtr = 0;
+  }
+
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLGetFunctions(
-  SQLHDBC           ConnectionHandle,
-  SQLUSMALLINT      FunctionId,
-  SQLUSMALLINT *    SupportedPtr) {
+  SQLHDBC ConnectionHandle,
+  SQLUSMALLINT FunctionId,
+  _Out_writes_opt_(_Inexpressible_("Buffer length pfExists points to depends on fFunction value.")) SQLUSMALLINT* SupportedPtr) {
   TRACE(L"SQLGetFunctions(ConnectionHandle = %X, FunctionId = %d)\n", ConnectionHandle, FunctionId);
+  
+  if (SupportedPtr) {
+    *SupportedPtr = SQL_FALSE;
+  }
+  
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
     std::lock_guard<Connection> lock(connection);
@@ -674,10 +689,11 @@ SQLRETURN SQL_API SQLGetFunctions(
           case SQL_API_SQLNUMPARAMS:
           case SQL_API_SQLDRIVERCONNECT:
           case SQL_API_SQLMORERESULTS:
-            *SupportedPtr = SQL_TRUE;
+            if (SupportedPtr) {
+              *SupportedPtr = SQL_TRUE;
+            }
+
             break;
-          default:
-            *SupportedPtr = SQL_FALSE;
         }
 
         TRACE(L"SQLGetFunctions returns SQL_SUCCESS\n");
@@ -704,10 +720,10 @@ SQLRETURN SQL_API SQLGetFunctions(
 }
 
 SQLRETURN SQL_API SQLSetConnectAttrW(
-  SQLHDBC       ConnectionHandle,
-  SQLINTEGER    Attribute,
-  SQLPOINTER    ValuePtr,
-  SQLINTEGER    StringLength) {
+  SQLHDBC ConnectionHandle,
+  SQLINTEGER Attribute,
+  _In_reads_bytes_opt_(StringLength) SQLPOINTER ValuePtr,
+  SQLINTEGER StringLength) {
   TRACE(L"SQLSetConnectAttrW(ConnectionHandle = %X, Attribute = %d)\n", ConnectionHandle, Attribute);
   try {
     auto& connection = Driver::getInstance().getConnection(ConnectionHandle);
@@ -749,21 +765,21 @@ SQLRETURN SQL_API SQLSetConnectAttrW(
 }
 
 SQLRETURN SQL_API SQLGetConnectAttrW(
-  SQLHDBC        ConnectionHandle,
-  SQLINTEGER     Attribute,
-  SQLPOINTER     ValuePtr,
-  SQLINTEGER     BufferLength,
-  SQLINTEGER *   StringLengthPtr) {
+  SQLHDBC ConnectionHandle,
+  SQLINTEGER Attribute,
+  _Out_writes_opt_(_Inexpressible_(BufferLength)) SQLPOINTER ValuePtr,
+  SQLINTEGER BufferLength,
+  _Out_opt_ SQLINTEGER* StringLengthPtr) {
   TRACE(L"SQLGetConnectAttrW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLGetStmtAttrW(
-  SQLHSTMT        StatementHandle,
-  SQLINTEGER      Attribute,
-  SQLPOINTER      ValuePtr,
-  SQLINTEGER      BufferLength,
-  SQLINTEGER *    StringLengthPtr) {
+  SQLHSTMT StatementHandle,
+  SQLINTEGER Attribute,
+  SQLPOINTER ValuePtr,
+  SQLINTEGER BufferLength,
+  SQLINTEGER* StringLengthPtr) {
   // Dummy address for setting dummy statement descriptors.
   static char dummyDesc = '\0';
 
@@ -806,9 +822,9 @@ SQLRETURN SQL_API SQLGetStmtAttrW(
 }
 
 SQLRETURN SQL_API SQLPrepareW(
-  SQLHSTMT      StatementHandle,
-  SQLWCHAR *     StatementText,
-  SQLINTEGER    TextLength) {
+  SQLHSTMT StatementHandle,
+  _In_reads_(TextLength) SQLWCHAR* StatementText,
+  SQLINTEGER TextLength) {
   TRACE(L"SQLPrepareW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     PROFILE_FUNCTION(TIMER_PREPARE);
@@ -852,22 +868,22 @@ SQLRETURN SQL_API SQLPrepareW(
 }
 
 SQLRETURN SQL_API SQLBindParameter(
-  SQLHSTMT        StatementHandle,
-  SQLUSMALLINT    ParameterNumber,
-  SQLSMALLINT     InputOutputType,
-  SQLSMALLINT     ValueType,
-  SQLSMALLINT     ParameterType,
-  SQLULEN         ColumnSize,
-  SQLSMALLINT     DecimalDigits,
-  SQLPOINTER      ParameterValuePtr,
-  SQLLEN          BufferLength,
-  SQLLEN *        StrLen_or_IndPtr) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT ParameterNumber,
+  SQLSMALLINT InputOutputType,
+  SQLSMALLINT ValueType,
+  SQLSMALLINT ParameterType,
+  SQLULEN ColumnSize,
+  SQLSMALLINT DecimalDigits,
+  SQLPOINTER ParameterValuePtr,
+  SQLLEN BufferLength,
+  SQLLEN* StrLen_or_IndPtr) {
   TRACE(L"SQLBindParameter\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLExecute(
-  SQLHSTMT     StatementHandle) {
+  SQLHSTMT StatementHandle) {
   TRACE(L"SQLExecute(StatementHandle = %X)\n", StatementHandle);
   // For Tableau, statement execution moved to SQLPrepare
   // auto& statement = Driver::getInstance().getStatement(StatementHandle);
@@ -877,9 +893,9 @@ SQLRETURN SQL_API SQLExecute(
 }
 
 SQLRETURN SQL_API SQLExecDirectW(
-  SQLHSTMT     StatementHandle,
-  SQLWCHAR *   StatementText,
-  SQLINTEGER   TextLength) {
+  SQLHSTMT StatementHandle,
+  _In_reads_opt_(TextLength) SQLWCHAR* StatementText,
+  SQLINTEGER TextLength) {
   TRACE(L"SQLExecDirectW(StatementHandle = %X, StatementText = %s)\n", StatementHandle, StatementText);
   try {
     PROFILE_FUNCTION(TIMER_EXECUTE);
@@ -922,22 +938,26 @@ SQLRETURN SQL_API SQLExecDirectW(
 }
 
 SQLRETURN SQL_API SQLNumParams(
-  SQLHSTMT        StatementHandle,
-  SQLSMALLINT *   ParameterCountPtr) {
+  SQLHSTMT StatementHandle,
+  _Out_opt_ SQLSMALLINT* ParameterCountPtr) {
   TRACE(L"SQLNumParams\n");
+  if (ParameterCountPtr) {
+    *ParameterCountPtr = 0;
+  }
+
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLParamData(
-  SQLHSTMT       StatementHandle,
-  SQLPOINTER *   ValuePtrPtr) {
+  SQLHSTMT StatementHandle,
+  _Out_opt_ SQLPOINTER* ValuePtrPtr) {
   TRACE(L"SQLParamData\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLNumResultCols(
-  SQLHSTMT        StatementHandle,
-  SQLSMALLINT *   ColumnCountPtr) {
+  SQLHSTMT StatementHandle,
+  _Out_ SQLSMALLINT* ColumnCountPtr) {
   TRACE(L"SQLNumResultCols(StatementHandle = %X)\n", StatementHandle);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
@@ -971,15 +991,15 @@ SQLRETURN SQL_API SQLNumResultCols(
 }
 
 SQLRETURN SQL_API SQLDescribeColW(
-  SQLHSTMT       StatementHandle,
-  SQLUSMALLINT   ColumnNumber,
-  SQLWCHAR *     ColumnName,
-  SQLSMALLINT    BufferLength,
-  SQLSMALLINT *  NameLengthPtr,
-  SQLSMALLINT *  DataTypePtr,
-  SQLULEN *      ColumnSizePtr,
-  SQLSMALLINT *  DecimalDigitsPtr,
-  SQLSMALLINT *  NullablePtr) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT ColumnNumber,
+  _Out_writes_opt_(BufferLength) SQLWCHAR* ColumnName,
+  SQLSMALLINT BufferLength,
+  _Out_opt_ SQLSMALLINT* NameLengthPtr,
+  _Out_opt_ SQLSMALLINT* DataTypePtr,
+  _Out_opt_ SQLULEN* ColumnSizePtr,
+  _Out_opt_ SQLSMALLINT* DecimalDigitsPtr,
+  _Out_opt_ SQLSMALLINT* NullablePtr) {
   TRACE(L"SQLDescribeColW(StatementHandle = %X, ColumnNumber = %d)\n", StatementHandle, ColumnNumber);
   try {
     auto& statement = Driver::getInstance().getStatement(StatementHandle);
@@ -1027,13 +1047,13 @@ SQLRETURN SQL_API SQLDescribeColW(
 }
 
 SQLRETURN SQL_API SQLColAttributeW(
-  SQLHSTMT        StatementHandle,
-  SQLUSMALLINT    ColumnNumber,
-  SQLUSMALLINT    FieldIdentifier,
-  SQLPOINTER      CharacterAttributePtr,
-  SQLSMALLINT     BufferLength,
-  SQLSMALLINT *   StringLengthPtr,
-  SQLLEN *        NumericAttributePtr) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT ColumnNumber,
+  SQLUSMALLINT FieldIdentifier,
+  _Out_writes_bytes_opt_(BufferLength) SQLPOINTER CharacterAttributePtr,
+  SQLSMALLINT BufferLength,
+  _Out_opt_ SQLSMALLINT* StringLengthPtr,
+  _Out_opt_ SQLLEN* NumericAttributePtr) {
   TRACE(
     L"SQLColAttributeW(StatementHandle = %X, ColumnNumber = %d, FieldIdentifier = %d)\n",
     StatementHandle,
@@ -1239,12 +1259,12 @@ SQLRETURN SQL_API SQLColAttributeW(
 }
 
 SQLRETURN SQL_API SQLBindCol(
-  SQLHSTMT       StatementHandle,
-  SQLUSMALLINT   ColumnNumber,
-  SQLSMALLINT    TargetType,
-  SQLPOINTER     TargetValuePtr,
-  SQLLEN         BufferLength,
-  SQLLEN *       StrLen_or_Ind) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT ColumnNumber,
+  SQLSMALLINT TargetType,
+  _Inout_updates_opt_(_Inexpressible_(BufferLength)) SQLPOINTER TargetValuePtr,
+  SQLLEN BufferLength,
+  _Inout_opt_ SQLLEN* StrLen_or_Ind) {
   TRACE(
     L"SQLBindCol(StatementHandle = %X, ColumnNumber = %d, TargetType = %d, BufferLength = %d)\n",
     StatementHandle,
@@ -1290,7 +1310,7 @@ SQLRETURN SQL_API SQLBindCol(
 }
 
 SQLRETURN SQL_API SQLFetch(
-  SQLHSTMT     StatementHandle) {
+  SQLHSTMT StatementHandle) {
   TRACE(L"SQLFetch(StatementHandle = %X)\n", StatementHandle);
   try {
     PROFILE_FUNCTION(TIMER_FETCH);
@@ -1338,21 +1358,21 @@ SQLRETURN SQL_API SQLFetch(
 }
 
 SQLRETURN SQL_API SQLGetData(
-  SQLHSTMT       StatementHandle,
-  SQLUSMALLINT   Col_or_Param_Num,
-  SQLSMALLINT    TargetType,
-  SQLPOINTER     TargetValuePtr,
-  SQLLEN         BufferLength,
-  SQLLEN *       StrLen_or_IndPtr) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT Col_or_Param_Num,
+  SQLSMALLINT TargetType,
+  _Out_writes_opt_(_Inexpressible_(BufferLength)) SQLPOINTER TargetValuePtr,
+  SQLLEN BufferLength,
+  _Out_opt_ SQLLEN* StrLen_or_IndPtr) {
   TRACE(L"SQLGetData\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLSetPos(
-  SQLHSTMT        StatementHandle,
-  SQLSETPOSIROW   RowNumber,
-  SQLUSMALLINT    Operation,
-  SQLUSMALLINT    LockType) {
+  SQLHSTMT StatementHandle,
+  SQLSETPOSIROW RowNumber,
+  SQLUSMALLINT Operation,
+  SQLUSMALLINT LockType) {
   TRACE(L"SQLSetPos\n");
   return SQL_ERROR;
 }
@@ -1364,15 +1384,15 @@ SQLRETURN SQL_API SQLMoreResults(
 }
 
 SQLRETURN SQL_API SQLColumnsW(
-  SQLHSTMT       StatementHandle,
-  SQLWCHAR *      CatalogName,
-  SQLSMALLINT    NameLength1,
-  SQLWCHAR *      SchemaName,
-  SQLSMALLINT    NameLength2,
-  SQLWCHAR *      TableName,
-  SQLSMALLINT    NameLength3,
-  SQLWCHAR *      ColumnName,
-  SQLSMALLINT    NameLength4) {
+  SQLHSTMT StatementHandle,
+  _In_reads_opt_(NameLength1) SQLWCHAR* CatalogName,
+  SQLSMALLINT NameLength1,
+  _In_reads_opt_(NameLength2) SQLWCHAR* SchemaName,
+  SQLSMALLINT NameLength2,
+  _In_reads_opt_(NameLength3) SQLWCHAR* TableName,
+  SQLSMALLINT NameLength3,
+  _In_reads_opt_(NameLength4) SQLWCHAR* ColumnName,
+  SQLSMALLINT NameLength4) {
   TRACE(
     L"SQLColumnsW(StatementHandle = %X, CatalogName = %s, SchemaName = %s, TableName = %s, ColumnName = %s)\n",
     StatementHandle,
@@ -1422,27 +1442,27 @@ SQLRETURN SQL_API SQLColumnsW(
 }
 
 SQLRETURN SQL_API SQLPrimaryKeysW(
-  SQLHSTMT       StatementHandle,
-  SQLWCHAR *     CatalogName,
-  SQLSMALLINT    NameLength1,
-  SQLWCHAR *     SchemaName,
-  SQLSMALLINT    NameLength2,
-  SQLWCHAR *     TableName,
-  SQLSMALLINT    NameLength3) {
+  SQLHSTMT StatementHandle,
+  _In_reads_opt_(NameLength1) SQLWCHAR* CatalogName,
+  SQLSMALLINT NameLength1,
+  _In_reads_opt_(NameLength2) SQLWCHAR* SchemaName,
+  SQLSMALLINT NameLength2,
+  _In_reads_opt_(NameLength3) SQLWCHAR* TableName,
+  SQLSMALLINT NameLength3) {
   TRACE(L"SQLPrimaryKeysW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLTablesW(
-  SQLHSTMT       StatementHandle,
-  SQLWCHAR *     CatalogName,
-  SQLSMALLINT    NameLength1,
-  SQLWCHAR *     SchemaName,
-  SQLSMALLINT    NameLength2,
-  SQLWCHAR *     TableName,
-  SQLSMALLINT    NameLength3,
-  SQLWCHAR *     TableType,
-  SQLSMALLINT    NameLength4) {
+  SQLHSTMT StatementHandle,
+  _In_reads_opt_(NameLength1) SQLWCHAR* CatalogName,
+  SQLSMALLINT NameLength1,
+  _In_reads_opt_(NameLength2) SQLWCHAR* SchemaName,
+  SQLSMALLINT NameLength2,
+  _In_reads_opt_(NameLength3) SQLWCHAR* TableName,
+  SQLSMALLINT NameLength3,
+  _In_reads_opt_(NameLength4) SQLWCHAR* TableType,
+  SQLSMALLINT NameLength4) {
   TRACE(
     L"SQLTablesW(StatementHandle = %X, CatalogName = %s, SchemaName = %s, TableName = %s, TableType = %s)\n",
     StatementHandle,
@@ -1500,16 +1520,16 @@ SQLRETURN SQL_API SQLTablesW(
 }
 
 SQLRETURN SQL_API SQLSpecialColumnsW(
-  SQLHSTMT      StatementHandle,
-  SQLSMALLINT   IdentifierType,
-  SQLWCHAR *    CatalogName,
-  SQLSMALLINT   NameLength1,
-  SQLWCHAR *    SchemaName,
-  SQLSMALLINT   NameLength2,
-  SQLWCHAR *    TableName,
-  SQLSMALLINT   NameLength3,
-  SQLSMALLINT   Scope,
-  SQLSMALLINT   Nullable) {
+  SQLHSTMT StatementHandle,
+  SQLSMALLINT IdentifierType,
+  SQLWCHAR* CatalogName,
+  SQLSMALLINT NameLength1,
+  SQLWCHAR* SchemaName,
+  SQLSMALLINT NameLength2,
+  SQLWCHAR* TableName,
+  SQLSMALLINT NameLength3,
+  SQLSMALLINT Scope,
+  SQLSMALLINT Nullable) {
   TRACE(
     L"SQLSpecialColumnsW(StatementHandle = %X, IdentifierType = %d, CatalogName = %s, SchemaName = %s, TableName = %s, Scope = %d, Nullable = %d)\n",
     StatementHandle,
@@ -1696,19 +1716,19 @@ SQLRETURN SQL_API SQLBulkOperations(
 }
 
 SQLRETURN SQL_API SQLExtendedFetch(
-  SQLHSTMT         StatementHandle,
-  SQLUSMALLINT     FetchOrientation,
-  SQLLEN           FetchOffset,
-  SQLULEN *        RowCountPtr,
-  SQLUSMALLINT *   RowStatusArray) {
+  SQLHSTMT StatementHandle,
+  SQLUSMALLINT FetchOrientation,
+  SQLLEN FetchOffset,
+  _Out_opt_ SQLULEN* RowCountPtr,
+  _Out_opt_ SQLUSMALLINT* RowStatusArray) {
   TRACE(L"SQLExtendedFetch\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLPutData(
-  SQLHSTMT     StatementHandle,
-  SQLPOINTER   DataPtr,
-  SQLLEN       StrLen_or_Ind) {
+  SQLHSTMT StatementHandle,
+  _In_reads_(_Inexpressible_(StrLen_or_Ind)) SQLPOINTER DataPtr,
+  SQLLEN StrLen_or_Ind) {
   TRACE(L"SQLPutData\n");
   return SQL_ERROR;
 }
@@ -1723,9 +1743,9 @@ SQLRETURN SQL_API SQLFetchScroll(
 
 SQLRETURN SQL_API SQLGetCursorNameW(
   SQLHSTMT StatementHandle,
-  SQLWCHAR *CursorName,
+  _Out_writes_opt_(BufferLength) SQLWCHAR *CursorName,
   SQLSMALLINT BufferLength,
-  SQLSMALLINT *NameLengthPtr) {
+  _Out_opt_ SQLSMALLINT *NameLengthPtr) {
   TRACE(L"SQLGetCursorNameW\n");
   return SQL_ERROR;
 }
@@ -1734,9 +1754,9 @@ SQLRETURN SQL_API SQLGetDescFieldW(
   SQLHDESC DescriptorHandle,
   SQLSMALLINT RecNumber,
   SQLSMALLINT FieldIdentifier,
-  SQLPOINTER Value,
+  _Out_writes_opt_(_Inexpressible_(BufferLength)) SQLPOINTER Value,
   SQLINTEGER BufferLength,
-  SQLINTEGER *StringLength) {
+  _Out_opt_ SQLINTEGER *StringLength) {
   TRACE(L"SQLGetDescFieldW\n");
   return SQL_ERROR;
 }
@@ -1744,15 +1764,15 @@ SQLRETURN SQL_API SQLGetDescFieldW(
 SQLRETURN SQL_API SQLGetDescRecW(
   SQLHDESC DescriptorHandle,
   SQLSMALLINT RecNumber,
-  SQLWCHAR *Name,
+  _Out_writes_opt_(BufferLength) SQLWCHAR* Name,
   SQLSMALLINT BufferLength,
-  SQLSMALLINT *StringLengthPtr,
-  SQLSMALLINT *TypePtr,
-  SQLSMALLINT *SubTypePtr,
-  SQLLEN *LengthPtr,
-  SQLSMALLINT *PrecisionPtr,
-  SQLSMALLINT *ScalePtr,
-  SQLSMALLINT *NullablePtr) {
+  _Out_opt_ SQLSMALLINT* StringLengthPtr,
+  _Out_opt_ SQLSMALLINT* TypePtr,
+  _Out_opt_ SQLSMALLINT* SubTypePtr,
+  _Out_opt_ SQLLEN* LengthPtr,
+  _Out_opt_ SQLSMALLINT* PrecisionPtr,
+  _Out_opt_ SQLSMALLINT* ScalePtr,
+  _Out_opt_ SQLSMALLINT* NullablePtr) {
   TRACE(L"SQLGetDescRecW\n");
   return SQL_ERROR;
 }
@@ -1762,9 +1782,9 @@ SQLRETURN SQL_API SQLGetDiagFieldW(
   SQLHANDLE Handle,
   SQLSMALLINT RecNumber,
   SQLSMALLINT DiagIdentifier,
-  SQLPOINTER DiagInfo,
+  _Out_writes_opt_(_Inexpressible_(BufferLength)) SQLPOINTER DiagInfo,
   SQLSMALLINT BufferLength,
-  SQLSMALLINT *StringLength) {
+  _Out_opt_ SQLSMALLINT* StringLength) {
   TRACE(
     L"SQLGetDiagFieldW (HandleType = %d, Handle = %X, RecNumber = %d, DiagIdentifier = %d, DiagInfo = %X, BufferLength = %d, StringLength = %d)\n",
     HandleType,
@@ -1839,9 +1859,9 @@ SQLRETURN SQL_API SQLGetDiagRecW(
   SQLSMALLINT HandleType,
   SQLHANDLE Handle,
   SQLSMALLINT RecNumber,
-  SQLWCHAR *Sqlstate,
+  _Out_writes_opt_(6) SQLWCHAR *Sqlstate,
   SQLINTEGER *NativeError,
-  SQLWCHAR* MessageText,
+  _Out_writes_opt_(BufferLength) SQLWCHAR* MessageText,
   SQLSMALLINT BufferLength,
   SQLSMALLINT *TextLength) {
   TRACE(
@@ -1899,45 +1919,45 @@ SQLRETURN SQL_API SQLGetDiagRecW(
 }
 
 SQLRETURN SQL_API SQLNativeSqlW(
-  SQLHDBC        ConnectionHandle,
-  SQLWCHAR *     InStatementText,
-  SQLINTEGER     TextLength1,
-  SQLWCHAR *     OutStatementText,
-  SQLINTEGER     BufferLength,
-  SQLINTEGER *   TextLength2Ptr) {
+  SQLHDBC ConnectionHandle,
+  _In_reads_(TextLength1) SQLWCHAR* InStatementText,
+  SQLINTEGER TextLength1,
+  _Out_writes_opt_(BufferLength) SQLWCHAR* OutStatementText,
+  SQLINTEGER BufferLength,
+  SQLINTEGER* TextLength2Ptr) {
   TRACE(L"SQLNativeSqlW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLProcedureColumnsW(
-  SQLHSTMT    hstmt,
-  SQLWCHAR*   szCatalogName,
+  SQLHSTMT hstmt,
+  _In_reads_opt_(cchCatalogName) SQLWCHAR* szCatalogName,
   SQLSMALLINT cchCatalogName,
-  SQLWCHAR*   szSchemaName,
+  _In_reads_opt_(cchSchemaName) SQLWCHAR* szSchemaName,
   SQLSMALLINT cchSchemaName,
-  SQLWCHAR*   szProcName,
+  _In_reads_opt_(cchProcName) SQLWCHAR* szProcName,
   SQLSMALLINT cchProcName,
-  SQLWCHAR*   szColumnName,
+  _In_reads_opt_(cchColumnName) SQLWCHAR* szColumnName,
   SQLSMALLINT cchColumnName) {
   TRACE(L"SQLProcedureColumnsW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLProceduresW(
-  SQLHSTMT    hstmt,
-  SQLWCHAR*   szCatalogName,
+  SQLHSTMT hstmt,
+  _In_reads_opt_(cchCatalogName) SQLWCHAR* szCatalogName,
   SQLSMALLINT cchCatalogName,
-  SQLWCHAR*   szSchemaName,
+  _In_reads_opt_(cchSchemaName) SQLWCHAR* szSchemaName,
   SQLSMALLINT cchSchemaName,
-  SQLWCHAR*   szProcName,
+  _In_reads_opt_(cchProcName) SQLWCHAR* szProcName,
   SQLSMALLINT cchProcName) {
   TRACE(L"SQLProceduresW\n");
   return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLRowCount(
-  SQLHSTMT StatementHandle,
-  SQLLEN* RowCount) {
+  _In_ SQLHSTMT StatementHandle,
+  _Out_ SQLLEN* RowCount) {
   TRACE(L"SQLRowCount\n");
   return SQL_ERROR;
 }
@@ -1952,7 +1972,7 @@ SQLRETURN SQL_API SQLSetConnectOptionW(
 
 SQLRETURN SQL_API SQLSetCursorNameW(
   SQLHSTMT StatementHandle,
-  SQLWCHAR* CursorName,
+  _In_reads_(NameLength) SQLWCHAR* CursorName,
   SQLSMALLINT NameLength) {
   TRACE(L"SQLSetCursorNameW\n");
   return SQL_ERROR;
@@ -1970,12 +1990,15 @@ SQLRETURN SQL_API SQLSetDescFieldW(
 
 SQLRETURN SQL_API SQLSetDescRec(
   SQLHDESC DescriptorHandle,
-  SQLSMALLINT RecNumber, SQLSMALLINT Type,
-  SQLSMALLINT SubType, SQLLEN Length,
-  SQLSMALLINT Precision, SQLSMALLINT Scale,
-  SQLPOINTER Data,
-  SQLLEN *StringLength,
-  SQLLEN *Indicator) {
+  SQLSMALLINT RecNumber, 
+  SQLSMALLINT Type,
+  SQLSMALLINT SubType, 
+  SQLLEN Length,
+  SQLSMALLINT Precision, 
+  SQLSMALLINT Scale,
+  _Inout_updates_bytes_opt_(Length) SQLPOINTER Data,
+  _Inout_opt_ SQLLEN* StringLength,
+  _Inout_opt_ SQLLEN* Indicator) {
   TRACE(L"SQLSetDescRec\n");
   return SQL_ERROR;
 }
@@ -1983,7 +2006,7 @@ SQLRETURN SQL_API SQLSetDescRec(
 SQLRETURN SQL_API SQLSetEnvAttr(
   SQLHENV EnvironmentHandle,
   SQLINTEGER Attribute,
-  SQLPOINTER Value,
+  _In_reads_bytes_opt_(StringLength) SQLPOINTER Value,
   SQLINTEGER StringLength) {
   TRACE(L"SQLSetEnvAttr(EnvironmentHandle = %X, Attribute = %d)\n", EnvironmentHandle, Attribute);
   TRACE(L"SQLSetEnvAttr returns SQL_SUCCESS\n");

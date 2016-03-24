@@ -26,7 +26,7 @@ std::wstring Cask::CdapOdbc::VersionInfo::getProductVersion() {
   VS_FIXEDFILEINFO *fileInfo;
   UINT bufLen;
 
-  if (GetModuleFileNameW(Library::getInstanceHandle(), fullPath, sizeof(fullPath))) {
+  if (GetModuleFileNameW(Library::getInstanceHandle(), fullPath, _countof(fullPath))) {
     len = GetFileVersionInfoSizeW(fullPath, &handle);
     if (len > 0) {
       data.reset(new char[len]);
