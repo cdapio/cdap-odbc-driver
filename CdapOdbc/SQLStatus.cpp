@@ -50,7 +50,7 @@ void Cask::CdapOdbc::SQLStatus::clear() {
 
 const std::wstring& Cask::CdapOdbc::SQLStatus::getCode(SQLSMALLINT recNum) {
 
-  if (statusItems.size() >= recNum && recNum >= 1) {
+  if (static_cast<SQLSMALLINT>(statusItems.size()) >= recNum && recNum >= 1) {
     auto& it = statusItems.begin();
     std::advance(it, recNum - 1);
     return it->code;
@@ -60,7 +60,7 @@ const std::wstring& Cask::CdapOdbc::SQLStatus::getCode(SQLSMALLINT recNum) {
 }
 
 const std::wstring& Cask::CdapOdbc::SQLStatus::getMessage(SQLSMALLINT recNum) {
-  if (statusItems.size() >= recNum && recNum >= 1) {
+  if (static_cast<SQLSMALLINT>(statusItems.size()) >= recNum && recNum >= 1) {
     auto& it = statusItems.begin();
     std::advance(it, recNum - 1);
     return it->msg;
