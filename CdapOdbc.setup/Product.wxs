@@ -11,7 +11,7 @@
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
   <?define Win64 = "yes" ?>
 <?else ?>
-  <?define targetArch = x86 ?>
+  <?define targetArch = Win32 ?>
   <?define ProgramsPath = "ProgramFilesFolder" ?>
   <?define Win64 = "no" ?>
 <?endif ?>
