@@ -34,6 +34,9 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{916ebbec-037a-47a2-bae0-961de2c4961a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Statements\Parsers">
+      <UniqueIdentifier>{b1ab6860-dce0-4980-b996-d344c5e3853f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Driver.h">
@@ -213,6 +216,9 @@
     <ClInclude Include="FileLogAppender.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="ODBCEscapeSequenceParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -381,6 +387,9 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="QuerySELECT1DataReader.cpp" />
+    <ClCompile Include="ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">

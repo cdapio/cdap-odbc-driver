@@ -177,6 +177,7 @@
     <ClInclude Include="FileLogAppender.h" />
     <ClInclude Include="LogAppender.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="ODBCEscapeSequenceParser.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="QueryBuilder.h" />
     <ClInclude Include="QuerySELECT1DataReader.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="FileLogAppender.cpp" />
     <ClCompile Include="LogAppender.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="ODBCEscapeSequenceParser.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="QueryBuilder.cpp" />
     <ClCompile Include="QuerySELECT1DataReader.cpp" />
