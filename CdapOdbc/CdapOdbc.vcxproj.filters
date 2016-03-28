@@ -4,6 +4,9 @@
     <Filter Include="Library">
       <UniqueIdentifier>{bfa9e0b2-0ea5-4bc5-bcfe-433249ecdef8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Statements\Parsers">
+      <UniqueIdentifier>{b1ab6860-dce0-4980-b996-d344c5e3853f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -18,6 +21,9 @@
     <ClInclude Include="setup.h">
       <Filter>Library</Filter>
     </ClInclude>
+    <ClInclude Include="ODBCEscapeSequenceParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -28,6 +34,9 @@
     </ClCompile>
     <ClCompile Include="setup.cpp">
       <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

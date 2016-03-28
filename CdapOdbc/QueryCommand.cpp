@@ -21,6 +21,7 @@
 #include "QuerySELECT1DataReader.h"
 #include "CdapException.h"
 #include "QueryBuilder.h"
+#include "ODBCEscapeSequenceParser.h"
 
 Cask::CdapOdbc::QueryCommand::QueryCommand(Connection* connection, const std::wstring& query)
   : Command(connection)
@@ -34,8 +35,10 @@ std::unique_ptr<Cask::CdapOdbc::DataReader> Cask::CdapOdbc::QueryCommand::execut
   }
 
   if (this->queryHandle.size() == 0) {
-    QueryBuilder queryBuilder(this->query);
-    this->queryHandle = this->getConnection()->getExploreClient().execute(queryBuilder.toString());
+//    QueryBuilder queryBuilder(this->query);
+    ODBCEscapeSequenceParser queryParser(this->query);
+//    this->queryHandle = this->getConnection()->getExploreClient().execute(queryBuilder.toString());
+    this->queryHandle = this->getConnection()->getExploreClient().execute(queryParser.toString());
   }
 
   auto status = this->getConnection()->getExploreClient().getQueryStatus(this->queryHandle);
