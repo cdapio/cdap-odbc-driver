@@ -99,9 +99,6 @@
     <ClCompile Include="..\CdapOdbc\Encoding.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\CdapOdbc\String.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\CdapOdbc\Command.cpp">
       <Filter>Statements</Filter>
     </ClCompile>
@@ -198,6 +195,12 @@
     <ClCompile Include="..\CdapOdbc\stdafx.cpp">
       <Filter>Library</Filter>
     </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SecureString.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CdapOdbc\debug.h">
@@ -264,9 +267,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\CdapOdbc\Encoding.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CdapOdbc\String.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\CdapOdbc\Command.h">
@@ -370,6 +370,12 @@
     </ClInclude>
     <ClInclude Include="..\CdapOdbc\stdafx.h">
       <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ODBCEscapeSequenceParser.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SecureString.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

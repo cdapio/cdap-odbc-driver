@@ -19,7 +19,7 @@
 #include "ConnectionParams.h"
 #include "ExploreClient.h"
 #include "SQLStatus.h"
-#include "String.h"
+#include "SecureString.h"
 
 namespace Cask {
   namespace CdapOdbc {

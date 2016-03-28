@@ -33,8 +33,7 @@ Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
   , regexDate(REGEX_DATE)
   , regexGuid(REGEX_GUID)
   , regexInterval(REGEX_INTERVAL)
-  , regexTimestamp(REGEX_TIMESTAMP)
-{
+  , regexTimestamp(REGEX_TIMESTAMP) {
 }
 
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, std::wsmatch match, size_t pos_start, size_t pos_end) {
@@ -75,7 +74,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
   std::wstring result = query;
   std::wstring subresult;
   std::wsmatch match;
-  size_t i = 0, resolvedLength;
+  size_t i = 0;
   bool insideLiteral = false;
   wchar_t currentQuote;
   std::vector<size_t> fn_openings = std::vector<size_t>();
@@ -89,8 +88,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
       }
       i++;
       continue;
-    }
-    else if (!insideLiteral && isQuote(result, i) && !isEscapedQuote(result, i)) {
+    } else if (!insideLiteral && isQuote(result, i) && !isEscapedQuote(result, i)) {
       // enter literal
       insideLiteral = true;
       currentQuote = result[i];
@@ -103,29 +101,23 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
       /* At first try fixed-length non-nested  */
       if (std::regex_search(subresult, match, this->regexGuid)) {
         i = this->resolveGuid(result, match, i); // <-- This throws exception, since not supported.
-      }
-      else if (std::regex_search(subresult, match, this->regexInterval)) {
+      } else if (std::regex_search(subresult, match, this->regexInterval)) {
         i = this->resolveInterval(result, match, i); // <-- This throws exception, since not supported.
-      }
-      else if (std::regex_search(subresult, match, this->regexDate)) {
+      } else if (std::regex_search(subresult, match, this->regexDate)) {
         i = this->resolveDate(result, match, i);
-      }
-      else if (std::regex_search(subresult, match, this->regexTimestamp)) {
+      } else if (std::regex_search(subresult, match, this->regexTimestamp)) {
         i = this->resolveTimestamp(result, match, i);
-      }
-      else if (std::regex_search(subresult, match, this->regexFunctionBeginning)) {
+      } else if (std::regex_search(subresult, match, this->regexFunctionBeginning)) {
         fn_openings.push_back(i);
         i += 4;
       }
-    }
-    else if (result[i] == L'}') {
+    } else if (result[i] == L'}') {
       if (fn_openings.size() == 0) {
         throw CdapException(L"Unmatched } in the query at position " + std::to_wstring(i) + L".");
       }
       i = this->resolveFunction(subresult, match, fn_openings.back(), i);
       fn_openings.pop_back();
-    }
-    else {
+    } else {
       i++;
     }
   } // while(i < result.length())

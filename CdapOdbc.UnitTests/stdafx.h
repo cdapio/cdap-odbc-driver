@@ -20,3 +20,7 @@
 
 // Headers for CppUnitTest
 #include "CppUnitTest.h"
+
+#include <string>
+#include <regex>
+#include <memory>

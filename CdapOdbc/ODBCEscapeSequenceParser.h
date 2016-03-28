@@ -15,17 +15,13 @@
 */
 
 #pragma once
-#include "stdafx.h"
 
 namespace Cask {
   namespace CdapOdbc {
     class ODBCEscapeSequenceParser {
 
-      ODBCEscapeSequenceParser() = delete;
       ODBCEscapeSequenceParser(const ODBCEscapeSequenceParser&) = delete;
       void operator=(const ODBCEscapeSequenceParser&) = delete;
-
-    private:
 
       std::wstring query;
 

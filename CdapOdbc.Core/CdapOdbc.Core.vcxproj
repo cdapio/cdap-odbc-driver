@@ -50,6 +50,7 @@
     <ClCompile Include="..\CdapOdbc\LogAppender.cpp" />
     <ClCompile Include="..\CdapOdbc\Logger.cpp" />
     <ClCompile Include="..\CdapOdbc\NoSchemaColumnsDataReader.cpp" />
+    <ClCompile Include="..\CdapOdbc\ODBCEscapeSequenceParser.cpp" />
     <ClCompile Include="..\CdapOdbc\Profiler.cpp" />
     <ClCompile Include="..\CdapOdbc\QueryBuilder.cpp" />
     <ClCompile Include="..\CdapOdbc\QueryCommand.cpp" />
@@ -70,7 +71,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\CdapOdbc\StillExecutingException.cpp" />
-    <ClCompile Include="..\CdapOdbc\String.cpp" />
+    <ClCompile Include="..\CdapOdbc\SecureString.cpp" />
     <ClCompile Include="..\CdapOdbc\TablesCommand.cpp" />
     <ClCompile Include="..\CdapOdbc\TablesDataReader.cpp" />
     <ClCompile Include="..\CdapOdbc\Timer.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="..\CdapOdbc\LogAppender.h" />
     <ClInclude Include="..\CdapOdbc\Logger.h" />
     <ClInclude Include="..\CdapOdbc\NoSchemaColumnsDataReader.h" />
+    <ClInclude Include="..\CdapOdbc\ODBCEscapeSequenceParser.h" />
     <ClInclude Include="..\CdapOdbc\Profiler.h" />
     <ClInclude Include="..\CdapOdbc\QueryBuilder.h" />
     <ClInclude Include="..\CdapOdbc\QueryCommand.h" />
@@ -128,7 +130,7 @@
     <ClInclude Include="..\CdapOdbc\Statement.h" />
     <ClInclude Include="..\CdapOdbc\stdafx.h" />
     <ClInclude Include="..\CdapOdbc\StillExecutingException.h" />
-    <ClInclude Include="..\CdapOdbc\String.h" />
+    <ClInclude Include="..\CdapOdbc\SecureString.h" />
     <ClInclude Include="..\CdapOdbc\TablesCommand.h" />
     <ClInclude Include="..\CdapOdbc\TablesDataReader.h" />
     <ClInclude Include="..\CdapOdbc\targetver.h" />

@@ -17,7 +17,7 @@
 #include "stdafx.h"
 #include "DataReader.h"
 #include "Encoding.h"
-#include "String.h"
+#include "SecureString.h"
 #include "CdapException.h"
 
 namespace {

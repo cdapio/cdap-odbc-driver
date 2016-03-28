@@ -15,7 +15,7 @@
 */
 
 #include "stdafx.h"
-#include "String.h"
+#include "SecureString.h"
 
 void Cask::CdapOdbc::String::split(const SecureString& str, wchar_t delim, std::vector<SecureString>& tokens) {
   SecureStringStream stream(str.c_str());

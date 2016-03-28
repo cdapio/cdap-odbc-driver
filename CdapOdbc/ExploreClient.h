@@ -19,7 +19,7 @@
 #include "ColumnDesc.h"
 #include "QueryStatus.h"
 #include "QueryResult.h"
-#include "String.h"
+#include "SecureString.h"
 
 namespace Cask {
   namespace CdapOdbc {

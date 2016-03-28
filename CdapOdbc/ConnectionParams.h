@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "String.h"
+#include "SecureString.h"
 
 namespace Cask {
   namespace CdapOdbc {
