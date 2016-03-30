@@ -117,6 +117,9 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
         fn_openings.push_back(i);
         i += 4;
       }
+	    else {
+		    throw CdapException(L"Unrecognised ODBC escape sequence.");
+	    }
     }
     else if (result[i] == L'}') {
       if (fn_openings.size() == 0) {
