@@ -23,7 +23,7 @@
 #define REGEX_DATE            L"^\\{d ('[^']*')\\}"
 #define REGEX_TIMESTAMP       L"^\\{ts ('[^']*')\\}"
 #define REGEX_INTERVAL        L"^\\{INTERVAL ([+-] )*'[^']+' ([^\\}]+)\\}"
-#define REGEX_GUID            L"^\\{guid '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'\\}"
+#define REGEX_GUID            L"^\\{guid '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'\\}"
 
 Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
   const std::wstring& query)
