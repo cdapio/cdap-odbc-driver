@@ -17,8 +17,9 @@
 #include "stdafx.h"
 #include "ODBCEscapeSequenceParser.h"
 #include "CdapException.h"
+#include "ArgumentsParser.h"
 
-#define REGEX_FUNCTION        L"^\\{fn ([^\\(]+)([^\\{\\}]+)\\}" // TODO: change inside to [.*]\\}_end_of_multiline_string_
+#define REGEX_FUNCTION        L"^\\{fn ([^\\(]+)\\((.*)\\)\\}$"
 #define REGEX_FUNCTION_START  L"^\\{fn "
 #define REGEX_DATE            L"^\\{d ('[^']*')\\}"
 #define REGEX_TIMESTAMP       L"^\\{ts ('[^']*')\\}"
@@ -37,18 +38,89 @@ Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
 {
 }
 
-size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, std::wsmatch match, size_t pos_start, size_t pos_end) {
-  return 0;
+size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, size_t pos_start, size_t pos_end) {
+  std::wstring matched = query.substr(pos_start, pos_end - pos_start + 1);
+  std::wsmatch match;
+  if (std::regex_search(matched, match, regexFunction)) {
+    std::wstring found = std::wstring(match[1].str().c_str());
+    if (
+      /* Datetime functions */
+      _wcsicmp(found.c_str(), L"year") == 0
+      || _wcsicmp(found.c_str(), L"month") == 0
+      || _wcsicmp(found.c_str(), L"day") == 0
+      || _wcsicmp(found.c_str(), L"hour") == 0
+      || _wcsicmp(found.c_str(), L"minute") == 0
+      || _wcsicmp(found.c_str(), L"second") == 0
+      || _wcsicmp(found.c_str(), L"dayofmonth") == 0
+
+      /* String functions */
+      || _wcsicmp(found.c_str(), L"ascii") == 0
+      || _wcsicmp(found.c_str(), L"concat") == 0
+      || _wcsicmp(found.c_str(), L"lcase") == 0
+      || _wcsicmp(found.c_str(), L"length") == 0
+      || _wcsicmp(found.c_str(), L"locate") == 0
+      || _wcsicmp(found.c_str(), L"ltrim") == 0
+      || _wcsicmp(found.c_str(), L"repeat") == 0
+      || _wcsicmp(found.c_str(), L"rtrim") == 0
+      || _wcsicmp(found.c_str(), L"space") == 0
+      || _wcsicmp(found.c_str(), L"substring") == 0
+      || _wcsicmp(found.c_str(), L"ucase") == 0
+
+      /* Numeric functions */
+      || _wcsicmp(found.c_str(), L"abs") == 0
+      || _wcsicmp(found.c_str(), L"acos") == 0
+      || _wcsicmp(found.c_str(), L"asin") == 0
+      || _wcsicmp(found.c_str(), L"atan") == 0
+      || _wcsicmp(found.c_str(), L"ceiling") == 0
+      || _wcsicmp(found.c_str(), L"cos") == 0
+      || _wcsicmp(found.c_str(), L"degrees") == 0
+      || _wcsicmp(found.c_str(), L"exp") == 0
+      || _wcsicmp(found.c_str(), L"floor") == 0
+      || _wcsicmp(found.c_str(), L"log10") == 0
+      || _wcsicmp(found.c_str(), L"pi") == 0
+      || _wcsicmp(found.c_str(), L"power") == 0
+      || _wcsicmp(found.c_str(), L"radians") == 0
+      || _wcsicmp(found.c_str(), L"rand") == 0
+      || _wcsicmp(found.c_str(), L"round") == 0
+      || _wcsicmp(found.c_str(), L"sign") == 0
+      || _wcsicmp(found.c_str(), L"sin") == 0
+      || _wcsicmp(found.c_str(), L"sqrt") == 0
+      || _wcsicmp(found.c_str(), L"tan") == 0
+      )
+    {
+      matched = std::regex_replace(matched, regexFunction, L"$1($2)");
+    }
+    else if (_wcsicmp(found.c_str(), L"mod") == 0) {
+      matched = std::regex_replace(matched, regexFunction, L"pmod($2)");
+    }
+    else if (_wcsicmp(found.c_str(), L"replace") == 0) {
+      matched = std::regex_replace(matched, regexFunction, L"translate($2)");
+    }
+    else if (_wcsicmp(found.c_str(), L"cot") == 0) {
+      matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/(tan$2) as DOUBLE)");
+    }
+    else if (_wcsicmp(found.c_str(), L"now") == 0) {
+      matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
+    }
+    else {
+      throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str()) + L".");
+    }
+  } /* if (regex_match); function selection */
+  else {
+    throw CdapException(L"Encountered malformed scalar function escape sequence:\n" + matched);
+  }
+  query = query.replace(pos_start, pos_end - pos_start + 1, matched);
+  return pos_start + matched.length();
 }
 
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveTimestamp(std::wstring& query, std::wsmatch match, size_t pos_start) {
-  size_t resolveLen = match[1].length() + 9 + 2; // TIMESTAMP(<literal>)
+  size_t resolveLen = match[1].length() + 9 + 2; // + TIMESTAMP(...)
   query.replace(pos_start, std::wstring::npos, match.format(L"TIMESTAMP($1)") + match.suffix().str());
   return pos_start + resolveLen;
 }
 
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveDate(std::wstring& query, std::wsmatch match, size_t pos_start) {
-  size_t resolveLen = match[1].length() + 4 + 2; // date(<literal>)
+  size_t resolveLen = match[1].length() + 4 + 2; // + DATE(...)
   query.replace(pos_start, std::wstring::npos, match.format(L"DATE($1)") + match.suffix().str());
   return pos_start + resolveLen;
 }
@@ -78,20 +150,20 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
   size_t i = 0, resolvedLength;
   bool insideLiteral = false;
   wchar_t currentQuote;
-  std::vector<size_t> fn_openings = std::vector<size_t>();
+  std::vector<size_t> fnOpenings = std::vector<size_t>();
 
   while (i < result.length()) {
     /* Check current position w.r.t. literal */
     if (insideLiteral) {
       if ((result[i] == currentQuote) && !isEscapedQuote(result, i)) {
-        // exit literal
+        /* Exit literal */
         insideLiteral = false;
       }
       i++;
       continue;
     }
     else if (!insideLiteral && isQuote(result, i) && !isEscapedQuote(result, i)) {
-      // enter literal
+      /* Enter literal */
       insideLiteral = true;
       currentQuote = result[i];
       i++;
@@ -114,7 +186,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
         i = this->resolveTimestamp(result, match, i);
       }
       else if (std::regex_search(subresult, match, this->regexFunctionBeginning)) {
-        fn_openings.push_back(i);
+        fnOpenings.push_back(i);
         i += 4;
       }
 	    else {
@@ -122,11 +194,11 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
 	    }
     }
     else if (result[i] == L'}') {
-      if (fn_openings.size() == 0) {
+      if (fnOpenings.size() == 0) {
         throw CdapException(L"Unmatched } in the query at position " + std::to_wstring(i) + L".");
       }
-      i = this->resolveFunction(subresult, match, fn_openings.back(), i);
-      fn_openings.pop_back();
+      i = this->resolveFunction(result, fnOpenings.back(), i);
+      fnOpenings.pop_back();
     }
     else {
       i++;
