@@ -34,6 +34,9 @@
     <Filter Include="Library">
       <UniqueIdentifier>{a9942209-3f70-405f-a56b-ce11f8f72f53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Statements\Parsers">
+      <UniqueIdentifier>{13812f27-925a-49c6-b875-bf168b972bb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\CdapOdbc\DebugLogAppender.cpp">
@@ -195,11 +198,14 @@
     <ClCompile Include="..\CdapOdbc\stdafx.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\CdapOdbc\ODBCEscapeSequenceParser.cpp">
-      <Filter>Statements\Commands</Filter>
-    </ClCompile>
     <ClCompile Include="..\CdapOdbc\SecureString.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ArgumentsParser.cpp">
+      <Filter>Statements\Parsers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -371,11 +377,14 @@
     <ClInclude Include="..\CdapOdbc\stdafx.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="..\CdapOdbc\ODBCEscapeSequenceParser.h">
-      <Filter>Statements\Commands</Filter>
-    </ClInclude>
     <ClInclude Include="..\CdapOdbc\SecureString.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ODBCEscapeSequenceParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ArgumentsParser.h">
+      <Filter>Statements\Parsers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\CdapOdbc\Argument.cpp" />
+    <ClCompile Include="..\CdapOdbc\ArgumentsParser.cpp" />
     <ClCompile Include="..\CdapOdbc\BadRequestException.cpp" />
     <ClCompile Include="..\CdapOdbc\CancelException.cpp" />
     <ClCompile Include="..\CdapOdbc\CdapException.cpp" />
@@ -82,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CdapOdbc\Argument.h" />
+    <ClInclude Include="..\CdapOdbc\ArgumentsParser.h" />
     <ClInclude Include="..\CdapOdbc\BadRequestException.h" />
     <ClInclude Include="..\CdapOdbc\CancelException.h" />
     <ClInclude Include="..\CdapOdbc\CdapException.h" />

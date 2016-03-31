@@ -87,40 +87,34 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
       || _wcsicmp(found.c_str(), L"sign") == 0
       || _wcsicmp(found.c_str(), L"sin") == 0
       || _wcsicmp(found.c_str(), L"sqrt") == 0
-      || _wcsicmp(found.c_str(), L"tan") == 0
-      )
-    {
+      || _wcsicmp(found.c_str(), L"tan") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"$1($2)");
-}
-    else if (_wcsicmp(found.c_str(), L"mod") == 0) {
+    } else if (_wcsicmp(found.c_str(), L"mod") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"pmod($2)");
-    }
-    else if (_wcsicmp(found.c_str(), L"replace") == 0) {
+    } else if (_wcsicmp(found.c_str(), L"replace") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"translate($2)");
-    }
-    else if (_wcsicmp(found.c_str(), L"cot") == 0) {
+    } else if (_wcsicmp(found.c_str(), L"cot") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/(tan$2) as DOUBLE)");
-    }
-    else if (_wcsicmp(found.c_str(), L"now") == 0) {
+    } else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
-    }
-    else if (_wcsicmp(found.c_str(), L"left") == 0) {
+    } else if (_wcsicmp(found.c_str(), L"left") == 0) {
       argsString = match[2].str();
       ArgumentsParser argParser(argsString);
       arguments = argParser.GetArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
       }
+
       matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
-    }
-    else {
+    } else {
       throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str())
-                          + L".");
+        + L".");
     }
-  } /* if (regex_match); function selection */
-  else {
+  } else {
+    /* if (regex_match); function selection */
     throw CdapException(L"Encountered malformed scalar function escape sequence:\n" + matched);
   }
+
   query = query.replace(pos_start, pos_end - pos_start + 1, matched);
   return pos_start + matched.length();
 }
@@ -171,6 +165,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
         /* Exit literal */
         insideLiteral = false;
       }
+
       i++;
       continue;
     } else if (!insideLiteral && isQuote(result, i) && !isEscapedQuote(result, i)) {
@@ -180,6 +175,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
       i++;
       continue;
     }
+
     /* Check for escape sequences */
     if (result[i] == L'{') {
       subresult = result.substr(i);
@@ -195,15 +191,14 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
       } else if (std::regex_search(subresult, match, this->regexFunctionBeginning)) {
         fnOpenings.push_back(i);
         i += 4;
+      } else {
+        throw CdapException(L"Unrecognised ODBC escape sequence.");
       }
-	    else {
-		    throw CdapException(L"Unrecognised ODBC escape sequence.");
-	    }
-    }
-    else if (result[i] == L'}') {
+    } else if (result[i] == L'}') {
       if (fnOpenings.size() == 0) {
         throw CdapException(L"Unmatched } in the query at position " + std::to_wstring(i) + L".");
       }
+
       i = this->resolveFunction(result, fnOpenings.back(), i);
       fnOpenings.pop_back();
     } else {
