@@ -94,7 +94,7 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     } else if (_wcsicmp(found.c_str(), L"replace") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"translate($2)");
     } else if (_wcsicmp(found.c_str(), L"cot") == 0) {
-      matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/(tan$2) as DOUBLE)");
+      matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/tan($2) as DOUBLE)");
     } else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
     } else if (_wcsicmp(found.c_str(), L"left") == 0) {
