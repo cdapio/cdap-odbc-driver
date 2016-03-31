@@ -219,6 +219,9 @@
     <ClInclude Include="ODBCEscapeSequenceParser.h">
       <Filter>Statements\Parsers</Filter>
     </ClInclude>
+    <ClInclude Include="ArgumentsParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp">
@@ -388,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="QuerySELECT1DataReader.cpp" />
     <ClCompile Include="ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentsParser.cpp">
       <Filter>Statements\Parsers</Filter>
     </ClCompile>
   </ItemGroup>

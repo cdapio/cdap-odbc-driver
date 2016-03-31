@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Argument.h" />
+    <ClInclude Include="ArgumentsParser.h" />
     <ClInclude Include="BadRequestException.h" />
     <ClInclude Include="CancelException.h" />
     <ClInclude Include="CdapException.h" />
@@ -211,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Argument.cpp" />
+    <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="BadRequestException.cpp" />
     <ClCompile Include="CancelException.cpp" />
     <ClCompile Include="CdapException.cpp" />

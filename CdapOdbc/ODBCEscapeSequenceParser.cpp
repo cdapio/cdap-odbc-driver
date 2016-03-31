@@ -41,6 +41,9 @@ Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, size_t pos_start, size_t pos_end) {
   std::wstring matched = query.substr(pos_start, pos_end - pos_start + 1);
   std::wsmatch match;
+  std::wstring argsString;
+  std::vector<std::wstring> arguments;
+
   if (std::regex_search(matched, match, regexFunction)) {
     std::wstring found = std::wstring(match[1].str().c_str());
     if (
@@ -102,8 +105,18 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
     }
+    else if (_wcsicmp(found.c_str(), L"left") == 0) {
+      argsString = match[2].str();
+      ArgumentsParser argParser(argsString);
+      arguments = argParser.GetArguments();
+      if (arguments.size() != 2) {
+        throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
+      }
+      matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
+    }
     else {
-      throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str()) + L".");
+      throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str())
+                          + L".");
     }
   } /* if (regex_match); function selection */
   else {
