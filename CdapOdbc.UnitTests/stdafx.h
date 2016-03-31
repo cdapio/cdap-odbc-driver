@@ -18,9 +18,16 @@
 
 #include "targetver.h"
 
+// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN   
+
 // Headers for CppUnitTest
 #include "CppUnitTest.h"
 
 #include <string>
 #include <regex>
 #include <memory>
+#include <stdexcept>
+
+#include <windows.h>
+#include <sqltypes.h>
