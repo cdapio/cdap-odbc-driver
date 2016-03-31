@@ -436,6 +436,7 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_FN_STR_LOCATE |
             SQL_FN_STR_LTRIM |
             SQL_FN_STR_REPEAT |
+            SQL_FN_STR_REPLACE |
             SQL_FN_STR_RTRIM |
             SQL_FN_STR_SPACE |
             SQL_FN_STR_SUBSTRING |
@@ -443,8 +444,8 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(
             L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = SQL_FN_STR_ASCII "
             L"| SQL_FN_STR_CONCAT | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH | SQL_FN_STR_LOCATE "
-            L"| SQL_FN_STR_LTRIM | SQL_FN_STR_REPEAT | SQL_FN_STR_RTRIM | SQL_FN_STR_SPACE \n"
-            L"| SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE \n");
+            L"| SQL_FN_STR_LTRIM | SQL_FN_STR_REPEAT | SQL_FN_STR_REPLACE | SQL_FN_STR_RTRIM \n"
+            L"| SQL_FN_STR_SPACE | SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE \n");
           return SQL_SUCCESS;
         case SQL_SQL92_DATETIME_FUNCTIONS:
           *(reinterpret_cast<SQLUINTEGER*>(InfoValuePtr)) = 0L;
