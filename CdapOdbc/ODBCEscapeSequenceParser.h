@@ -33,7 +33,7 @@ namespace Cask {
       std::wregex regexInterval;
       std::wregex regexGuid;
 
-      size_t resolveFunction(std::wstring& query, std::wsmatch match, size_t pos_start, size_t pos_end);
+      size_t resolveFunction(std::wstring& query, size_t pos_start, size_t pos_end);
       size_t resolveTimestamp(std::wstring& query, std::wsmatch match, size_t pos_start);
       size_t resolveDate(std::wstring& query, std::wsmatch match, size_t pos_start);
       size_t resolveInterval(std::wstring& query, std::wsmatch match, size_t pos_start);

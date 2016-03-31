@@ -24,6 +24,9 @@
     <ClInclude Include="ODBCEscapeSequenceParser.h">
       <Filter>Statements\Parsers</Filter>
     </ClInclude>
+    <ClInclude Include="ArgumentsParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +39,9 @@
       <Filter>Library</Filter>
     </ClCompile>
     <ClCompile Include="ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentsParser.cpp">
       <Filter>Statements\Parsers</Filter>
     </ClCompile>
   </ItemGroup>
