@@ -392,6 +392,7 @@ SQLRETURN SQL_API SQLGetInfoW(
             SQL_FN_NUM_ACOS |
             SQL_FN_NUM_ASIN |
             SQL_FN_NUM_ATAN |
+            SQL_FN_NUM_ATAN2 |
             SQL_FN_NUM_CEILING |
             SQL_FN_NUM_COS |
             SQL_FN_NUM_DEGREES |

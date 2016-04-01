@@ -41,7 +41,7 @@ Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, size_t pos_start, size_t pos_end) {
   std::wstring matched = query.substr(pos_start, pos_end - pos_start + 1);
   std::wsmatch match;
-  std::wstring argsString;
+  ArgumentsParser argParser(match[2].str());
   std::vector<std::wstring> arguments;
 
   if (std::regex_search(matched, match, regexFunction)) {
@@ -102,18 +102,24 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     else if (_wcsicmp(found.c_str(), L"cot") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/(tan$2) as DOUBLE)");
     }
+    else if (_wcsicmp(found.c_str(), L"atan2") == 0) {
+      arguments = argParser.GetArguments();
+      if (arguments.size() != 2) {
+        throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
+      }
+      matched = L"atan((" + arguments[1] + L") / (" + arguments[0] + L"))";
+    }
     else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
     }
     else if (_wcsicmp(found.c_str(), L"left") == 0) {
-      argsString = match[2].str();
-      ArgumentsParser argParser(argsString);
       arguments = argParser.GetArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
       }
       matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
     }
+
     else {
       throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str())
                           + L".");
@@ -160,7 +166,7 @@ std::wstring Cask::CdapOdbc::ODBCEscapeSequenceParser::toString() {
   std::wstring result = query;
   std::wstring subresult;
   std::wsmatch match;
-  size_t i = 0, resolvedLength;
+  size_t i = 0;
   bool insideLiteral = false;
   wchar_t currentQuote;
   std::vector<size_t> fnOpenings = std::vector<size_t>();
