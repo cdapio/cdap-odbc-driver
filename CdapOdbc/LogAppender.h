@@ -26,6 +26,11 @@ namespace Cask {
     public:
 
       /**
+       * Destructor.
+       */
+      virtual ~LogAppender() = default;
+
+      /**
        * Logs debug message.
        */
       virtual void write(const std::wstring& message) = 0;

@@ -40,7 +40,7 @@ void Cask::CdapOdbc::Logger::write(const wchar_t* message, ...) {
   va_start(argList, message);
 
   wchar_t buf[4096];
-  _vsnwprintf_s(buf, sizeof(buf), message, argList);
+  _vsnwprintf_s(buf, _countof(buf), message, argList);
   std::wstring tmp = buf;
   for (auto& item : this->appenders) {
     item->write(tmp);
