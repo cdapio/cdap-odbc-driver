@@ -69,12 +69,33 @@ namespace Cask {
       /**
        * Removes whitespaces from the start and the end of a string.
        */
-      static SecureString trim(const SecureString& str);
+      template <typename T>
+      static T trim(const T& str);
 
       /**
        * Converts double to string with specified width.
        */
       static std::wstring fromDouble(double value, int width);
     };
+
+
+    template<typename T>
+    inline T String::trim(const T & str) {
+      T result = str;
+
+      // Trim trailing spaces
+      size_t endPos = result.find_last_not_of(L" \t");
+      if (T::npos != endPos) {
+        result = result.substr(0, endPos + 1);
+      }
+
+      // Trim leading spaces
+      size_t startPos = result.find_first_not_of(L" \t");
+      if (T::npos != startPos) {
+        result = result.substr(startPos);
+      }
+
+      return result;
+    }
   }
 }

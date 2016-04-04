@@ -63,18 +63,18 @@
       <RemoveExistingProducts Before="InstallInitialize">NEWERVERSIONDETECTED OR PREVIOUSVERSIONSINSTALLED</RemoveExistingProducts>
       <ScheduleReboot After="InstallExecute"/>
     </InstallExecuteSequence>
-		<MediaTemplate EmbedCab="yes"/>
+    <MediaTemplate EmbedCab="yes"/>
     <Feature Id="VCRedist" Title="Visual C++ Runtime" AllowAdvertise="no" Display="hidden" Level="1">
       <MergeRef Id="VCRedist"/>
     </Feature>
-		<Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
-			<ComponentGroupRef Id="ProductComponents" />
+    <Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
       <?if  $(var.CdapOdbc.Configuration) = Debug ?>
         <!-- This option should be enabled only for debugging -->
         <ComponentRef Id="VC140DCRT" />
       <?endif?>
-		</Feature>
-	</Product>
+    </Feature>
+  </Product>
 
   <Fragment>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
@@ -96,19 +96,19 @@
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="$(var.ProgramsPath)">
+      <Directory Id="$(var.ProgramsPath)">
         <Directory Id="VENDORFOLDER" Name="Cask" >
-				  <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
+          <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
         </Directory>
-			</Directory>
+      </Directory>
       <Directory Id="ProgramMenuFolder">
          <Directory Id="ApplicationProgramsFolder" Name="CDAP ODBC Driver"/>
       </Directory>
-		</Directory>
+    </Directory>
     <DirectoryRef Id="TARGETDIR">
       <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)Microsoft_VC140_CRT_x64.msm" DiskId="1" Language="0"/>
     </DirectoryRef>
-	</Fragment>
+  </Fragment>
 
   <Fragment>
     <DirectoryRef Id="APPFOLDER">
@@ -173,13 +173,13 @@
     </DirectoryRef>
   </Fragment>
 
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
       <ComponentRef Id="CdapOdbcDll" />
       <ComponentRef Id="CppRestDll" />
       <ComponentRef Id="RgistryEntriesHKLM" />
       <ComponentRef Id="RgistryEntriesHKCU" />
       <ComponentRef Id="UninstallShortcut" />
-		</ComponentGroup>
-	</Fragment>
+    </ComponentGroup>
+  </Fragment>
 </Wix>
