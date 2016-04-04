@@ -207,6 +207,12 @@
     <ClCompile Include="..\CdapOdbc\ArgumentsParser.cpp">
       <Filter>Statements\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionPool.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CdapOdbc\debug.h">
@@ -385,6 +391,12 @@
     </ClInclude>
     <ClInclude Include="..\CdapOdbc\ArgumentsParser.h">
       <Filter>Statements\Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionPool.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionInfo.h">
+      <Filter>Driver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

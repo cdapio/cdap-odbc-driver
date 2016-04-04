@@ -34,7 +34,9 @@
     <ClCompile Include="..\CdapOdbc\ConcurrentQueue.cpp" />
     <ClCompile Include="..\CdapOdbc\Connection.cpp" />
     <ClCompile Include="..\CdapOdbc\ConnectionDialog.cpp" />
+    <ClCompile Include="..\CdapOdbc\ConnectionInfo.cpp" />
     <ClCompile Include="..\CdapOdbc\ConnectionParams.cpp" />
+    <ClCompile Include="..\CdapOdbc\ConnectionPool.cpp" />
     <ClCompile Include="..\CdapOdbc\DataReader.cpp" />
     <ClCompile Include="..\CdapOdbc\DataSourceDialog.cpp" />
     <ClCompile Include="..\CdapOdbc\DataType.cpp" />
@@ -97,7 +99,9 @@
     <ClInclude Include="..\CdapOdbc\ConcurrentQueue.h" />
     <ClInclude Include="..\CdapOdbc\Connection.h" />
     <ClInclude Include="..\CdapOdbc\ConnectionDialog.h" />
+    <ClInclude Include="..\CdapOdbc\ConnectionInfo.h" />
     <ClInclude Include="..\CdapOdbc\ConnectionParams.h" />
+    <ClInclude Include="..\CdapOdbc\ConnectionPool.h" />
     <ClInclude Include="..\CdapOdbc\DataReader.h" />
     <ClInclude Include="..\CdapOdbc\DataSourceDialog.h" />
     <ClInclude Include="..\CdapOdbc\DataType.h" />

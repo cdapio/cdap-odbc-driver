@@ -22,7 +22,7 @@
 #include "InvalidHandleException.h"
 #include "Argument.h"
 #include "Connection.h"
-#include "String.h"
+#include "SecureString.h"
 
 using namespace Cask::CdapOdbc;
 
