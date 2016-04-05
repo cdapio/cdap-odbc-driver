@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "Statement.h"
 #include "Connection.h"
-#include "String.h"
 #include "Encoding.h"
 #include "SchemasCommand.h"
 #include "TablesCommand.h"

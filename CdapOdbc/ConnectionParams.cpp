@@ -16,7 +16,6 @@
 
 #include "stdafx.h"
 #include "ConnectionParams.h"
-#include "String.h"
 
 using namespace Cask::CdapOdbc;
 

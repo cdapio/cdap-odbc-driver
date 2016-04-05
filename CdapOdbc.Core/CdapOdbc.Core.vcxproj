@@ -127,6 +127,7 @@
     <ClInclude Include="..\CdapOdbc\QueryResult.h" />
     <ClInclude Include="..\CdapOdbc\QuerySELECT1DataReader.h" />
     <ClInclude Include="..\CdapOdbc\QueryStatus.h" />
+    <ClInclude Include="..\CdapOdbc\SchemaProperties.h" />
     <ClInclude Include="..\CdapOdbc\SchemasCommand.h" />
     <ClInclude Include="..\CdapOdbc\SchemasDataReader.h" />
     <ClInclude Include="..\CdapOdbc\SpecialColumnsCommand.h" />

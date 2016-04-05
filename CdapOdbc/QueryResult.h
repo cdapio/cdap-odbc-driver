@@ -51,6 +51,13 @@ namespace Cask {
       }
 
       /**
+       * Gets a query data.
+       */
+      const web::json::value& getValue() const {
+        return this->rows;
+      }
+
+      /**
        * Gets a number of rows.
        */
       int getSize() const {

@@ -395,6 +395,9 @@
     <ClInclude Include="..\CdapOdbc\ConnectionInfo.h">
       <Filter>Driver</Filter>
     </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SchemaProperties.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

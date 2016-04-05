@@ -16,13 +16,14 @@
 
 #include "stdafx.h"
 #include "TablesDataReader.h"
-#include "String.h"
+#include "SchemaProperties.h"
 
 void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
   std::vector<web::json::value> newRows;
   auto& rows = this->datasets.getRows();
   for (auto& row : rows) {
-    if (row.at(L"properties").has_field(L"schema")) {
+    auto& props = row.at(L"properties");
+    if (props.has_field(PROP_SCHEMA) || props.has_field(PROP_SCHEMA_ALT)) {
       newRows.push_back(row);
     }
   }

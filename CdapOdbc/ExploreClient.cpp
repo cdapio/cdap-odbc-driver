@@ -176,19 +176,13 @@ QueryResult Cask::CdapOdbc::ExploreClient::getDatasets() {
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getStreamFields(const std::wstring& streamName) {
-  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/streams/" + streamName).at(L"format").at(L"schema").at(L"fields");
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/streams/" + streamName);
   return QueryResult(value);
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getDatasetFields(const std::wstring& datasetName) {
-  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/data/datasets/" + datasetName).at(L"spec").at(L"properties").at(L"schema");
-  std::error_code error;
-  auto schema = web::json::value::parse(value.as_string(), error);
-  if (error) {
-    throw std::system_error(error);
-  }
-
-  return QueryResult(schema.at(L"fields"));
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/data/datasets/" + datasetName);
+  return QueryResult(value);
 }
 
 QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
