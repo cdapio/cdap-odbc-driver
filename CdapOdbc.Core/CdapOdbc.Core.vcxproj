@@ -127,7 +127,6 @@
     <ClInclude Include="..\CdapOdbc\QueryResult.h" />
     <ClInclude Include="..\CdapOdbc\QuerySELECT1DataReader.h" />
     <ClInclude Include="..\CdapOdbc\QueryStatus.h" />
-    <ClInclude Include="..\CdapOdbc\resource.h" />
     <ClInclude Include="..\CdapOdbc\SchemasCommand.h" />
     <ClInclude Include="..\CdapOdbc\SchemasDataReader.h" />
     <ClInclude Include="..\CdapOdbc\SpecialColumnsCommand.h" />
@@ -145,9 +144,6 @@
     <ClInclude Include="..\CdapOdbc\TypesCommand.h" />
     <ClInclude Include="..\CdapOdbc\TypesDataReader.h" />
     <ClInclude Include="..\CdapOdbc\VersionInfo.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\CdapOdbc\Resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

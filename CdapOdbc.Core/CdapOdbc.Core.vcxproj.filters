@@ -341,9 +341,6 @@
     <ClInclude Include="..\CdapOdbc\Dialog.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\CdapOdbc\resource.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\CdapOdbc\ColumnDesc.h">
       <Filter>Explore</Filter>
     </ClInclude>
@@ -398,11 +395,6 @@
     <ClInclude Include="..\CdapOdbc\ConnectionInfo.h">
       <Filter>Driver</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\CdapOdbc\Resource.rc">
-      <Filter>Resources</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

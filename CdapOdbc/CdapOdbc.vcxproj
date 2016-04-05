@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="spi.h" />
     <ClInclude Include="stdafx.h" />
@@ -179,6 +180,9 @@
     <ProjectReference Include="..\CdapOdbc.Core\CdapOdbc.Core.vcxproj">
       <Project>{d38292fa-1f09-4b04-a4e3-dab69fb1c6a6}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
