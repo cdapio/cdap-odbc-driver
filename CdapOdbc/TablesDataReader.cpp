@@ -22,6 +22,10 @@ void Cask::CdapOdbc::TablesDataReader::filterDatasets() {
   std::vector<web::json::value> newRows;
   auto& rows = this->datasets.getRows();
   for (auto& row : rows) {
+    // TODO: once CDAP 3.4 is issued, schema retreival must be updated:
+    // All filesets created by HYDRATOR plugin define schema as dataset property (CDAP-5322)
+    // For now we use heuristic approach: "schema" or "explore.table.property.avro.schema.literal"
+    // See CDAP-5516
     auto& props = row.at(L"properties");
     if (props.has_field(PROP_SCHEMA) || props.has_field(PROP_SCHEMA_ALT)) {
       newRows.push_back(row);
