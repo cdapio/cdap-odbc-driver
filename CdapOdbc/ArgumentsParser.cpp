@@ -44,7 +44,7 @@ bool Cask::CdapOdbc::ArgumentsParser::isNestedMatched(wchar_t begin, wchar_t end
   return (begin == L'(' && end == L')');
 }
 
-std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::GetArguments() {
+std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::getArguments() {
   std::vector<std::wstring> result;
   std::wstring buffer = L"";
 
@@ -94,10 +94,10 @@ std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::GetArguments() {
     } else if (isNestedBeginning(args, i)) {
       nestedStack.push_back(args[i]);
     }
-  
+
     buffer.push_back(args[i]);
   } // for
-  
+
   if (!buffer.empty()) {
     result.push_back(buffer);
   }
