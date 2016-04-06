@@ -122,6 +122,15 @@ Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
   this->schema = this->queryCommand->loadSchema();
 }
 
+Cask::CdapOdbc::QueryDataReader::~QueryDataReader() {
+  // Ensure all tasks stopped
+  for (auto& item : this->tasks) {
+    if (!item.is_done()) {
+      item.wait();
+    }
+  }
+}
+
 bool Cask::CdapOdbc::QueryDataReader::read() {
   bool result = false;
   if (this->queryCommand->getHasData()) {
