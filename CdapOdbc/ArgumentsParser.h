@@ -42,7 +42,7 @@ namespace Cask {
       /**
       * Parses the string in format "<argument-1>[,<argument-2>...]" into separate arguments.
       */
-      std::vector<std::wstring> GetArguments();
+      std::vector<std::wstring> getArguments();
 
     };
   }

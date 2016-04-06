@@ -94,9 +94,9 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     } else if (_wcsicmp(found.c_str(), L"replace") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"translate($2)");
     } else if (_wcsicmp(found.c_str(), L"cot") == 0) {
-      matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/(tan$2) as DOUBLE)");
+      matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/tan($2) as DOUBLE)");
     } else if (_wcsicmp(found.c_str(), L"atan2") == 0) {
-      arguments = argParser.GetArguments();
+      arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
       }
@@ -104,21 +104,21 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     } else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
     } else if (_wcsicmp(found.c_str(), L"left") == 0) {
-      arguments = argParser.GetArguments();
+      arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
       }
 
       matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
     } else if (_wcsicmp(found.c_str(), L"left") == 0) {
-      arguments = argParser.GetArguments();
+      arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
       }
       matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
     } else {
       throw CdapException(L"Not supported function in escape sequence: " + std::wstring(found.c_str())
-                          + L".");
+        + L".");
     }
   } else {
     throw CdapException(L"Encountered malformed scalar function escape sequence:\n" + matched);

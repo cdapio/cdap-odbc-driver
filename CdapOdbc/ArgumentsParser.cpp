@@ -44,7 +44,7 @@ bool Cask::CdapOdbc::ArgumentsParser::isNestedMatched(wchar_t begin, wchar_t end
   return (begin == L'(' && end == L')');
 }
 
-std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::GetArguments() {
+std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::getArguments() {
   std::vector<std::wstring> result;
   std::wstring buffer = L"";
 
@@ -73,37 +73,34 @@ std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::GetArguments() {
         /* Exit literal */
         insideLiteral = false;
       }
-    }
-    else if (isQuote(args, i) && !isEscapedQuote(args, i)) {
+    } else if (isQuote(args, i) && !isEscapedQuote(args, i)) {
       /* Enter literal */
       insideLiteral = true;
       currentQuote = args[i];
-    }
-    else if (isNestedBeginning(args, i)) {
+    } else if (isNestedBeginning(args, i)) {
       nestedStack.push_back(args[i]);
-    }
-    else if (isNestedEnding(args, i)) {
+    } else if (isNestedEnding(args, i)) {
       if (!nestedStack.empty() && isNestedMatched(nestedStack.back(), args[i])) {
         nestedStack.pop_back();
+      } else {
+        throw CdapException(L"Unmatched closing brace ')' at position: "
+          + std::to_wstring(i)
+          + L".");
       }
-      else {
-        throw CdapException(L"Unmatched closing brace ')' at position: " 
-                            + std::to_wstring(i) 
-                            + L".");
-      }
-    }
-    else if (!nestedStack.empty()) {
+    } else if (!nestedStack.empty()) {
       if (isNestedMatched(nestedStack.back(), args[i])) {
         nestedStack.pop_back();
       }
-    }
-    else if (isNestedBeginning(args, i)) {
+    } else if (isNestedBeginning(args, i)) {
       nestedStack.push_back(args[i]);
     }
+
     buffer.push_back(args[i]);
   } // for
+
   if (!buffer.empty()) {
     result.push_back(buffer);
   }
+
   return result;
 }
