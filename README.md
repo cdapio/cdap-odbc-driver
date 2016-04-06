@@ -5,14 +5,26 @@ Cask CDAP ODBC Driver
 Introduction
 ============
 
-This is ODBC driver for Cask CDAP Dataset platform that allows to query datasets
-from Microsoft Excel (including MS Query) and Tableau applications.
+ODBC driver for CDAP Datasets allows to access datasets via ODBC interface. Driver is compatible and tested
+with the following applications:
+ * Microsoft Excel (including MS Query)
+ * Tableau.
 
-For full list of supported HSQL features see:
+Driver provides the following functionality:
+ * Support for asynchronous mode
+ * Connection pool
+ * Support for CDAP Datasets schema data types: INT, LONG, FLOAT, DOUBLE, STRING, BOOLEAN, BYTES and MAP<STRING, STRING>; the latter is converted to STRING type
+ * ODBC escaped sequences for function calls, date and timestamps.
+Driver supports the following HSQL features see:
 TODO: add link.
 
+Known limitations
+=================
 
-Requirements
+ * ODBC Driver does not support interval, guid, datetime and procedure call escape sequences as they are not supported by Hive in CDAP.
+ * 
+
+Compatibility
 ============
 
 Cask CDAP ODBC Driver is compatible with Windows 7, Windows 8/8.1 and Windows 10.
