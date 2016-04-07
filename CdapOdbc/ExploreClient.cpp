@@ -18,6 +18,7 @@
 #include "ExploreClient.h"
 #include "BadRequestException.h"
 #include "CdapException.h"
+#include "CommunicationLinkFailure.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -66,8 +67,10 @@ web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_reques
     auto errorTask = response.extract_utf16string();
     errorTask.wait();
     throw BadRequestException(errorTask.get());
+  } else if (response.status_code() == web::http::status_codes::Unauthorized) {
+    throw CdapException(L"Wrong authentication token.");
   } else {
-    throw CdapException(L"Cannot get the response.");
+    throw CommunicationLinkFailure();
   }
 }
 
@@ -94,11 +97,7 @@ Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, cons
 }
 
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
-  try {
-    return (this->doRequest(web::http::methods::GET, L"explore/status").at(L"status").as_string() == L"OK");
-  } catch (std::exception&) {
-    return false;
-  }
+  return (this->doRequest(web::http::methods::GET, L"explore/status").at(L"status").as_string() == L"OK");
 }
 
 QueryStatus Cask::CdapOdbc::ExploreClient::getQueryStatus(const QueryHandle& handle) {
