@@ -65,6 +65,11 @@ namespace Cask {
        */
       QueryDataReader(QueryCommand* command);
 
+      /**
+       * Destructor.
+       */
+      virtual ~QueryDataReader() override;
+
       // Inherited via DataReader
       virtual bool read() override;
 
