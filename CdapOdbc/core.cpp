@@ -535,7 +535,7 @@ SQLRETURN SQL_API SQLGetInfoW(
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, *InfoValuePtr = 1\n");
           return SQL_SUCCESS;
         case SQL_DBMS_NAME:
-          Argument::fromStdString(L"CDAP Databases", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
+          Argument::fromStdString(L"CDAP Datasets", static_cast<SQLWCHAR*>(InfoValuePtr), BufferLength, StringLengthPtr);
           TRACE(L"SQLGetInfoW returns SQL_SUCCESS, InfoValuePtr = %s\n", static_cast<SQLWCHAR*>(InfoValuePtr));
           return SQL_SUCCESS;
         case SQL_DBMS_VER:
