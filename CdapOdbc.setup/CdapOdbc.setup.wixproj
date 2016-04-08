@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>232af8b4-f2c9-4673-9d88-6b327251f7f8</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CdapOdbcDriver</OutputName>
+    <OutputName>CDAP.ODBCDriver</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -52,6 +52,16 @@
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\CDAP_-ODBC.bmp" />
+    <Content Include="resources\CDAP_ODBC_BG.bmp" />
+    <Content Include="resources\CDAP_ODBC_Excl.bmp" />
+    <Content Include="resources\CDAP_ODBC_Info.bmp" />
+    <Content Include="resources\CDAP_ODBC_TopBanner.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

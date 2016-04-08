@@ -76,6 +76,16 @@
         <ComponentRef Id="VC140DCRT" />
       <?endif?>
     </Feature>
+    <Icon Id="cdap.icon" SourceFile="resources\CDAP_-ODBC.bmp" />
+    <Property Id="ARPPRODUCTICON" Value="cdap.icon" />
+
+    <WixVariable Id="WixUIBannerBmp" Value="resources\CDAP_ODBC_TopBanner.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="resources\CDAP_ODBC_BG.bmp"/>
+    <WixVariable Id="WixUIExclamationIco" Value="resources\CDAP_ODBC_Excl.bmp"/>
+    <WixVariable Id="WixUIInfoIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+    <WixVariable Id="WixUINewIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+    <WixVariable Id="WixUIUpIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+
   </Product>
 
   <Fragment>
