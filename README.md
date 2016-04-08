@@ -45,8 +45,8 @@ Solution contains 5 projects:
  * CdapOdbc.UnitTests - unit tests;
 
 Output path:
- * .DDL file: <solution-catalog>\\<architecture>\\<configuration>
- * .MSI installer: <solution-catalog>\\CdapOdbc.setup\\bin\\<architecture>\\<solution>
+ * .DDL file: \<path-to-solution>\\\<architecture>\\\<configuration>
+ * .MSI installer: \<path-to-solution\>\CdapOdbc.setup\\bin\\\<architecture>\\<solution>
 
 
 Installation
