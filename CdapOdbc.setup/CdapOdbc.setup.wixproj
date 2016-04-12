@@ -63,6 +63,9 @@
   <ItemGroup>
     <Folder Include="resources" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WixUI_en-us.wxl" />
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
