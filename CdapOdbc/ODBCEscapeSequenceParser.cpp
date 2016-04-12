@@ -40,7 +40,6 @@ Cask::CdapOdbc::ODBCEscapeSequenceParser::ODBCEscapeSequenceParser(
 size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& query, size_t pos_start, size_t pos_end) {
   std::wstring matched = query.substr(pos_start, pos_end - pos_start + 1);
   std::wsmatch match;
-  ArgumentsParser argParser(match[2].str());
   std::vector<std::wstring> arguments;
 
   if (std::regex_search(matched, match, regexFunction)) {
@@ -96,6 +95,7 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     } else if (_wcsicmp(found.c_str(), L"cot") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"CAST(1.0/tan($2) as DOUBLE)");
     } else if (_wcsicmp(found.c_str(), L"atan2") == 0) {
+      ArgumentsParser argParser(match[2].str());
       arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
@@ -104,6 +104,7 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     } else if (_wcsicmp(found.c_str(), L"now") == 0) {
       matched = std::regex_replace(matched, regexFunction, L"from_unixtime(unix_timestamp())");
     } else if (_wcsicmp(found.c_str(), L"left") == 0) {
+      ArgumentsParser argParser(match[2].str());
       arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
@@ -111,6 +112,7 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
 
       matched = L"substr(" + arguments[0] + L", 0, " + arguments[1] + L")";
     } else if (_wcsicmp(found.c_str(), L"left") == 0) {
+      ArgumentsParser argParser(match[2].str());
       arguments = argParser.getArguments();
       if (arguments.size() != 2) {
         throw CdapException(L"Unable to parse function arguments: " + std::wstring(found.c_str()) + L".");
