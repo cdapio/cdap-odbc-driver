@@ -39,16 +39,16 @@ namespace Cask {
       std::atomic_bool moreFrames;
       ConcurrentQueue<QueryResult> frameCache;
       bool firstLoad;
-      std::vector<pplx::task<bool>> tasks;
       int fetchSize;
-   
+      pplx::task<bool> task;
+      bool taskCreated;
+
+      void checkTaskForExceptions();
       void adjustFetchSize(std::int64_t responseSize);
-      void checkTasksForExceptions();
       bool loadDataContinue();
       bool loadDataBegin();
       bool loadFrame();
       void tryLoadFrameAsync();
-      pplx::task<bool>& loadFrameAsync();
 
       const QueryResult& getFrame() const {
         return this->frameCache.front();

@@ -19,24 +19,17 @@
 #include "QueryCommand.h"
 #include "Driver.h"
 
+void Cask::CdapOdbc::QueryDataReader::checkTaskForExceptions() {
+  if (this->task.is_done()) {
+    this->task.get();
+  }
+}
+
 void Cask::CdapOdbc::QueryDataReader::adjustFetchSize(std::int64_t responseSize) {
   auto oneRow = responseSize / this->fetchSize;
   auto newFetchSize = OPTIMAL_RESPONSE_SIZE_IN_BYTES / oneRow;
   this->fetchSize = static_cast<int>(newFetchSize);
   TRACE(L"FETCH SIZE adjusted to: %d\n", this->fetchSize);
-}
-
-void Cask::CdapOdbc::QueryDataReader::checkTasksForExceptions() {
-  auto it = this->tasks.begin();
-  while (it != this->tasks.end()) {
-    if (it->is_done()) {
-      // Check for exceptions
-      it->get();
-      it = this->tasks.erase(it);
-    } else {
-      ++it;
-    }
-  }
 }
 
 bool Cask::CdapOdbc::QueryDataReader::loadDataContinue() {
@@ -45,23 +38,22 @@ bool Cask::CdapOdbc::QueryDataReader::loadDataContinue() {
   TRACE(L"Popped frame. Frame count: %d\n", this->frameCache.size());
 
   this->currentRowIndex = 0;
+  this->tryLoadFrameAsync();
 
-  if (this->moreFrames) {
-    // Start loading next async frame
-    auto& task = this->loadFrameAsync();
-
-    // At this point we must know if there are more rows in query
-    // If data fetched quickier than loading cache can be empty
-    // In this case we have to wait for next frame
-    if (this->frameCache.empty()) {
-      task.wait();
-      
+  // At this point we must know if there are more rows in query
+  // If data fetched quickier than loading cache can be empty
+  // In this case we have to wait for next frame
+  if (this->taskCreated) {
+    if (!this->task.is_done() && this->frameCache.empty()) {
+      this->task.wait();
       // As task done check immediately for exceptions
-      task.get();
+      this->task.get();
     }
   }
 
-  if (!this->frameCache.empty() && this->getFrame().getSize() > 0) {
+  // Sometimes we can have empty frame cache and load task in progress
+  if ((this->taskCreated && !this->task.is_done()) || 
+      (!this->frameCache.empty() && this->getFrame().getSize() > 0)) {
     return true;
   } else {
     return false;
@@ -71,7 +63,7 @@ bool Cask::CdapOdbc::QueryDataReader::loadDataContinue() {
 bool Cask::CdapOdbc::QueryDataReader::loadDataBegin() {
   if (this->moreFrames && this->loadFrame()) {
     this->currentRowIndex = 0;
-    // After first frame loaded we could try to load a few more
+    // After first frame loaded start loading the next one
     this->tryLoadFrameAsync();
     return true;
   } else {
@@ -98,19 +90,15 @@ bool Cask::CdapOdbc::QueryDataReader::loadFrame() {
 }
 
 void Cask::CdapOdbc::QueryDataReader::tryLoadFrameAsync() {
-  if (this->moreFrames) {
-    this->loadFrameAsync();
+  // If task created by default constructor is_done() cannot be called
+  if (this->moreFrames && (!this->taskCreated || this->task.is_done())) {
+    this->task = std::move(pplx::task<bool>([this]() {
+      TRACE(L"Started loading new frame\n");
+      return this->loadFrame();
+    }));
+    // Mark that task is created
+    this->taskCreated = true;
   }
-}
-
-pplx::task<bool>& Cask::CdapOdbc::QueryDataReader::loadFrameAsync() {
-  auto task = pplx::task<bool>([this]() {
-    TRACE(L"Started loading new frame\n");
-    return this->loadFrame();
-  });
-
-  this->tasks.emplace_back(std::move(task));
-  return this->tasks.back();
 }
 
 Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
@@ -118,16 +106,19 @@ Cask::CdapOdbc::QueryDataReader::QueryDataReader(QueryCommand* command)
   , currentRowIndex(-1)
   , moreFrames(true)
   , firstLoad(true)
-  , fetchSize(FETCH_SIZE) {
+  , fetchSize(FETCH_SIZE)
+  , taskCreated(false) {
   this->schema = this->queryCommand->loadSchema();
 }
 
 Cask::CdapOdbc::QueryDataReader::~QueryDataReader() {
-  // Ensure all tasks stopped
-  for (auto& item : this->tasks) {
-    if (!item.is_done()) {
-      item.wait();
+  try {
+    // If task not complete yet
+    // wait for completion for safe destruction
+    if (this->taskCreated && !this->task.is_done()) {
+      this->task.wait();
     }
+  } catch (...) {
   }
 }
 
@@ -138,7 +129,7 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
       this->firstLoad = false;
       result = this->loadDataBegin();
     } else {
-      this->checkTasksForExceptions();
+      this->checkTaskForExceptions();
       ++this->currentRowIndex;
       if (this->isFrameFetched()) {
         result = this->loadDataContinue();
@@ -156,7 +147,7 @@ bool Cask::CdapOdbc::QueryDataReader::read() {
 void Cask::CdapOdbc::QueryDataReader::getColumnValue(const ColumnBinding& binding) const {
   const auto& row = this->getFrame().getRows().at(this->currentRowIndex);
   auto& value = row.at(L"columns").as_array().at(binding.getColumnNumber() - 1);
-  
+
   if (value.is_null()) {
     this->fetchNull(binding);
   } else {
