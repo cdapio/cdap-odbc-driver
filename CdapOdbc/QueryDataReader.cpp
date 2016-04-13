@@ -20,7 +20,7 @@
 #include "Driver.h"
 
 void Cask::CdapOdbc::QueryDataReader::checkTaskForExceptions() {
-  if (this->task.is_done()) {
+  if (this->taskCreated && this->task.is_done()) {
     this->task.get();
   }
 }
