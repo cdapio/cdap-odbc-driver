@@ -9,10 +9,12 @@
 <?endif ?>
 <?if $(var.targetArch) = x64 ?>
   <?define ProductName = "CDAP ODBC Driver (x64)"?>
+  <?define DatasourceName = "CDAP Datasets (x64)"?>
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
   <?define Win64 = "yes" ?>
 <?else ?>
   <?define ProductName = "CDAP ODBC Driver (x32)"?>
+  <?define DatasourceName = "CDAP Datasets (x32)"?>
   <?define targetArch = Win32 ?>
   <?define ProgramsPath = "ProgramFilesFolder" ?>
   <?define Win64 = "no" ?>
@@ -76,7 +78,7 @@
         <ComponentRef Id="VC140DCRT" />
       <?endif?>
     </Feature>
-    <Icon Id="cdap.icon" SourceFile="resources\CDAP_-ODBC.bmp" />
+    <Icon Id="cdap.icon" SourceFile="resources\cdap.ico" />
     <Property Id="ARPPRODUCTICON" Value="cdap.icon" />
 
     <WixVariable Id="WixUIBannerBmp" Value="resources\CDAP_ODBC_TopBanner.bmp"/>
@@ -91,15 +93,18 @@
   <Fragment>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
     <UI Id="MyWixUI">
+      <TextStyle Id="styleCaskTitle" FaceName="Tahoma" Size="10" Red="255" Green="255" Blue="255" Bold="yes"/>
+      <TextStyle Id="styleCaskSubtitle" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
+      <TextStyle Id="styleCaskText" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
       <UIRef Id="WixUI_Minimal" />
-      <Dialog Id="AcceptUninstall" Title="Accept uninstall previouse products" Height="80" Width="250">
-        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+      <Dialog Id="AcceptUninstall" Title="Accept uninstall of previous products" Height="60" Width="350">
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="350" Height="15" Transparent="yes" NoPrefix="yes">
           <Text>A newer version of [ProductName] is already installed. Continue installation?</Text>
         </Control>
-        <Control Id="No" Type="PushButton" X="132" Y="57" Width="56" Height="17" Default="yes" Cancel="yes" Text="No">
+        <Control Id="No" Type="PushButton" X="182" Y="37" Width="56" Height="17" Default="yes" Cancel="yes" Text="No">
           <Publish Event="EndDialog" Value="Exit">1</Publish>
         </Control>
-        <Control Id="Yes" Type="PushButton" X="72" Y="57" Width="56" Height="17" Text="Yes">
+        <Control Id="Yes" Type="PushButton" X="122" Y="37" Width="56" Height="17" Text="Yes">
           <Publish Event="EndDialog" Value="Return">1</Publish>
         </Control>
       </Dialog>
@@ -159,10 +164,10 @@
       <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">
         <RegistryKey Root="HKCU"
                   Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
-          <RegistryValue Type="string" Name="CDAP Datasets" Value="[ProductName]"/>
+          <RegistryValue Type="string" Name="$(var.DatasourceName)" Value="[ProductName]"/>
         </RegistryKey>
         <RegistryKey Root="HKCU"
-                  Key="SOFTWARE\ODBC\ODBC.INI\CDAP Datasets">
+                  Key="SOFTWARE\ODBC\ODBC.INI\$(var.DatasourceName)">
           <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
         </RegistryKey>
       </Component>

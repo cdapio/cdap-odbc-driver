@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+
+  <String Id="PrepareDlgTitle" Overridable="yes">{\styleCaskTitle}Welcome to the [ProductName] Setup Wizard</String>
+  <String Id="PrepareDlgDescription" Overridable="yes">{\styleCaskText}Please wait while the Setup Wizard prepares to guide you through the installation.</String>
+
+  <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes">{\styleCaskTitle}Welcome to the [ProductName] Setup Wizard</String>
+  <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">{\styleCaskText}The Setup Wizard allows you to change the way [ProductName] features are installed on your computer or to remove it from your computer. Click Next to continue or Cancel to exit the Setup Wizard.</String>
+
+  <String Id="WelcomeEulaDlgTitle" Overridable="yes">{\styleCaskTitle}Please read the [ProductName] License Agreement</String>
+
+  <String Id="ProgressDlgTitleInstalling" Overridable="yes">{\styleCaskTitle}Installing [ProductName]</String>
+  <String Id="ProgressDlgTitleChanging" Overridable="yes">{\styleCaskTitle}Changing [ProductName]</String>
+  <String Id="ProgressDlgTitleRepairing" Overridable="yes">{\styleCaskTitle}Repairing [ProductName]</String>
+  <String Id="ProgressDlgTitleRemoving" Overridable="yes">{\styleCaskTitle}Removing [ProductName]</String>
+
+  <String Id="MaintenanceTypeDlgTitle" Overridable="yes">{\styleCaskTitle}Change, repair, or remove installation</String>
+  <String Id="MaintenanceTypeDlgDescription" Overridable="yes">{\styleCaskText}Select the operation you wish to perform.</String>
+
+  <String Id="VerifyReadyDlgInstallTitle" Overridable="yes">{\styleCaskTitle}Ready to install [ProductName]</String>
+  <String Id="VerifyReadyDlgChangeTitle" Overridable="yes">{\styleCaskTitle}Ready to change [ProductName]</String>
+  <String Id="VerifyReadyDlgRepairTitle" Overridable="yes">{\styleCaskTitle}Ready to repair [ProductName]</String>
+  <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes">{\styleCaskTitle}Ready to remove [ProductName]</String>
+
+  <String Id="ExitDialogTitle" Overridable="yes">{\styleCaskTitle}Completed the [ProductName] Setup Wizard</String>
+  <String Id="ExitDialogDescription" Overridable="yes">{\styleCaskText}Click the Finish button to exit the Setup Wizard.</String>
+
+  <String Id="UserExitTitle">{\styleCaskTitle}[ProductName] Setup Wizard was interrupted</String>
+  <String Id="UserExitDescription1">{\styleCaskText}[ProductName] setup was interrupted. Your system has not been modified. To install this program at a later time, please run the installation again.</String>
+  <String Id="UserExitDescription2">Click the Finish button to exit the Setup Wizard.</String>
+
+</WixLocalization>
