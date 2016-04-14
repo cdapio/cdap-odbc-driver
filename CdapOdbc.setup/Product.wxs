@@ -25,6 +25,11 @@
 <?endif ?>
 <?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
 <?define redistMSMPath = "C:\Program Files (x86)\Common Files\Merge Modules\" ?>
+<?if $(var.targetArch) = x64?>
+  <?define redistMSMName = "Microsoft_VC140_CRT_x64.msm"?>
+<?else?>
+  <?define redistMSMName = "Microsoft_VC140_CRT_x86.msm"?>
+<?endif?>
 <?define nonRedistPath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist\x64\Microsoft.VC140.DebugCRT\" ?>
 
 <?define CurrentVersion="!(bind.fileVersion.$(var.CdapOdbcDll))"?>
@@ -36,8 +41,7 @@
            UpgradeCode="$(var.UpgradeCode)" >
     <Package InstallerVersion="301"
              Compressed="yes"
-             InstallScope="perMachine"
-             Platform="x64"  />
+             InstallScope="perMachine" />
     <Upgrade Id="$(var.UpgradeCode)">
       <!-- Populate NEWERVERSIONDETECTED if there is an installed
          package with the same upgrade code
@@ -131,7 +135,7 @@
       </Directory>
     </Directory>
     <DirectoryRef Id="TARGETDIR">
-      <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)Microsoft_VC140_CRT_x64.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)$(var.redistMSMName)" DiskId="1" Language="0"/>
     </DirectoryRef>
   </Fragment>
 
@@ -149,7 +153,7 @@
       <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
         <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
       </Component>
-      <Component Id="CppRestDll"  Win64 ="$(var.Win64)" Guid="*">
+      <Component Id="CppRestDll" Win64 ="$(var.Win64)" Guid="*">
         <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" />
       </Component>
       <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
