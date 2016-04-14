@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>232af8b4-f2c9-4673-9d88-6b327251f7f8</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CDAP.ODBCDriver</OutputName>
+    <OutputName>CDAP.ODBCDriver-$(Platform)</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -54,7 +55,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="resources\CDAP_-ODBC.bmp" />
+    <Content Include="resources\cdap.ico" />
     <Content Include="resources\CDAP_ODBC_BG.bmp" />
     <Content Include="resources\CDAP_ODBC_Excl.bmp" />
     <Content Include="resources\CDAP_ODBC_Info.bmp" />

@@ -8,13 +8,17 @@
   <?define CppRestDll = "cpprest140_2_8.dll" ?>
 <?endif ?>
 <?if $(var.targetArch) = x64 ?>
-  <?define ProductName = "CDAP ODBC Driver (x64)"?>
-  <?define DatasourceName = "CDAP Datasets (x64)"?>
+  <?define ProductCode="{77D82CBD-FBD8-4BD5-ABE2-9B37E0CBC3ED}" ?>
+  <?define UpgradeCode="{6A65B544-F23B-4F53-A617-12DD50E2751A}"?>
+  <?define ProductName = "CDAP ODBC Driver 64-bit"?>
+  <?define DatasourceName = "CDAP Datasets 64-bit"?>
   <?define ProgramsPath = "ProgramFiles64Folder" ?>
   <?define Win64 = "yes" ?>
 <?else ?>
-  <?define ProductName = "CDAP ODBC Driver (x32)"?>
-  <?define DatasourceName = "CDAP Datasets (x32)"?>
+  <?define ProductCode="{E79AB59D-FFA4-40CE-85C3-10A8ADE1C7B4}" ?>
+  <?define UpgradeCode="{10B657C6-26AD-4938-A9A7-01D1D58C45B9}"?>
+  <?define ProductName = "CDAP ODBC Driver 32-bit"?>
+  <?define DatasourceName = "CDAP Datasets 32-bit"?>
   <?define targetArch = Win32 ?>
   <?define ProgramsPath = "ProgramFilesFolder" ?>
   <?define Win64 = "no" ?>
@@ -25,9 +29,8 @@
 
 <?define CurrentVersion="!(bind.fileVersion.$(var.CdapOdbcDll))"?>
 <?define FirstVersion="0.0.0.0"?>
-<?define UpgradeCode="{6A65B544-F23B-4F53-A617-12DD50E2751A}"?>
 
-  <Product Id="*"
+  <Product Id="$(var.ProductCode)"
            Name="$(var.ProductName)" Language="1033"
            Version="$(var.CurrentVersion)" Manufacturer="Cask"
            UpgradeCode="$(var.UpgradeCode)" >
@@ -78,9 +81,12 @@
         <ComponentRef Id="VC140DCRT" />
       <?endif?>
     </Feature>
+
+    <!-- Driver's icon in Programs and Features list -->
     <Icon Id="cdap.icon" SourceFile="resources\cdap.ico" />
     <Property Id="ARPPRODUCTICON" Value="cdap.icon" />
 
+    <!-- This is to customize the installer design -->
     <WixVariable Id="WixUIBannerBmp" Value="resources\CDAP_ODBC_TopBanner.bmp"/>
     <WixVariable Id="WixUIDialogBmp" Value="resources\CDAP_ODBC_BG.bmp"/>
     <WixVariable Id="WixUIExclamationIco" Value="resources\CDAP_ODBC_Excl.bmp"/>
@@ -93,9 +99,11 @@
   <Fragment>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
     <UI Id="MyWixUI">
+
       <TextStyle Id="styleCaskTitle" FaceName="Tahoma" Size="10" Red="255" Green="255" Blue="255" Bold="yes"/>
       <TextStyle Id="styleCaskSubtitle" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
       <TextStyle Id="styleCaskText" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
+
       <UIRef Id="WixUI_Minimal" />
       <Dialog Id="AcceptUninstall" Title="Accept uninstall of previous products" Height="60" Width="350">
         <Control Id="Title" Type="Text" X="15" Y="6" Width="350" Height="15" Transparent="yes" NoPrefix="yes">
@@ -199,4 +207,5 @@
       <ComponentRef Id="UninstallShortcut" />
     </ComponentGroup>
   </Fragment>
+
 </Wix>
