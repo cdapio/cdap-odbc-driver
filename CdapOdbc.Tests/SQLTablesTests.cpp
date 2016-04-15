@@ -72,7 +72,7 @@ namespace Cask {
         }
 
         std::wstring getBaseConnectionStringW() {
-          return L"Host=localhost;Port=10000";
+          return TEST_CONNECTION_STRING;
         }
 
       public:

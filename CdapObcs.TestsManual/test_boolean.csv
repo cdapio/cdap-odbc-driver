@@ -1,0 +1,11 @@
+1,TRUE,TRUE
+2,true,true
+3, tRuE, tRuE
+4,FALSE,FALSE
+5,false,false
+6,false_,false_
+7,0,0
+8,1,1
+9,,<empty>
+10,null,null
+11,NULL,NULL

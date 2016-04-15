@@ -1,74 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Driver">
-      <UniqueIdentifier>{6e3a7bb5-0c2a-47f6-8bf0-0291c776e0ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tests">
-      <UniqueIdentifier>{49e0be68-730b-49dc-94c6-96ea0e0e4d58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Explore">
-      <UniqueIdentifier>{00e4425b-3718-4025-9e00-2b3fb5465c8c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Exceptions">
-      <UniqueIdentifier>{4c377402-8356-4754-9efd-fd3b249fda1e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Library">
       <UniqueIdentifier>{bfa9e0b2-0ea5-4bc5-bcfe-433249ecdef8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{eb637143-8302-4742-991a-80b63cf9ac44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Driver.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Environment.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Connection.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Statement.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Descriptor.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Encoding.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="Argument.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="ConnectionParams.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="ColumnBinding.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
-    <ClInclude Include="QueryResult.h">
-      <Filter>Explore</Filter>
-    </ClInclude>
-    <ClInclude Include="QueryStatus.h">
-      <Filter>Explore</Filter>
-    </ClInclude>
-    <ClInclude Include="ExploreClient.h">
-      <Filter>Explore</Filter>
-    </ClInclude>
-    <ClInclude Include="ColumnDesc.h">
-      <Filter>Explore</Filter>
-    </ClInclude>
-    <ClInclude Include="StillExecutingException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="InvalidHandleException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="NoDataException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>Driver</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Library</Filter>
     </ClInclude>
@@ -78,88 +18,39 @@
     <ClInclude Include="core.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="debug.h">
+    <ClInclude Include="setup.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnMapper.h">
-      <Filter>Driver</Filter>
+    <ClInclude Include="spi.h">
+      <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="MetadataColumnMapper.h">
-      <Filter>Driver</Filter>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Driver.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Environment.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Connection.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Statement.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Descriptor.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Encoding.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="Argument.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="ConnectionParams.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnBinding.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
-    <ClCompile Include="QueryStatus.cpp">
-      <Filter>Explore</Filter>
-    </ClCompile>
-    <ClCompile Include="QueryResult.cpp">
-      <Filter>Explore</Filter>
-    </ClCompile>
-    <ClCompile Include="ExploreClient.cpp">
-      <Filter>Explore</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnDesc.cpp">
-      <Filter>Explore</Filter>
-    </ClCompile>
-    <ClCompile Include="StillExecutingException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="InvalidHandleException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="NoDataException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="String.cpp">
-      <Filter>Driver</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Library</Filter>
     </ClCompile>
     <ClCompile Include="core.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnMapper.cpp">
-      <Filter>Driver</Filter>
+    <ClCompile Include="setup.cpp">
+      <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="MetadataColumnMapper.cpp">
-      <Filter>Driver</Filter>
+    <ClCompile Include="spi.cpp">
+      <Filter>Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CdapOdbc.def">
-      <Filter>Driver</Filter>
+      <Filter>Library</Filter>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

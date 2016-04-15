@@ -23,5 +23,9 @@
 #include <Windows.h>
 #include <sql.h>
 #include <sqlext.h>
+#include <sqlspi.h>
 
 #include <tuple>
+
+#define TEST_CONNECTION_STRING L"Driver=Cask CDAP ODBC Driver;Host=104.154.22.63"
+#define TEST_CONNECTION_STRING2 L"Driver=Cask CDAP ODBC Driver;Host=localhost"

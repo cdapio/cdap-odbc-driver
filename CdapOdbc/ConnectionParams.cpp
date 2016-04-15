@@ -16,7 +16,8 @@
 
 #include "stdafx.h"
 #include "ConnectionParams.h"
-#include "String.h"
+
+using namespace Cask::CdapOdbc;
 
 namespace {
 
@@ -51,9 +52,9 @@ namespace {
   }
 }
 
-void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionString) {
-  std::vector<std::wstring> params;
-  std::vector<std::wstring> values;
+void Cask::CdapOdbc::ConnectionParams::parse(const SecureString& connectionString) {
+  std::vector<SecureString> params;
+  std::vector<SecureString> values;
   std::wstring key;
 
   String::split(connectionString, L';', params);
@@ -64,35 +65,71 @@ void Cask::CdapOdbc::ConnectionParams::parse(const std::wstring& connectionStrin
       throw std::invalid_argument("connectionString");
     }
 
-    key = String::trim(values[0]);
+    key = String::trim(values[0]).c_str();
     if (key.size() == 0) {
       throw std::invalid_argument("connectionString");
     }
 
     if (equals(key, L"driver")) {
-      this->driver = String::trim(values[1]);
+      this->driver = String::trim(values[1]).c_str();
+    } else if (equals(key, L"dsn")) {
+      this->dsn = String::trim(values[1]).c_str();
     } else if (equals(key, L"host")) {
-      this->host = String::trim(values[1]);
+      this->host = String::trim(values[1]).c_str();
     } else if (equals(key, L"port")) {
-      this->port = parseInt(String::trim(values[1]));
+      this->port = parseInt(String::trim(values[1]).c_str());
     } else if (equals(key, L"auth_token")) {
       this->authToken = String::trim(values[1]);
     } else if (equals(key, L"namespace")) {
-      this->namespace_ = String::trim(values[1]);
+      this->namespace_ = String::trim(values[1]).c_str();
     } else if (equals(key, L"ssl_enabled")) {
-      this->sslEnabled = parseBool(String::trim(values[1]));
+      this->sslEnabled = parseBool(String::trim(values[1]).c_str());
     } else if (equals(key, L"verify_ssl_cert")) {
-      this->verifySslCert = parseBool(String::trim(values[1]));
+      this->verifySslCert = parseBool(String::trim(values[1]).c_str());
     }
-  }
-
-  if (this->host.size() == 0) {
-    throw std::invalid_argument("connectionString");
   }
 }
 
-Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectionString)
+Cask::CdapOdbc::ConnectionParams::ConnectionParams()
   : driver()
+  , dsn()
+  , host()
+  , port(10000)
+  , authToken()
+  , namespace_(L"default")
+  , sslEnabled(false)
+  , verifySslCert(true) {
+}
+
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(const ConnectionParams& other) 
+  : driver(other.driver)
+  , dsn(other.dsn)
+  , host(other.host)
+  , port(other.port)
+  , authToken(other.authToken)
+  , namespace_(other.namespace_)
+  , sslEnabled(other.sslEnabled)
+  , verifySslCert(other.verifySslCert) {
+}
+
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(ConnectionParams&& other) 
+  : driver(std::move(other.driver))
+  , dsn(std::move(other.dsn))
+  , host(std::move(other.host))
+  , port(other.port)
+  , authToken(std::move(other.authToken))
+  , namespace_(std::move(other.namespace_))
+  , sslEnabled(other.sslEnabled)
+  , verifySslCert(other.verifySslCert) {
+  other.port = 10000;
+  other.namespace_ = L"default";
+  other.sslEnabled = true;
+  other.verifySslCert = false;
+}
+
+Cask::CdapOdbc::ConnectionParams::ConnectionParams(const SecureString& connectionString)
+  : driver()
+  , dsn()
   , host()
   , port(10000)
   , authToken()
@@ -102,44 +139,71 @@ Cask::CdapOdbc::ConnectionParams::ConnectionParams(const std::wstring& connectio
   this->parse(connectionString);
 }
 
-std::wstring Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
-  std::wstring result;
+void Cask::CdapOdbc::ConnectionParams::operator=(const ConnectionParams& other) {
+  this->driver = other.driver;
+  this->dsn = other.dsn;
+  this->host = other.host;
+  this->port = other.port;
+  this->authToken = other.authToken;
+  this->namespace_ = other.namespace_;
+  this->sslEnabled = other.sslEnabled;
+  this->verifySslCert = other.verifySslCert;
+}
+
+void Cask::CdapOdbc::ConnectionParams::operator=(ConnectionParams&& other) {
+  this->driver = std::move(other.driver);
+  this->dsn = std::move(other.dsn);
+  this->host = std::move(other.host);
+  this->port = other.port;
+  this->authToken = std::move(other.authToken);
+  this->namespace_ = std::move(other.namespace_);
+  this->sslEnabled = other.sslEnabled;
+  this->verifySslCert = other.verifySslCert;
+  other.port = 10000;
+  other.namespace_ = L"default";
+  other.sslEnabled = true;
+  other.verifySslCert = false;
+}
+
+Cask::CdapOdbc::SecureString Cask::CdapOdbc::ConnectionParams::getFullConnectionString() const {
+  SecureStringStream result;
 
   if (this->driver.size() > 0) {
-    result += L"Driver=";
-    result += this->driver;
-    result += L";";
+    result << L"Driver=" << this->driver << L";";
   }
 
-  result += L"Host=";
-  result += this->host;
-  result += L";";
+  result << L"Host=" << this->host << L";";
 
   if (this->port > 0) {
-    result += L"Port=";
-    result += this->port;
-    result += L";";
+    result << L"Port=" << this->port << L";";
   }
 
   if (this->authToken.size() > 0) {
-    result += L"Auth_Token=";
-    result += this->authToken;
-    result += L";";
+    result << L"Auth_Token=" << this->authToken << L";";
   }
 
   if (!equals(this->namespace_, L"default")) {
-    result += L"Namespace=";
-    result += this->namespace_;
-    result += L";";
+    result << L"Namespace=" << this->namespace_ << L";";
   }
 
   if (sslEnabled) {
-    result += L"SSL_Enabled=True;";
+    result << L"SSL_Enabled=True;";
   }
 
   if (!verifySslCert) {
-    result += L"Verify_SSL_Cert=False;";
+    result << L"Verify_SSL_Cert=False;";
   }
 
-  return result;
+  return result.str();
+}
+
+bool Cask::CdapOdbc::ConnectionParams::operator==(const ConnectionParams& other) const {
+  return (this->driver == other.driver &&
+    this->dsn == other.dsn &&
+    equals(this->host, other.host) &&
+    this->port == other.port &&
+    this->authToken == other.authToken &&
+    equals(this->namespace_, other.namespace_) &&
+    this->sslEnabled == other.sslEnabled &&
+    this->verifySslCert == other.verifySslCert);
 }

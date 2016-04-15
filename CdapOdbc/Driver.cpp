@@ -20,7 +20,13 @@
 #include "Connection.h"
 #include "Statement.h"
 #include "Descriptor.h"
+#include "ConnectionInfo.h"
 #include "InvalidHandleException.h"
+#include "CancelException.h"
+#include "DataSourceDialog.h"
+#include "Argument.h"
+
+#define ODBC_INI L"ODBC.INI"
 
 using namespace Cask::CdapOdbc;
 
@@ -44,7 +50,7 @@ Environment* Cask::CdapOdbc::Driver::findEnvironment(SQLHENV env) {
     return it->second.get();
   }
 
-  throw InvalidHandleException("env", env);
+  throw InvalidHandleException();
 }
 
 Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
@@ -53,7 +59,7 @@ Connection* Cask::CdapOdbc::Driver::findConnection(SQLHDBC dbc) {
     return it->second.get();
   }
 
-  throw InvalidHandleException("dbc", dbc);
+  throw InvalidHandleException();
 }
 
 void Cask::CdapOdbc::Driver::freeConnections(const Environment& env) {
@@ -91,7 +97,198 @@ void Cask::CdapOdbc::Driver::freeDescriptors(const Connection& dbc) {
   }
 }
 
-Cask::CdapOdbc::Driver::Driver() {
+void Cask::CdapOdbc::Driver::initializeDataTypes() {
+  int INT32MAX = std::numeric_limits<std::int32_t>::max();
+
+  this->dataTypes.insert({ L"boolean", 
+    DataType(
+      L"boolean"      /* name */,
+      SQL_BIT         /* sqlType */,
+      1               /* size */,
+      1               /* displaySize */,
+      0               /* decimalDigits*/,
+      1               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      1               /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"binary", 
+    DataType(
+      L"binary"       /* name */,
+      SQL_BINARY      /* sqlType */,
+      0               /* size */,
+      0               /* displaySize */,
+      0               /* decimalDigits*/,
+      0               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_NONE   /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      0               /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"double",
+    DataType(
+      L"double"       /* name */,
+      SQL_DOUBLE      /* sqlType */,
+      0               /* size */,
+      24              /* displaySize */,
+      24              /* decimalDigits*/,
+      8               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      2               /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      15              /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"float",
+    DataType(
+      L"float"        /* name */,
+      SQL_REAL        /* sqlType */,
+      0               /* size */,
+      14              /* displaySize */,
+      12              /* decimalDigits*/,
+      4               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      2               /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      7               /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"int",
+    DataType(
+      L"int"          /* name */,
+      SQL_BIGINT      /* sqlType */,
+      0               /* size */,
+      11              /* displaySize */,
+      11              /* decimalDigits*/,
+      4               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      10              /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      10              /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"bigint",
+    DataType(
+      L"bigint"       /* name */,
+      SQL_BIGINT      /* sqlType */,
+      0               /* size */,
+      20              /* displaySize */,
+      20              /* decimalDigits*/,
+      20              /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      10              /* precRadix */,
+      1               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      19              /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"string",
+    DataType(
+      L"string"       /* name */,
+      SQL_CHAR        /* sqlType */,
+      std::numeric_limits<std::uint16_t>::max() /* size */,
+      std::numeric_limits<std::uint16_t>::max() /* displaySize */,
+      0               /* decimalDigits*/,
+      0               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_SEARCHABLE  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      1               /* caseSensitive */,
+      0               /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"map<string,string>",
+    DataType(
+      L"string"       /* name */,
+      SQL_CHAR        /* sqlType */,
+      0               /* size */,
+      0               /* displaySize */,
+      0               /* decimalDigits*/,
+      0               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_SEARCHABLE  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      1               /* caseSensitive */,
+      0               /* precision */,
+      0               /* scale */
+    )}
+  );
+  this->dataTypes.insert({ L"timestamp",
+    DataType(
+      L"timestamp"    /* name */,
+      SQL_TIMESTAMP   /* sqlType */,
+      0               /* size */,
+      23              /* displaySize */,
+      0               /* decimalDigits*/,
+      0               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      0               /* precision */,
+      0               /* scale */
+      ) }
+  );
+  this->dataTypes.insert({ L"date",
+    DataType(
+      L"date"         /* name */,
+      SQL_DATE        /* sqlType */,
+      0               /* size */,
+      10              /* displaySize */,
+      0               /* decimalDigits*/,
+      0               /* octetLength */,
+      SQL_NULLABLE    /* nullable */,
+      SQL_PRED_BASIC  /* searchable */,
+      0               /* fixedPrecisionScale */,
+      0               /* precRadix */,
+      0               /* unsignedAttr */,
+      0               /* caseSensitive */,
+      0               /* precision */,
+      0               /* scale */
+      ) }
+  );
+}
+
+Cask::CdapOdbc::Driver::Driver()
+  : connectionPooling(ConnectionPooling::None){
+  this->initializeDataTypes();
+}
+
+Cask::CdapOdbc::Driver::~Driver() {
+  TRACE(L"Destructing Driver object...\n");
 }
 
 Driver& Cask::CdapOdbc::Driver::getInstance() {
@@ -115,7 +312,7 @@ Statement& Cask::CdapOdbc::Driver::getStatement(SQLHSTMT stmt) {
     return *(it->second);
   }
 
-  throw InvalidHandleException("stmt", stmt);
+  throw InvalidHandleException();
 }
 
 Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
@@ -125,7 +322,17 @@ Descriptor& Cask::CdapOdbc::Driver::getDescriptor(SQLHDESC desc) {
     return *(it->second);
   }
 
-  throw InvalidHandleException("desc", desc);
+  throw InvalidHandleException();
+}
+
+ConnectionInfo& Cask::CdapOdbc::Driver::getConnectionInfo(SQLHDBC_INFO_TOKEN info) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  auto it = this->connectionInfos.find(info);
+  if (it != this->connectionInfos.end()) {
+    return *(it->second);
+  }
+
+  throw InvalidHandleException();
 }
 
 SQLHENV Cask::CdapOdbc::Driver::allocEnvironment() {
@@ -159,12 +366,24 @@ SQLHDESC Cask::CdapOdbc::Driver::allocDescriptor(SQLHDBC dbc) {
   return desc;
 }
 
+SQLHDBC_INFO_TOKEN Cask::CdapOdbc::Driver::allocConnectionInfo(SQLHENV env) {
+  SQLHDBC_INFO_TOKEN info = generateNewHandle();
+  Environment* environment = nullptr;
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (env != SQL_NULL_HANDLE) {
+    environment = this->findEnvironment(env);
+  }
+
+  this->connectionInfos.emplace(info, std::make_unique<ConnectionInfo>(environment, info));
+  return info;
+}
+
 void Cask::CdapOdbc::Driver::freeEnvironment(SQLHENV env) {
   std::lock_guard<std::mutex> lock(this->mutex);
 
   auto it = this->environments.find(env);
   if (it == this->environments.end()) {
-    throw InvalidHandleException("env", env);
+    throw InvalidHandleException();
   }
 
   this->freeConnections(*it->second);
@@ -176,7 +395,7 @@ void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
 
   auto it = this->connections.find(dbc);
   if (it == this->connections.end()) {
-    throw InvalidHandleException("dbc", dbc);
+    throw InvalidHandleException();
   }
 
   this->freeDescriptors(*it->second);
@@ -187,14 +406,21 @@ void Cask::CdapOdbc::Driver::freeConnection(SQLHDBC dbc) {
 void Cask::CdapOdbc::Driver::freeStatement(SQLHSTMT stmt) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->statements.erase(stmt) == 0) {
-    throw InvalidHandleException("stmt", stmt);
+    throw InvalidHandleException();
   }
 }
 
 void Cask::CdapOdbc::Driver::freeDescriptor(SQLHDESC desc) {
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->descriptors.erase(desc) == 0) {
-    throw InvalidHandleException("desc", desc);
+    throw InvalidHandleException();
+  }
+}
+
+void Cask::CdapOdbc::Driver::freeConnectionInfo(SQLHDBC_INFO_TOKEN info) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (this->connectionInfos.erase(info) == 0) {
+    throw InvalidHandleException();
   }
 }
 
@@ -260,4 +486,50 @@ void Cask::CdapOdbc::Driver::setupSupportedFunctions(SQLUSMALLINT* bitset) {
   setFunction(bitset, SQL_API_SQLSPECIALCOLUMNS);
   setFunction(bitset, SQL_API_SQLSTATISTICS);
   setFunction(bitset, SQL_API_SQLTABLES);
+}
+
+void Cask::CdapOdbc::Driver::addDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
+  if (!dialog->show()) {
+    throw CancelException();
+  }
+
+  if (dialog->getName().size() == 0) {
+    throw std::logic_error("Data source name cannot be empty.");
+  }
+
+  if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+    throw std::logic_error("Cannot write data source.");
+  }
+}
+
+void Cask::CdapOdbc::Driver::modifyDataSource(HWND parentWindow, const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  auto params = ConnectionParams(attrs.c_str());
+  auto dialog = std::make_unique<DataSourceDialog>(parentWindow);
+  dialog->setName(params.getDsn());
+  if (dialog->show()) {
+    throw CancelException();
+  }
+
+  if (dialog->getName().size() == 0) {
+    throw std::logic_error("Data source name cannot be empty.");
+  }
+
+  if (params.getDsn() != dialog->getName()) {
+    ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
+    if (!::SQLWriteDSNToIniW(dialog->getName().c_str(), driver.c_str())) {
+      throw std::logic_error("Cannot write data source.");
+    }
+  }
+}
+
+void Cask::CdapOdbc::Driver::deleteDataSource(const std::wstring& driver, const std::wstring& attrs) {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  auto params = ConnectionParams(attrs.c_str());
+  ::SQLRemoveDSNFromIniW(params.getDsn().c_str());
 }

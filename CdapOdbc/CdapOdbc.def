@@ -1,5 +1,6 @@
 LIBRARY CdapOdbc
 EXPORTS
+    ConfigDSN
     SQLAllocHandle
     SQLBindCol
     SQLBindParameter
@@ -54,3 +55,10 @@ EXPORTS
     SQLSpecialColumnsW
     SQLStatisticsW
     SQLTablesW
+    SQLCleanupConnectionPoolID
+    SQLGetPoolID
+    SQLPoolConnectW
+    SQLRateConnection
+    SQLSetConnectAttrForDbcInfoW
+    SQLSetConnectInfoW
+    SQLSetDriverConnectInfoW
