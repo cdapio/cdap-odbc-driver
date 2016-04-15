@@ -43,13 +43,3 @@ Alternatively, solution can be built from the command line:
 ```
 > MSBuild
 ```
-
-## Running tests 
-To run tests execute the following:
-```
->VSTest.Console.exe Debug/CdapOdbc.Tests.dll
-```
-or for x64:
-```
->VSTest.Console.exe x64/Debug/CdapOdbc.Tests.dll /platform:x64
-```
