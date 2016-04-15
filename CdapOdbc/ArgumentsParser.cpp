@@ -51,7 +51,7 @@ std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::getArguments() {
   std::wstring args = std::wstring(this->arguments);
   args = String::trim(args);
 
-  wchar_t currentQuote;//, currentChar;
+  wchar_t currentQuote;
   std::vector<wchar_t> nestedStack;
 
   bool insideLiteral = false;
@@ -60,7 +60,7 @@ std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::getArguments() {
   for (size_t i = 0; i < args.length(); i++) {
     /*
      * Check current position w.r.t. literal
-     * Everything inside single or double matched quotes is treated as literal as not analysed
+     * Everything inside single or double matched quotes is treated as literal -- and skipped
      */
     if (!insideLiteral && !insideNested && args[i] == L',') {
       result.push_back(buffer);
@@ -83,7 +83,7 @@ std::vector<std::wstring> Cask::CdapOdbc::ArgumentsParser::getArguments() {
       if (!nestedStack.empty() && isNestedMatched(nestedStack.back(), args[i])) {
         nestedStack.pop_back();
       } else {
-        throw CdapException(L"Unmatched closing brace ')' at position: "
+        throw CdapException(L"Unmatching closing brace ')' at position: "
           + std::to_wstring(i)
           + L".");
       }
