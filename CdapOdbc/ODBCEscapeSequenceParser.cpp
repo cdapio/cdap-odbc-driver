@@ -124,7 +124,7 @@ size_t Cask::CdapOdbc::ODBCEscapeSequenceParser::resolveFunction(std::wstring& q
     }
   } else {
     throw CdapException(L"Encountered malformed scalar function escape sequence:\n" + matched);
-  }
+  } // regex match
 
   query = query.replace(pos_start, pos_end - pos_start + 1, matched);
   return pos_start + matched.length();
