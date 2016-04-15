@@ -19,6 +19,7 @@
 #include "ColumnDesc.h"
 #include "QueryStatus.h"
 #include "QueryResult.h"
+#include "SecureString.h"
 
 namespace Cask {
   namespace CdapOdbc {
@@ -32,14 +33,11 @@ namespace Cask {
      */
     class ExploreClient {
       std::unique_ptr<web::http::client::http_client> httpClient;
+      std::wstring namespace_;
+      SecureString authToken;
 
-      web::json::value doRequest(web::http::http_request& request);
-      web::json::value doRequest(web::http::method mhd, const utility::string_t& path);
-      web::json::value doRequest(web::http::method mhd, const utility::string_t& path, web::json::value body);
-      web::json::value doGet(const utility::string_t& path);
-      web::json::value doPost(const utility::string_t& path);
-      web::json::value doPost(const utility::string_t& path, web::json::value body);
-      web::json::value doDelete(const utility::string_t& path);
+      web::json::value doRequest(web::http::http_request& request, std::int64_t* sizeInBytes);
+      web::json::value doRequest(web::http::method mhd, const utility::string_t& path, const web::json::value* body = nullptr, std::int64_t* sizeInBytes = nullptr);
 
       ExploreClient(const ExploreClient&) = delete;
       void operator=(const ExploreClient&) = delete;
@@ -49,7 +47,7 @@ namespace Cask {
       /**
        * Creates an instance of explore client.
        */
-      ExploreClient(const web::http::uri& baseUri);
+      ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_, const SecureString& authToken);
       
       /**
        * Destructor.
@@ -106,9 +104,24 @@ namespace Cask {
       QueryResult getStreams();
 
       /**
-       * Retrieves a list 
+       * Retrieves a list of datasets.
+       */
+      QueryResult getDatasets();
+
+      /**
+       * Retrieves a list of stream fields.
        */
       QueryResult getStreamFields(const std::wstring& streamName);
+
+      /**
+       * Retrieves a list of dataset fields.
+       */
+      QueryResult getDatasetFields(const std::wstring& datasetName);
+
+      /**
+      * Executes SQL statement.
+      */
+      QueryHandle execute(const std::wstring& statement);
     };
   }
 }

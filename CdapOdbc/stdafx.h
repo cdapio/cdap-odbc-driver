@@ -23,6 +23,7 @@
 
 // Windows Header Files:
 #include <windows.h>
+#include <shlwapi.h>
 
 // Conflicts with query op status
 #undef ERROR
@@ -31,18 +32,24 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <sqlspi.h>
 #include <odbcinst.h>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <cstdlib>
 #include <crtdbg.h>
+
+#ifndef DBG_NEW
+#define DBG_NEW new (_NORMAL_BLOCK , __FILE__ , __LINE__)
+#define new DBG_NEW
+#endif
+
 #endif // _DEBUG
 
 #include <cassert>
 
 #include <memory>
-#include <unordered_map>
 #include <map>
 #include <atomic>
 #include <mutex>
@@ -56,11 +63,18 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <cwctype>
+#include <iomanip>
+#include <regex>
+#ifdef _DEBUG
+#include <chrono>
+#endif
 
 #include <cpprest/uri.h>
 #include <cpprest/uri_builder.h>
 #include <cpprest/http_client.h>
 #include <cpprest/http_headers.h>
 #include <cpprest/json.h>
+#include <pplx/pplxtasks.h>
 
 #include "debug.h"

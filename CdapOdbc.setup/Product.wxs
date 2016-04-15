@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<?define targetArch =  $(var.CdapOdbc.Platform)  ?>
+<?define CdapOdbcDll = "CdapOdbc.dll" ?>
+<?if $(var.CdapOdbc.Configuration) = Debug ?>
+  <?define CppRestDll = "cpprest140d_2_8.dll" ?>
+<?else ?>
+  <?define CppRestDll = "cpprest140_2_8.dll" ?>
+<?endif ?>
+<?if $(var.targetArch) = x64 ?>
+  <?define ProductCode="{77D82CBD-FBD8-4BD5-ABE2-9B37E0CBC3ED}" ?>
+  <?define UpgradeCode="{6A65B544-F23B-4F53-A617-12DD50E2751A}"?>
+  <?define ProductName = "CDAP ODBC Driver 64-bit"?>
+  <?define DatasourceName = "CDAP Datasets 64-bit"?>
+  <?define ProgramsPath = "ProgramFiles64Folder" ?>
+  <?define Win64 = "yes" ?>
+<?else ?>
+  <?define ProductCode="{E79AB59D-FFA4-40CE-85C3-10A8ADE1C7B4}" ?>
+  <?define UpgradeCode="{10B657C6-26AD-4938-A9A7-01D1D58C45B9}"?>
+  <?define ProductName = "CDAP ODBC Driver 32-bit"?>
+  <?define DatasourceName = "CDAP Datasets 32-bit"?>
+  <?define targetArch = Win32 ?>
+  <?define ProgramsPath = "ProgramFilesFolder" ?>
+  <?define Win64 = "no" ?>
+<?endif ?>
+<?define BuildPath = "$(var.SolutionDir)$(var.targetArch)\$(var.Configuration)" ?>
+<?define redistMSMPath = "C:\Program Files (x86)\Common Files\Merge Modules\" ?>
+<?if $(var.targetArch) = x64?>
+  <?define redistMSMName = "Microsoft_VC140_CRT_x64.msm"?>
+<?else?>
+  <?define redistMSMName = "Microsoft_VC140_CRT_x86.msm"?>
+<?endif?>
+<?define nonRedistPath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist\x64\Microsoft.VC140.DebugCRT\" ?>
+
+<?define CurrentVersion="!(bind.fileVersion.$(var.CdapOdbcDll))"?>
+<?define FirstVersion="0.0.0.0"?>
+
+  <Product Id="$(var.ProductCode)"
+           Name="$(var.ProductName)" Language="1033"
+           Version="$(var.CurrentVersion)" Manufacturer="Cask"
+           UpgradeCode="$(var.UpgradeCode)" >
+    <Package InstallerVersion="301"
+             Compressed="yes"
+             InstallScope="perMachine" />
+    <Upgrade Id="$(var.UpgradeCode)">
+      <!-- Populate NEWERVERSIONDETECTED if there is an installed
+         package with the same upgrade code
+         and the version is large the version being installed -->
+      <UpgradeVersion
+          Minimum="$(var.CurrentVersion)"
+          IncludeMinimum="no"
+          Maximum="99.99.99.99"
+          IncludeMaximum="yes"
+          Language="1033"
+          Property="NEWERVERSIONDETECTED"
+          OnlyDetect="no" />
+      <!-- Populate PREVIOUSVERSIONSINSTALLED if there is an installed
+         package with the same upgrade code
+         and the version is between the earliest version defined
+         and the version being installed -->
+      <UpgradeVersion
+           Minimum="$(var.FirstVersion)"
+           IncludeMinimum="yes"
+           Maximum="$(var.CurrentVersion)"
+           IncludeMaximum="yes"
+           Language="1033"
+           Property="PREVIOUSVERSIONSINSTALLED"
+           OnlyDetect="no" />
+    </Upgrade>
+    <InstallUISequence>
+      <Show Dialog="AcceptUninstall" After="CostFinalize">NEWERVERSIONDETECTED</Show>
+    </InstallUISequence>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Before="InstallInitialize">NEWERVERSIONDETECTED OR PREVIOUSVERSIONSINSTALLED</RemoveExistingProducts>
+      <ScheduleReboot After="InstallExecute"/>
+    </InstallExecuteSequence>
+    <MediaTemplate EmbedCab="yes"/>
+    <Feature Id="VCRedist" Title="Visual C++ Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="VCRedist"/>
+    </Feature>
+    <Feature Id="ProductFeature" Title="CdapOdbc.setup" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <?if  $(var.CdapOdbc.Configuration) = Debug ?>
+        <!-- This option should be enabled only for debugging -->
+        <ComponentRef Id="VC140DCRT" />
+      <?endif?>
+    </Feature>
+
+    <!-- Driver's icon in Programs and Features list -->
+    <Icon Id="cdap.icon" SourceFile="resources\cdap.ico" />
+    <Property Id="ARPPRODUCTICON" Value="cdap.icon" />
+
+    <!-- This is to customize the installer design -->
+    <WixVariable Id="WixUIBannerBmp" Value="resources\CDAP_ODBC_TopBanner.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="resources\CDAP_ODBC_BG.bmp"/>
+    <WixVariable Id="WixUIExclamationIco" Value="resources\CDAP_ODBC_Excl.bmp"/>
+    <WixVariable Id="WixUIInfoIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+    <WixVariable Id="WixUINewIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+    <WixVariable Id="WixUIUpIco" Value="resources\CDAP_ODBC_Info.bmp"/>
+
+  </Product>
+
+  <Fragment>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
+    <UI Id="MyWixUI">
+
+      <TextStyle Id="styleCaskTitle" FaceName="Tahoma" Size="10" Red="255" Green="255" Blue="255" Bold="yes"/>
+      <TextStyle Id="styleCaskSubtitle" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
+      <TextStyle Id="styleCaskText" FaceName="Tahoma" Size="8" Red="255" Green="255" Blue="255"/>
+
+      <UIRef Id="WixUI_Minimal" />
+      <Dialog Id="AcceptUninstall" Title="Accept uninstall of previous products" Height="60" Width="350">
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="350" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>A newer version of [ProductName] is already installed. Continue installation?</Text>
+        </Control>
+        <Control Id="No" Type="PushButton" X="182" Y="37" Width="56" Height="17" Default="yes" Cancel="yes" Text="No">
+          <Publish Event="EndDialog" Value="Exit">1</Publish>
+        </Control>
+        <Control Id="Yes" Type="PushButton" X="122" Y="37" Width="56" Height="17" Text="Yes">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+      </Dialog>
+    </UI>
+  </Fragment>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.ProgramsPath)">
+        <Directory Id="VENDORFOLDER" Name="Cask" >
+          <Directory Id="APPFOLDER" Name="CDAP ODBC Driver" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+         <Directory Id="ApplicationProgramsFolder" Name="CDAP ODBC Driver"/>
+      </Directory>
+    </Directory>
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist" SourceFile="$(var.redistMSMPath)$(var.redistMSMName)" DiskId="1" Language="0"/>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="APPFOLDER">
+      <?if  $(var.CdapOdbc.Configuration) = Debug ?>
+      <!-- This option should be enabled only for debugging -->
+      <Component Id="VC140DCRT" Win64="$(var.Win64)" Guid="{4F9DF96A-C0F4-4C85-A509-19529962CFE6}">
+        <File Id="concrt140.dll" Source="$(var.nonRedistPath)concrt140d.dll" />
+        <File Id="msvcp140.dll" Source="$(var.nonRedistPath)msvcp140d.dll" />
+        <File Id="vccorlib140.dll" Source="$(var.nonRedistPath)vccorlib140d.dll" />
+        <File Id="vcruntime140.dll" Source="$(var.nonRedistPath)vcruntime140d.dll" />
+      </Component>
+      <?endif ?>
+      <Component Id="CdapOdbcDll"  Win64="$(var.Win64)" Guid="*">
+        <File Id="$(var.CdapOdbcDll)" Source="$(var.BuildPath)\$(var.CdapOdbcDll)" />
+      </Component>
+      <Component Id="CppRestDll" Win64 ="$(var.Win64)" Guid="*">
+        <File Id="$(var.CppRestDll)" Source="$(var.BuildPath)\$(var.CppRestDll)" />
+      </Component>
+      <Component Id="RgistryEntriesHKLM"  Win64="$(var.Win64)" Guid="*">
+        <RegistryKey Root="HKLM"
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers">
+          <RegistryValue Type="string" Name="[ProductName]" Value="Installed" />
+        </RegistryKey>
+        <RegistryKey Root="HKLM"
+                  Key="SOFTWARE\ODBC\ODBCINST.INI\[ProductName]">
+          <RegistryValue Type="integer" Name="UsageCount" Value="00000001" />
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
+          <RegistryValue Type="string" Name="Setup" Value="[!$(var.CdapOdbcDll)]"/>
+          <RegistryValue Type="string" Name="SQLLevel" Value="0"/>
+          <RegistryValue Type="string" Name="FileUsage" Value="0"/>
+          <RegistryValue Type="string" Name="DriverODBCVer" Value="03.80"/>
+          <RegistryValue Type="string" Name="ConnectFunctions" Value="NYN"/>
+          <RegistryValue Type="string" Name="APILevel" Value="0"/>
+        </RegistryKey>
+      </Component>
+      <Component Id="RgistryEntriesHKCU" Win64="$(var.Win64)" Guid="*">
+        <RegistryKey Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
+          <RegistryValue Type="string" Name="$(var.DatasourceName)" Value="[ProductName]"/>
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\$(var.DatasourceName)">
+          <RegistryValue Type="string" Name="Driver" Value="[!$(var.CdapOdbcDll)]"/>
+        </RegistryKey>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="UninstallShortcut" Win64="$(var.Win64)" Guid="*">
+        <Shortcut Id="UninstallDriver"
+                  Name="Uninstal [ProductName]"
+                  Description="Uninstal [ProductName]"
+                  Target="[System64Folder]msiexec.exe"
+                  Arguments="/x [ProductCode]" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU"
+                  Key="SOFTWARE\ODBC\ODBC.INI\[ProductName]"
+                  Type="integer"
+                  Name="installed"
+                  Value="1"
+                  KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="APPFOLDER">
+      <ComponentRef Id="CdapOdbcDll" />
+      <ComponentRef Id="CppRestDll" />
+      <ComponentRef Id="RgistryEntriesHKLM" />
+      <ComponentRef Id="RgistryEntriesHKCU" />
+      <ComponentRef Id="UninstallShortcut" />
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

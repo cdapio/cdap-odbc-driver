@@ -16,6 +16,9 @@
 
 #include "stdafx.h"
 #include "ExploreClient.h"
+#include "BadRequestException.h"
+#include "CdapException.h"
+#include "CommunicationLinkFailure.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -33,72 +36,78 @@ namespace {
   }
 }
 
-web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_request& request) {
-  auto task = this->httpClient->request(request)
-    .then([](web::http::http_response response) {
-    if (response.status_code() == web::http::status_codes::OK) {
-      return response.extract_json();
-    } else {
-      throw std::exception("Cannot get the response.");
+web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::http_request& request, std::int64_t* sizeInBytes) {
+#ifdef TRACE_REQUESTS
+  TRACE(L"REQUEST: %s\n", request.to_string().c_str());
+#endif
+  auto requestTask = this->httpClient->request(request);
+  {
+    PROFILE_FUNCTION(TIMER_QUERY);
+    requestTask.wait();
+  }
+
+  auto response = requestTask.get();
+#ifdef TRACE_REQUESTS
+  TRACE(L"RESPONSE: %s\n", response.to_string().c_str());
+#endif
+//  TRACE(L"RESPONSE SIZE: %d\n", response.headers().content_length());
+  if (response.status_code() == web::http::status_codes::OK) {
+    auto jsonTask = response.extract_json();
+    {
+      PROFILE_FUNCTION(TIMER_PARSING);
+      jsonTask.wait();
     }
-  });
-  task.wait();
-  return task.get();
+
+    if (sizeInBytes) {
+      *sizeInBytes = response.headers().content_length();
+    }
+
+    return jsonTask.get();
+  } else if (response.status_code() == web::http::status_codes::BadRequest) {
+    auto errorTask = response.extract_utf16string();
+    errorTask.wait();
+    throw BadRequestException(errorTask.get());
+  } else if (response.status_code() == web::http::status_codes::Unauthorized) {
+    throw CdapException(L"Wrong authentication token.");
+  } else {
+    throw CommunicationLinkFailure();
+  }
 }
 
-web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path) {
+web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t& path, const web::json::value* body /* = nullptr */, std::int64_t* sizeInBytes /* = nullptr */) {
   web::http::uri_builder requestUri;
   web::http::http_request request(mhd);
+  
+  if (body) {
+    request.set_body(*body);
+  }
+
   request.set_request_uri(requestUri.append_path(path).to_uri());
-  //request.headers().add(header_names::authorization, L"Bearer " + this->authToken);
-  return this->doRequest(request);
+  if (this->authToken.size() > 0) {
+    request.headers().add(web::http::header_names::authorization, L"Bearer " + this->authToken);
+  }
+
+  return this->doRequest(request, sizeInBytes);
 }
 
-web::json::value Cask::CdapOdbc::ExploreClient::doRequest(web::http::method mhd, const utility::string_t & path, web::json::value body) {
-  web::http::uri_builder requestUri;
-  web::http::http_request request(mhd);
-  request.set_body(body);
-  request.set_request_uri(requestUri.append_path(path).to_uri());
-  //request.headers().add(header_names::authorization, L"Bearer " + this->authToken);
-  return this->doRequest(request);
-}
-
-web::json::value Cask::CdapOdbc::ExploreClient::doGet(const utility::string_t& path) {
-  return this->doRequest(web::http::methods::GET, path);
-}
-
-web::json::value Cask::CdapOdbc::ExploreClient::doPost(const utility::string_t & path) {
-  return this->doRequest(web::http::methods::POST, path);
-}
-
-web::json::value Cask::CdapOdbc::ExploreClient::doPost(const utility::string_t & path, web::json::value body) {
-  return this->doRequest(web::http::methods::POST, path, body);
-}
-
-web::json::value Cask::CdapOdbc::ExploreClient::doDelete(const utility::string_t & path) {
-  return this->doRequest(web::http::methods::DEL, path);
-}
-
-Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri) {
+Cask::CdapOdbc::ExploreClient::ExploreClient(const web::http::uri& baseUri, const std::wstring& namespace_, const SecureString& authToken)
+  : namespace_(namespace_)
+  , authToken(authToken) {
   this->httpClient = std::make_unique<web::http::client::http_client>(baseUri);
 }
 
 bool Cask::CdapOdbc::ExploreClient::isAvailable() {
-  try {
-    return (this->doGet(L"explore/status").at(L"status").as_string() == L"OK");
-  } catch (std::exception) {
-    return false;
-  }
+  return (this->doRequest(web::http::methods::GET, L"explore/status").at(L"status").as_string() == L"OK");
 }
 
 QueryStatus Cask::CdapOdbc::ExploreClient::getQueryStatus(const QueryHandle& handle) {
-  auto value = this->doGet(L"data/explore/queries/" + handle + L"/status");
+  auto value = this->doRequest(web::http::methods::GET, L"data/explore/queries/" + handle + L"/status");
   return QueryStatus(value);
 }
 
 std::vector<ColumnDesc> Cask::CdapOdbc::ExploreClient::getQuerySchema(const QueryHandle& handle) {
   std::vector<ColumnDesc> result;
-  auto value = this->doGet(L"data/explore/queries/" + handle + L"/schema");
+  auto value = this->doRequest(web::http::methods::GET, L"data/explore/queries/" + handle + L"/schema");
   auto columns = value.as_array();
   for (auto& item : columns) {
     result.push_back(ColumnDesc(item));
@@ -109,17 +118,18 @@ std::vector<ColumnDesc> Cask::CdapOdbc::ExploreClient::getQuerySchema(const Quer
 
 QueryResult Cask::CdapOdbc::ExploreClient::getQueryResult(const QueryHandle& handle, int rows) {
   web::json::value size;
+  std::int64_t sizeInBytes = 0L;
   size[L"size"] = web::json::value::number(rows);
-  auto value = this->doPost(L"data/explore/queries/" + handle + L"/next", size);
-  return QueryResult(value);
+  auto value = this->doRequest(web::http::methods::POST, L"data/explore/queries/" + handle + L"/next", &size, &sizeInBytes);
+  return QueryResult(value, sizeInBytes);
 }
 
 void Cask::CdapOdbc::ExploreClient::closeQuery(const QueryHandle& handle) {
-  this->doDelete(L"data/explore/queries/" + handle);
+  this->doRequest(web::http::methods::DEL, L"data/explore/queries/" + handle);
 }
 
 QueryHandle Cask::CdapOdbc::ExploreClient::getCatalogs() {
-  return this->doPost(L"data/explore/jdbc/catalogs").at(L"handle").as_string();
+  return this->doRequest(web::http::methods::POST, L"data/explore/jdbc/catalogs").at(L"handle").as_string();
 }
 
 QueryHandle Cask::CdapOdbc::ExploreClient::getSchemas(const std::wstring* catalog, const std::wstring* schemaPattern) {
@@ -127,7 +137,7 @@ QueryHandle Cask::CdapOdbc::ExploreClient::getSchemas(const std::wstring* catalo
   schemaArgs[L"catalog"] = toJson(catalog);
   schemaArgs[L"schemaPattern"] = toJson(schemaPattern);
 
-  auto value = this->doPost(L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/schemas", schemaArgs);
+  auto value = this->doRequest(web::http::methods::POST, L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/schemas", &schemaArgs);
   return value.at(L"handle").as_string();
 }
 
@@ -150,16 +160,42 @@ QueryHandle Cask::CdapOdbc::ExploreClient::getTables(const std::wstring* catalog
     tablesArgs[L"tableTypes"] = web::json::value::null();
   }
 
-  auto value = this->doPost(L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/tables", tablesArgs);
+  auto value = this->doRequest(web::http::methods::POST, L"namespaces/" + toUriPath(schemaPattern) + L"/data/explore/jdbc/tables", &tablesArgs);
   return value.at(L"handle").as_string();
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getStreams() {
-  auto value = this->doGet(L"namespaces/default/streams");
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/streams");
+  return QueryResult(value);
+}
+
+QueryResult Cask::CdapOdbc::ExploreClient::getDatasets() {
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/data/datasets");
   return QueryResult(value);
 }
 
 QueryResult Cask::CdapOdbc::ExploreClient::getStreamFields(const std::wstring& streamName) {
-  auto value = this->doGet(L"namespaces/default/streams/" + streamName).at(L"format").at(L"schema").at(L"fields");
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/streams/" + streamName);
   return QueryResult(value);
+}
+
+QueryResult Cask::CdapOdbc::ExploreClient::getDatasetFields(const std::wstring& datasetName) {
+  auto value = this->doRequest(web::http::methods::GET, L"namespaces/" + this->namespace_ + L"/data/datasets/" + datasetName);
+  return QueryResult(value);
+}
+
+QueryHandle Cask::CdapOdbc::ExploreClient::execute(const std::wstring& statement) {
+  web::json::value query;
+  std::wstring stmt_preproc = statement;
+  std::wstring::size_type found;
+
+  /* Remove 'HAVING (COUNT(1) > 0) clause' */
+  found = stmt_preproc.find(L"HAVING (COUNT(1) > 0)", 0);
+  if (found != std::wstring::npos) {
+    stmt_preproc.erase(found, 21);
+  }
+
+  query[L"query"] = toJson(&stmt_preproc);
+  auto value = this->doRequest(web::http::methods::POST, L"namespaces/" + this->namespace_ + L"/data/explore/queries", &query);
+  return value.at(L"handle").as_string();
 }

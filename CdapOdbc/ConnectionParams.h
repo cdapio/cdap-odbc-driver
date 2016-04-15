@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "SecureString.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
@@ -24,24 +26,37 @@ namespace Cask {
      */
     class ConnectionParams {
       std::wstring driver;
+      std::wstring dsn;
       std::wstring host;
       int port;
-      std::wstring authToken;
+      SecureString authToken;
       std::wstring namespace_;
       bool sslEnabled;
       bool verifySslCert;
 
-      void parse(const std::wstring& connectionString);
-
-      ConnectionParams(const ConnectionParams&) = delete;
-      void operator=(const ConnectionParams&) = delete;
+      void parse(const SecureString& connectionString);
 
     public:
 
       /**
+      * Creates an instance of connection params.
+      */
+      ConnectionParams();
+
+      /**
+       * Copy construdtor.
+       */ 
+      ConnectionParams(const ConnectionParams&);
+
+      /**
+      * Move construdtor.
+      */
+      ConnectionParams(ConnectionParams&&);
+
+      /**
        * Creates an instance of connection params.
        */
-      ConnectionParams(const std::wstring& connectionString);
+      ConnectionParams(const SecureString& connectionString);
 
       /**
        * Destructor.
@@ -49,10 +64,27 @@ namespace Cask {
       ~ConnectionParams() = default;
 
       /**
-      * Gets DRIVER connection parameter.
-      */
+       * Assignment copy operator.
+       */
+      void operator=(const ConnectionParams&);
+
+      /**
+       * Assignment move operator.
+       */
+      void operator=(ConnectionParams&&);
+
+      /**
+       * Gets DRIVER connection parameter.
+       */
       const std::wstring& getDriver() const {
         return this->driver;
+      }
+
+      /**
+       * Gets DSN connection parameter.
+       */
+      const std::wstring& getDsn() const {
+        return this->dsn;
       }
 
       /**
@@ -72,7 +104,7 @@ namespace Cask {
       /**
        * Gets AUTH_TOKEN connection parameter.
        */
-      const std::wstring& getAuthToken() const {
+      const SecureString& getAuthToken() const {
         return this->authToken;
       }
 
@@ -100,7 +132,68 @@ namespace Cask {
       /**
        * Gets full version of connection string.
        */
-      std::wstring getFullConnectionString() const;
+      SecureString getFullConnectionString() const;
+
+      /**
+       * Sets DRIVER connection parameter.
+       */
+      void setDriver(const std::wstring& value) {
+        this->driver = value;
+      }
+
+      /**
+       * Sets DSN connection parameter.
+       */
+      void setDsn(const std::wstring& value) {
+        this->dsn = value;
+      }
+
+      /**
+       * Sets HOST connection parameter.
+       */
+      void setHost(const std::wstring& value) {
+        this->host = value;
+      }
+
+      /**
+       * Sets PORT connection parameter.
+       */
+      void setPort(int value) {
+        this->port = value;
+      }
+
+      /**
+       * Sets AUTH_TOKEN connection parameter.
+       */
+      void setAuthToken(const SecureString& value) {
+        this->authToken = value;
+      }
+
+      /**
+       * Sets NAMESPACE connection parameter.
+       */
+      void setNamespace(const std::wstring& value) {
+        this->namespace_ = value;
+      }
+
+      /**
+       * Sets SSL_ENABLED connection parameter.
+       */
+      void setSslEnabled(bool value) {
+        this->sslEnabled = value;
+      }
+
+      /**
+       * Sets VERIFY_SSL_CERT connection parameter.
+       */
+      void setVerifySslCert(bool value) {
+        this->verifySslCert = value;
+      }
+
+      /**
+       * Checks if params are equal.
+       */
+      bool operator ==(const ConnectionParams&) const;
     };
   }
 }

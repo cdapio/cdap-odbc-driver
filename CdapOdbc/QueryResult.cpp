@@ -17,6 +17,16 @@
 #include "stdafx.h"
 #include "QueryResult.h"
 
+Cask::CdapOdbc::QueryResult::QueryResult()
+  : sizeInBytes(0L) {
+}
+
 Cask::CdapOdbc::QueryResult::QueryResult(const web::json::value& value)
-  : rows(value) {
+  : rows(value)
+  , sizeInBytes(0L) {
+}
+
+Cask::CdapOdbc::QueryResult::QueryResult(const web::json::value& value, std::int64_t sizeInBytes)
+  : rows(value)
+  , sizeInBytes(sizeInBytes) {
 }

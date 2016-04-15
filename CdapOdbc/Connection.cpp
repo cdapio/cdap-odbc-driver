@@ -18,6 +18,8 @@
 #include "Connection.h"
 #include "Environment.h"
 #include "Encoding.h"
+#include "CommunicationLinkFailure.h"
+#include "ConnectionInfo.h"
 
 using namespace Cask::CdapOdbc;
 
@@ -33,23 +35,53 @@ web::http::uri Cask::CdapOdbc::Connection::resolveUri() const {
   return uri.to_uri();
 }
 
+void Cask::CdapOdbc::Connection::internalOpen(const SecureString& connectionString) {
+  assert(!this->isOpen);
+  if (connectionString.size() == 0) {
+    throw CdapException(L"Connection string cannot be empty.");
+  }
+
+  this->params = std::make_unique<ConnectionParams>(connectionString);
+  auto baseUri = this->resolveUri();
+  this->exploreClient = std::make_unique<ExploreClient>(baseUri, this->params->getNamespace(), this->params->getAuthToken());
+  if (this->exploreClient->isAvailable()) {
+    this->isOpen = true;
+  } else {
+    throw CommunicationLinkFailure();
+  }
+}
+
 Cask::CdapOdbc::Connection::Connection(Environment* environment, SQLHDBC handle)
   : environment(environment)
   , handle(handle)
-  , isOpen(false) {
+  , isOpen(false)
+  , isAsync(false) {
   assert(environment);
   assert(handle);
 }
 
-void Cask::CdapOdbc::Connection::open(const std::wstring& connectionString) {
-  assert(!this->isOpen);
-  this->params = std::make_unique<ConnectionParams>(connectionString);
-  auto baseUri = this->resolveUri();
-  this->exploreClient = std::make_unique<ExploreClient>(baseUri);
-  if (this->exploreClient->isAvailable()) {
-    this->isOpen = true;
+void Cask::CdapOdbc::Connection::open(const SecureString& connectionString) {
+  assert(!this->isFunctionsAsync);
+  this->internalOpen(connectionString);
+}
+
+bool Cask::CdapOdbc::Connection::openAsync(const SecureString& connectionString) {
+  assert(this->isFunctionsAsync);
+  if (this->openTask) {
+    if (this->openTask->is_done()) {
+      // Throws all unhandled exceptions raised inside task body.
+      this->openTask->get();
+      this->openTask.reset();
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    throw std::exception("Service unavailable.");
+    this->openTask = std::make_unique<pplx::task<void>>([this, connectionString]() {
+      std::lock_guard<Connection> lock(*this);
+      this->internalOpen(connectionString);
+    });
+    return false;
   }
 }
 
@@ -58,4 +90,12 @@ void Cask::CdapOdbc::Connection::close() {
   this->exploreClient.reset();
   this->params.reset();
   this->isOpen = false;
+}
+
+void Cask::CdapOdbc::Connection::setInfo(const ConnectionInfo& info) {
+  assert(_wcsicmp(info.getParams().getHost().c_str(), this->params->getHost().c_str()) == 0);
+  assert(info.getParams().getPort() == this->params->getPort());
+  *this->params = info.getParams();
+  this->isAsync = info.getIsAsync();
+  this->isFunctionsAsync = info.getIsFunctionsAsync();
 }

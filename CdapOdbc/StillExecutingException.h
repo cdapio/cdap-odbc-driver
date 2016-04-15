@@ -16,23 +16,20 @@
 
 #pragma once
 
+#include "CdapException.h"
+
 namespace Cask {
   namespace CdapOdbc {
     /**
      * Reports errors that arise because query is still executing.
      */
-    class StillExecutingException : public std::logic_error {
+    class StillExecutingException : public CdapException {
     public:
 
       /**
        * Creates an instance.
        */
-      StillExecutingException(const char *what);
-      
-      /**
-       * Descructor.
-       */
-      ~StillExecutingException() = default;
+      StillExecutingException();
     };
   }
 }

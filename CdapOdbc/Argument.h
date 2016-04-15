@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "SecureString.h"
+
 namespace Cask {
   namespace CdapOdbc {
 
@@ -31,13 +33,28 @@ namespace Cask {
        * Converts SQL wide string to std::string.
        * Used for input arguments.
        */
-      static std::unique_ptr<std::wstring> toStdString(SQLWCHAR* string, SQLSMALLINT length);
+      template <typename T>
+      inline static std::unique_ptr<T> toStdString(SQLWCHAR* string, SQLSMALLINT length) {
+        if (string == nullptr) {
+          return nullptr;
+        } else if (length == SQL_NTS) {
+          return std::make_unique<T>(reinterpret_cast<const wchar_t*>(string));
+        } else {
+          return std::make_unique<T>(reinterpret_cast<const wchar_t*>(string), static_cast<size_t>(length));
+        }
+      }
 
       /**
        * Copies std::wstring to SQL wide string.
        * Used for output arguments.
        */
-      static void fromStdString(const std::wstring& input, SQLWCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
+      static void fromStdString(const std::wstring& input, SQLWCHAR* outString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
+
+      /**
+       * Copies SecureString to SQL wide string.
+       * Used for output arguments.
+       */
+      static void fromSecureString(const SecureString& input, SQLWCHAR* outString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
     };
   }
 }

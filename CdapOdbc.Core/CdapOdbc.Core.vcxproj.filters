@@ -1,0 +1,405 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{60ed8525-c454-4a26-a6a2-ecebfb651628}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Driver">
+      <UniqueIdentifier>{599331c0-ac8a-49f6-9c3c-955f7ce0ad93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{05fc2677-ddcb-4d60-a540-ca1d6f775721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{e44e1d0f-1848-465d-a292-f58492693591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements">
+      <UniqueIdentifier>{c3ed06ff-37a4-4101-83f6-3986eb11cdc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\Commands">
+      <UniqueIdentifier>{c9e89bbb-24bf-417f-b516-413df277933c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\DataReaders">
+      <UniqueIdentifier>{0f22257c-aebe-4509-8aa4-b3814691d8c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{405b1503-6ca4-42c7-866a-41478b9f73a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Explore">
+      <UniqueIdentifier>{17bf518a-b0d4-4205-afab-3af0ac353c96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{980b6046-6749-4fa2-bcd4-6d3326db6b76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{a9942209-3f70-405f-a56b-ce11f8f72f53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Statements\Parsers">
+      <UniqueIdentifier>{13812f27-925a-49c6-b875-bf168b972bb5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\CdapOdbc\DebugLogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\FileLogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\LogAppender.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Logger.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Profiler.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Timer.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\TimerProxy.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ColumnBinding.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ColumnInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Connection.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionParams.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\DataType.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Descriptor.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Driver.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Environment.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SQLStatus.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Statement.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\VersionInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Argument.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConcurrentQueue.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Encoding.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Command.cpp">
+      <Filter>Statements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\DataReader.cpp">
+      <Filter>Statements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QueryBuilder.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QueryCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SchemasCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SpecialColumnsCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\TablesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\TypesCommand.cpp">
+      <Filter>Statements\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\NoSchemaColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QueryDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SchemasDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SpecialColumnsDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\TablesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\TypesDataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionDialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\DataSourceDialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Dialog.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ColumnDesc.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ExploreClient.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QueryResult.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QueryStatus.cpp">
+      <Filter>Explore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\BadRequestException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\CancelException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\CdapException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\CommunicationLinkFailure.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\InvalidHandleException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\StillExecutingException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\QuerySELECT1DataReader.cpp">
+      <Filter>Statements\DataReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\Library.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\stdafx.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\SecureString.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ODBCEscapeSequenceParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ArgumentsParser.cpp">
+      <Filter>Statements\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionPool.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CdapOdbc\ConnectionInfo.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\CdapOdbc\debug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\DebugLogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\FileLogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\LogAppender.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Logger.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Profiler.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Timer.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\TimerProxy.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ColumnBinding.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ColumnInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Connection.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionParams.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\DataType.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Descriptor.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Driver.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Environment.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SQLStatus.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Statement.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\VersionInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Argument.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConcurrentQueue.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Encoding.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Command.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\DataReader.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QueryBuilder.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QueryCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SchemasCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SpecialColumnsCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\TablesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\TypesCommand.h">
+      <Filter>Statements\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QuerySELECT1DataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\NoSchemaColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QueryDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SchemasDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SpecialColumnsDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\TablesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\TypesDataReader.h">
+      <Filter>Statements\DataReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionDialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\DataSourceDialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Dialog.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ColumnDesc.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ExploreClient.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QueryResult.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\QueryStatus.h">
+      <Filter>Explore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\BadRequestException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\CancelException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\CdapException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\CommunicationLinkFailure.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\InvalidHandleException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\StillExecutingException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\Library.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\targetver.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\stdafx.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SecureString.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ODBCEscapeSequenceParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ArgumentsParser.h">
+      <Filter>Statements\Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionPool.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\ConnectionInfo.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CdapOdbc\SchemaProperties.h">
+      <Filter>Statements</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
