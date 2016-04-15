@@ -22,9 +22,29 @@ Table **stream_contacts** must have at least 4 columns:
 
 Data may be any. Other columns may be any. Column names don't matter.
 
-##Manual tests - integration with Excel
+###Running tests
+**From Visual Studio UI:**
+ - Open solution
+ - Select target architecture: **Test**-->**Test settings**-->**Default processor architecture**
+ - Run or debug tests: **Test**-->**Run** or **Test**-->**Debug**
+
+**From command line:**
+
+To run tests execute the following command from Visual Studio target-specific Command Prompt (see BUILD.md):
+```
+>VSTest.Console.exe Debug/CdapOdbc.Tests.dll
+```
+or for x64:
+```
+>VSTest.Console.exe x64/Debug/CdapOdbc.Tests.dll /platform:x64
+```
+
+##Manual tests - Integration with Excel
+
 Manual tests are located in folder CdapOdbc.TestsManual. These tests are intended to verify all CDAP Datasets data types compatibility with MS Excel.
+
 ###Configuration
+
 Initially all tests were based on CDAP cluster located at 104.154.22.63. Connection files are set up for that cluster. However you can use any other cluster. Only pre-configure the testing environment as follows:
  - Copy all .csv and .sh files from CdapOdbc.TestsManual into local folder.
  - Copy test-connections folder to the same local folder.
