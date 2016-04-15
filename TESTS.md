@@ -2,7 +2,6 @@
 ##Introduction
 Driver has automated functional tests. It also has manual test sheet to test integration with Excel.
 ##Functional Tests Configuration Guide
-###Introduction
 Functional tests are located in CdapOdbc.Tests project. They use Microsoft Unit Testing Framework for C++.
 ###Configuration
 Testing required two pre-configured instances of CDAP with specific schemas as described below. 
@@ -12,7 +11,7 @@ Connection strings to the respective CDAP Explore services are configured in fil
 #define TEST_CONNECTION_STRING2 L"Driver=Cask CDAP ODBC Driver;Host=localhost"
 ```
 The first Explore service must have specific database schema. The second one doesn't require any schema - only a valid connection. Both services must be with anonymous authentication.
-##Database schema
+###Database schema
 Table **stream_contacts** must have at least 4 columns:
 
 | Column # | Type         |
